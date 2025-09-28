@@ -56,18 +56,23 @@ struct rkPinsConfig {
  */
 struct rkConfig {
     rkConfig()
-        :  motor_id_left(4)
-        , motor_id_right(1)
+        : prevod_motoru(1981.3f) // pro 12v ==  41.62486f * 48.f, pro 6v == 1981.3f
+        , roztec_kol(200.0) // v mm
+        , motor_id_left(1)
+        , motor_id_right(4)
         , motor_max_power_pct(100)
         , motor_polarity_switch_left(false)
         , motor_polarity_switch_right(true)
         , motor_enable_failsafe(false)
-        , motor_wheel_diameter(67)
-        , motor_max_ticks_per_second(2600)
+        , motor_wheel_diameter(62)
+        , motor_max_ticks_per_second(32767)
         , motor_max_acceleration(50000)
         , stupid_servo_min(-1.65f)
         , stupid_servo_max(1.65f) {
     }
+
+    float prevod_motoru; //!< Převodový poměr motoru, výchozí: 41.62486f * 48.f pro 12V, 40.4124852f * 48.f pro 6V
+    float roztec_kol = 200.0f; //!< Rozteč kol robota v mm, použito na počítání ujeté vzdálenosti při zatáčení. Výchozí: `200` mm.
     uint8_t motor_id_left; //!< Které M číslo motoru patří levému, podle čísla na desce. Výchozí: `2`
     uint8_t motor_id_right; //!< Které M číslo motoru patří pravému, podle čísla na desce. Výchozí: `1`
     uint8_t motor_max_power_pct; //!< Limit výkonu motoru v procentech od 0 do 100. Ovlivňuje všechny režimy motorů. Výchozí: `60`
@@ -352,7 +357,11 @@ void rkMotorsSetPositionById(uint8_t id, float positionMm = 0.f);
  * \param y Y hodnota z joysticku.
  */
 void rkMotorsJoystick(int32_t x, int32_t y);
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void forward(float mm, float speed);
 
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**@}*/
 /**
  * \defgroup battery Baterie

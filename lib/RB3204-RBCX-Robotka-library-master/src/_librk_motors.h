@@ -26,7 +26,6 @@ public:
     void setSpeed(int8_t left, int8_t right);
     void setSpeed(int8_t left, int8_t right, uint8_t pwm_pct_left, uint8_t pwm_pct_right);
     void setSpeedById(rb::MotorId id, int8_t speed);
-    float calculateExpectedTime(float distance, float speed);
     void drive(float left, float right, float speed_left, float speed_right,  dual_callback_t callback = nullptr);
     void driveById(rb::MotorId id, float mm, uint8_t speed, std::function<void()> callback = nullptr);
 
@@ -35,6 +34,11 @@ public:
 
     void joystick(int32_t x, int32_t y);
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    int timeout_ms(float mm, float speed);
+    void forward(float mm, float speed);
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
     rb::MotorId idLeft() const { return m_id_left; }
     rb::MotorId idRight() const { return m_id_right; }
 
@@ -46,6 +50,8 @@ private:
     int16_t pctToSpeed(float pct) const;
     int32_t mmToTicks(float mm) const;
     float ticksToMm(int32_t ticks) const;
+    float prevod_motoru; 
+    float roztec_kol; // v mm
 
     struct DualCb {
         DualCb(dual_callback_t&& cb)

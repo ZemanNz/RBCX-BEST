@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include "robotka.h"
-#include "motor_commands.h"
 
 
 void setup() {
@@ -15,7 +14,11 @@ void setup() {
     delay(1000);
     rkLedRed(false); // Turn off red LED
 
-    forward(1000, 50);
+    // forward(1000, 100);
+    //rkMotorsSetPower(100, 100);
+
+    
+    forward(2000, 50);
     delay(500);
 
 }//230- dole 0 -nahore

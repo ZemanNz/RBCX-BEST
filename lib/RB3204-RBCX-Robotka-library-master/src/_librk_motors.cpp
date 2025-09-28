@@ -2,12 +2,13 @@
 #include "RBCX.h"
 #include <Arduino.h> // Přidání této hlavičky pro funkce delay a millis
 #include <thread> // Přidání této hlavičky pro std::thread
+#include <iostream>
 
 namespace rk {
 
 Motors::Motors()
     : m_id_left(rb::MotorId::M1)
-    , m_id_right(rb::MotorId::M2) {
+    , m_id_right(rb::MotorId::M4) {
 }
 
 Motors::~Motors() {
@@ -21,6 +22,8 @@ void Motors::init(const rkConfig& cfg) {
 
     m_wheel_circumference = M_PI * cfg.motor_wheel_diameter;
     m_max_speed = cfg.motor_max_ticks_per_second;
+    prevod_motoru = cfg.prevod_motoru;
+    roztec_kol = cfg.roztec_kol;
 
     auto& man
         = rb::Manager::get();
@@ -120,87 +123,6 @@ void Motors::setSpeedById(rb::MotorId id, int8_t power) {
         .set();
 }
 
-float Motors::calculateExpectedTime(float distance, float speed){
-    // Převod rychlosti z procent na mm/s
-    float speed_mm_per_s = (speed / 100.0) * m_max_speed * (m_wheel_circumference / (48.f * 41.62486f));
-    // Výpočet času v sekundách
-    return distance / speed_mm_per_s;
-}
-void Motors::drive(float left, float right, float speed_left, float speed_right, dual_callback_t callback) {
-    // 1. Ošetření polarity motorů
-    if (m_polarity_switch_left)
-        left = -left;
-    if (m_polarity_switch_right)
-        right = -right;
-
-    // 2. Příprava proměnné pro callback, která bude předána do řídicích funkcí motorů
-    rb::Motor::callback_t cb;
-    if (callback) {
-        std::lock_guard<std::mutex> lock(m_dual_callbacks_mu);
-        auto itr = m_dual_callbacks.emplace(m_dual_callbacks.end(), DualCb(std::move(callback)));
-
-        cb = [this, itr](rb::Motor& m) {
-            std::unique_lock<std::mutex> lock(m_dual_callbacks_mu);
-            if (!itr->completed && ++itr->count >= 1) {
-                itr->completed = true;
-                dual_callback_t localCb;
-                localCb.swap(itr->final_cb);
-                m_dual_callbacks.erase(itr);
-                lock.unlock();
-                Serial.println("Callback odblokovan motorama.");
-                localCb();
-            }
-        };
-
-        // 3. Timeout – připravíme monitor, který zajistí spuštění callbacku, pokud se neprovede včas
-        float expectedTimeLeft = calculateExpectedTime(left, speed_left);
-        float expectedTimeRight = calculateExpectedTime(right, speed_right);
-        float maxExpectedTime = std::max(expectedTimeLeft, expectedTimeRight);
-        const float timeoutSec = maxExpectedTime * 1.37f;
-
-        std::thread([this, itr, timeoutSec]() {
-            unsigned long startTime = millis();
-            while ((millis() - startTime) < (timeoutSec * 1000)) {
-                {
-                    std::lock_guard<std::mutex> lock(m_dual_callbacks_mu);
-                    if (itr->completed)
-                        return;
-                }
-                delay(10);
-            }
-            // Po vypršení timeoutu zkontrolujeme znovu
-            std::unique_lock<std::mutex> lock(m_dual_callbacks_mu);
-            if (!itr->completed) {
-                itr->completed = true;
-                dual_callback_t localCb;
-                localCb.swap(itr->final_cb);
-                m_dual_callbacks.erase(itr);
-                lock.unlock();
-                Serial.println("Timeout expiroval, callback odblokovan timeoutem.");
-                localCb();
-            }
-        }).detach();
-    }
-
-    // 4. Získání referencí na motory
-    auto& ml = rb::Manager::get().motor(m_id_left);
-    auto& mr = rb::Manager::get().motor(m_id_right);
-
-    // 5. Načtení informací o levém motoru (není třeba callback)
-    ml.requestInfo(nullptr);
-    // 6. Načtení informací o pravém motoru a nastavení pohybu motorů
-    mr.requestInfo([this, left, right, speed_left, speed_right, cb](rb::Motor& mr) {
-        auto& ml = rb::Manager::get().motor(m_id_left);
-        rb::Manager::get()
-            .setMotors()
-            .driveToValue(m_id_left, ml.position() + mmToTicks(left), pctToSpeed(speed_left), cb)
-            .driveToValue(m_id_right, mr.position() + mmToTicks(right), pctToSpeed(speed_right), cb)
-            .set();
-    });
-    Serial.printf("Leva rychlost: %d, Prava rychlost: %d\n", pctToSpeed(speed_left), pctToSpeed(speed_right));
-    Serial.printf("Leva vzdalenost: %d, Prava vzdalenost: %d\n", mmToTicks(left), mmToTicks(right));
-}
-
 
 void Motors::driveById(rb::MotorId id, float mm, uint8_t speed, std::function<void()> callback) {
     if ((m_polarity_switch_left && id == m_id_left) || (m_polarity_switch_right && id == m_id_right))
@@ -247,6 +169,184 @@ void Motors::joystick(int32_t x, int32_t y) {
     }
     setSpeed(l, r);
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////
+int Motors::timeout_ms(float mm, float speed){
+    return static_cast<int>(2750 * mm / speed); // vynásobeno 2 pro jistotu
+}
+
+void Motors::forward(float mm, float speed) {
+    auto& man = rb::Manager::get();
+    
+    float m_kp = 0.12f; // Proporcionální konstanta
+    float m_min_speed = 20.0f; // Minimální rychlost motorů
+    float m_max_correction = 10.0f; // Maximální korekce rychlosti
+    // Reset pozic
+    man.motor(m_id_left).setCurrentPosition(0);
+    man.motor(m_id_right).setCurrentPosition(0);
+    
+    int target_ticks = mmToTicks(mm);
+    int left_pos = 0;
+    int right_pos = 0;
+    std::cout << "Target ticks: " << target_ticks << std::endl;
+    // Základní rychlosti s přihlédnutím k polaritě
+    float base_speed_left = m_polarity_switch_left ? -speed : speed;
+    float base_speed_right = m_polarity_switch_right ? -speed : speed;
+    
+    unsigned long start_time = millis();
+    int timeoutMs = timeout_ms(mm, speed);
+    
+    while((target_ticks > abs(left_pos) || target_ticks > abs(right_pos)) && 
+          (millis() - start_time < timeoutMs)) {
+        
+        // Čtení pozic
+        man.motor(m_id_left).requestInfo([&](rb::Motor& info) {
+             left_pos = info.position();
+          });
+        man.motor(m_id_right).requestInfo([&](rb::Motor& info) {
+             right_pos = info.position();
+          });
+        std::cout << "Left pos: " << left_pos << ", Right pos: " << right_pos << std::endl;
+        // P regulátor - pracuje s absolutními hodnotami pozic
+        int error = abs(left_pos) - abs(right_pos);
+        float correction = error * m_kp;
+        correction = std::max(-m_max_correction, std::min(correction, m_max_correction));
+        
+        // Výpočet korigovaných rychlostí
+        float speed_left = base_speed_left;
+        float speed_right = base_speed_right;
+        
+        // Aplikace korekce podle polarity
+        if (error > 0) {
+            // Levý je napřed - zpomalit levý
+            if (m_polarity_switch_left) {
+                speed_left += correction;  // Přidat k záporné rychlosti = zpomalit
+            } else {
+                speed_left -= correction;  // Odečíst od kladné rychlosti = zpomalit
+            }
+        } else if (error < 0) {
+            // Pravý je napřed - zpomalit pravý
+            if (m_polarity_switch_right) {
+                speed_right -= correction;  // Odečíst od záporné rychlosti = zpomalit
+            } else {
+                speed_right += correction;  // Přidat ke kladné rychlosti = zpomalit
+            }
+        }
+        
+        // Zajištění minimální rychlosti
+        if (abs(speed_left) < m_min_speed && abs(speed_left) > 0) {
+            speed_left = (speed_left > 0) ? m_min_speed : -m_min_speed;
+        }
+        if (abs(speed_right) < m_min_speed && abs(speed_right) > 0) {
+            speed_right = (speed_right > 0) ? m_min_speed : -m_min_speed;
+        }
+        
+        // Nastavení výkonu motorů
+        man.motor(m_id_left).power(pctToSpeed(speed_left));
+        man.motor(m_id_right).power(pctToSpeed(speed_right));
+        std::cout << "Speed left: " << speed_left << ", Speed right: " << speed_right << std::endl;
+        delay(10);
+    }
+    
+    // Zastavení motorů
+    man.motor(m_id_left).power(0);
+    man.motor(m_id_right).power(0);
+}
+
+
+// void Motors::forward(float mm, float speed){
+//     float speed_right = speed;
+//     float speed_left = speed;
+//     auto& man = rb::Manager::get();
+//     man.motor(m_id_left).setCurrentPosition(0);
+//     man.motor(m_id_right).setCurrentPosition(0);
+//     int target_position =  mmToTicks(mm);
+//     int p = 1;
+//     int left_pos = 0;
+//     int right_pos = 0;
+//     if (m_polarity_switch_left){
+//         speed_left = -speed_left;
+//     }
+
+//     if (m_polarity_switch_right){
+//         speed_right = -speed_right;
+//     }   
+//     std::cout << "Target ticks: " << target_position << std::endl;
+//     while(target_position > abs(left_pos) || target_position > abs(right_pos)){
+//         man.motor(m_id_left).power(pctToSpeed(speed_left));
+//         man.motor(m_id_right).power(pctToSpeed(speed_right));
+//         delay(10);
+//         man.motor(m_id_left).requestInfo([&](rb::Motor& info) {
+//             left_pos = info.position();
+//          });
+//          man.motor(m_id_right).requestInfo([&](rb::Motor& info) {
+//             right_pos = info.position();
+//          });
+//         std::cout << "Left pos: " << left_pos << ", Right pos: " << right_pos << std::endl;
+//         p= (left_pos + right_pos);
+//         speed_left = speed_left - (p/100);
+//         speed_right = speed_right - (p/100);
+//         std::cout << "P: " << p << std::endl;
+//         std::cout << "Speed left: " << speed_left << ", Speed right: " << speed_right << std::endl;
+//     }
+//     man.motor(m_id_left).power(0);
+//     man.motor(m_id_right).power(0);
+// }
+// void Motors::forward(float mm, float speed) {
+//     // 1. Reset pozic
+//     auto& man = rb::Manager::get();
+//     man.motor(m_id_left).setCurrentPosition(0);
+//     man.motor(m_id_right).setCurrentPosition(0);
+    
+//     // 2. Cílová vzdálenost
+//     int target_ticks = mmToTicks(mm);
+    
+//     // 3. Inicializace P regulátoru
+//     float kP = 0.1f;  // Konstanta P regulátoru
+//     int last_left_pos = 0;
+//     int last_right_pos = 0;
+//     std::cout << "Target ticks: " << target_ticks << std::endl;
+//     int left_pos = 0;
+//     int right_pos = 0;
+//     // 4. Hlavní cyklus - ČEKÁME NA OBA MOTORY!
+//     while (abs(left_pos) < target_ticks || 
+//            abs(right_pos) < target_ticks) {
+        
+//         // Aktuální pozice
+//         man.motor(m_id_left).requestInfo([&](rb::Motor& info) {
+//            left_pos = info.position();
+//         });
+//         man.motor(m_id_right).requestInfo([&](rb::Motor& info) {
+//            right_pos = info.position();
+//         });
+//         std::cout << "Left pos: " << left_pos << ", Right pos: " << right_pos << std::endl;
+//         // P regulátor - koriguje rozdíl mezi motory
+//         int error = left_pos - right_pos;  // Rozdíl v ujeté vzdálenosti
+//         int correction = error * kP;       // Korekce
+        
+//         // Nastavení rychlostí s korekcí
+//         float speed_left_corrected = speed - correction;
+//         float speed_right_corrected = speed + correction;
+        
+//         // Aplikace polarity
+//         if (m_polarity_switch_left) speed_left_corrected = -speed_left_corrected;
+//         if (m_polarity_switch_right) speed_right_corrected = -speed_right_corrected;
+        
+//         // Použití SPEED místo POWER pro regulovaný pohyb
+//         man.motor(m_id_left).power(pctToSpeed(speed_left_corrected));
+//         man.motor(m_id_right).power(pctToSpeed(speed_right_corrected));
+        
+//         delay(10);
+        
+//         // Uložení pozic pro příští iteraci
+//         last_left_pos = left_pos;
+//         last_right_pos = right_pos;
+//     }
+    
+//     // 5. Zastavení motorů
+//     man.motor(m_id_left).power(0);
+//     man.motor(m_id_right).power(0);
+// }
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 int32_t Motors::scale(int32_t val) {
     return val * 100 / RBPROTOCOL_AXIS_MAX;
@@ -261,11 +361,11 @@ int16_t Motors::pctToSpeed(float pct) const {
 }
 
 int32_t Motors::mmToTicks(float mm) const {
-    return (mm / m_wheel_circumference) * 41.62486f * 48.f;
+    return (mm / m_wheel_circumference) * prevod_motoru;
 }
 
 float Motors::ticksToMm(int32_t ticks) const {
-    return float(ticks) / 41.62486f / 48.f * m_wheel_circumference;
+    return float(ticks) / prevod_motoru * m_wheel_circumference;
 }
 
 }; // namespacer rk
