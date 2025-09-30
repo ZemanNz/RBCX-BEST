@@ -56,8 +56,10 @@ struct rkPinsConfig {
  */
 struct rkConfig {
     rkConfig()
-        : prevod_motoru(1981.3f) // pro 12v ==  41.62486f * 48.f, pro 6v == 1981.3f
-        , roztec_kol(200.0) // v mm
+        : prevod_motoru(1979.3f) // pro 12v ==  41.62486f * 48.f, pro 6v == 1981.3f
+        , rozdil_v_kolech_levy(0.9989f)
+        , rozdil_v_kolech_pravy(1.0f)
+        , roztec_kol(135.0) // v mm
         , motor_id_left(1)
         , motor_id_right(4)
         , motor_max_power_pct(100)
@@ -72,7 +74,9 @@ struct rkConfig {
     }
 
     float prevod_motoru; //!< Převodový poměr motoru, výchozí: 41.62486f * 48.f pro 12V, 40.4124852f * 48.f pro 6V
-    float roztec_kol = 200.0f; //!< Rozteč kol robota v mm, použito na počítání ujeté vzdálenosti při zatáčení. Výchozí: `200` mm.
+    float rozdil_v_kolech_levy = 1; //!< Korekční faktor pro levé kolo, použito na vyrovnání rozdílných kol. Výchozí: `0.99` (pro 6V motory může být potřeba menší hodnota, např. 0.95)
+    float rozdil_v_kolech_pravy = 1; //!< Korekční faktor pro pravé kolo, použito na vyrovnání rozdílných kol. Výchozí: `1.0`
+    float roztec_kol; //!< Rozteč kol robota v mm, použito na počítání ujeté vzdálenosti při zatáčení. Výchozí: `200` mm.
     uint8_t motor_id_left; //!< Které M číslo motoru patří levému, podle čísla na desce. Výchozí: `2`
     uint8_t motor_id_right; //!< Které M číslo motoru patří pravému, podle čísla na desce. Výchozí: `1`
     uint8_t motor_max_power_pct; //!< Limit výkonu motoru v procentech od 0 do 100. Ovlivňuje všechny režimy motorů. Výchozí: `60`
@@ -360,7 +364,11 @@ void rkMotorsJoystick(int32_t x, int32_t y);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void forward(float mm, float speed);
 
+void backward(float mm, float speed);
 
+void turn_on_spot_left(float angle, float speed);
+
+void turn_on_spot_right(float angle, float speed);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**@}*/
 /**
@@ -795,4 +803,4 @@ lx16a::SmartServoBus& rkSmartServoBus(uint8_t servo_count);
 
 /**@}*/
 
-#endif // LIBRB_H
+#endif // LIBRB_

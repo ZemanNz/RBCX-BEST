@@ -9,18 +9,31 @@ void setup() {
     printf("Robotka started!\n");
 
     rkLedRed(true); // Turn on red LED
-    rkLedBlue(true); // Turn on blue LED
+    rkLedBlue(false); // Turn on blue LED
     rkLedYellow(true); // Turn on yellow LED
     delay(1000);
     rkLedRed(false); // Turn off red LED
 
     // forward(1000, 100);
     //rkMotorsSetPower(100, 100);
-
-    
-    forward(2000, 50);
-    delay(500);
-
+while (true){
+    if (rkButtonIsPressed(BTN_LEFT)) {
+        printf("Button ON is pressed!\n");
+        rkLedBlue(true); // Turn off blue LED
+        delay(1000);
+        turn_on_spot_left(180, 30);
+        rkLedBlue(false); // Turn off blue LED
+    }
+    if(rkButtonRight()){
+        printf("Button OFF is pressed!\n");
+        rkLedGreen(true); // Turn off blue LED
+        delay(1000);
+        turn_on_spot_right(180, 70);
+        rkLedGreen(false); // Turn off blue LED
+    }
+    //forward(2000, 60);
+    delay(50);
+    }
 }//230- dole 0 -nahore
 
 void loop() {

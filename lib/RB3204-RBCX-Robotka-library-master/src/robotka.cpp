@@ -219,7 +219,15 @@ void rkMotorsJoystick(int32_t x, int32_t y) {
 void forward(float mm, float speed){
     gCtx.motors().forward(mm, speed);
 }
-
+void backward(float mm, float speed){
+    gCtx.motors().backward(mm, speed);
+}   
+void turn_on_spot_left(float angle, float speed){
+    gCtx.motors().turn_on_spot_left(angle, speed);
+}
+void turn_on_spot_right(float angle, float speed){
+    gCtx.motors().turn_on_spot_right(angle, speed);
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

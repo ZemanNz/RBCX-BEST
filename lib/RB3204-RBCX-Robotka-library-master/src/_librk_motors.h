@@ -37,7 +37,9 @@ public:
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     int timeout_ms(float mm, float speed);
     void forward(float mm, float speed);
-
+    void backward(float mm, float speed);
+    void turn_on_spot_left(float angle, float speed);
+    void turn_on_spot_right(float angle, float speed);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     rb::MotorId idLeft() const { return m_id_left; }
     rb::MotorId idRight() const { return m_id_right; }
@@ -50,8 +52,11 @@ private:
     int16_t pctToSpeed(float pct) const;
     int32_t mmToTicks(float mm) const;
     float ticksToMm(int32_t ticks) const;
+    float approachValue(float current, float target, float step);
     float prevod_motoru; 
     float roztec_kol; // v mm
+    float rozdil_v_kolech_levy; // Korekční faktor pro levé kolo
+    float rozdil_v_kolech_pravy; // Korekční faktor pro pravé kolo
 
     struct DualCb {
         DualCb(dual_callback_t&& cb)
