@@ -57,9 +57,11 @@ struct rkPinsConfig {
 struct rkConfig {
     rkConfig()
         : prevod_motoru(1979.3f) // pro 12v ==  41.62486f * 48.f, pro 6v == 1981.3f
-        , rozdil_v_kolech_levy(0.9989f)
-        , rozdil_v_kolech_pravy(1.0f)
+        , rozdil_v_kolech_levy(0.9989f)// Korekční faktor pro levé kolo treba vetsi pneu
+        , rozdil_v_kolech_pravy(1.0f)// Korekční faktor pro pravé kolo napr. mensi pneu
         , roztec_kol(135.0) // v mm
+        , konstanta_radius_vnejsi_kolo(1.035f) // Korekční faktor pro vnější kolo při zatáčení
+        , konstanta_radius_vnitrni_kolo(1.0084f) // Korekční faktor pro vnitřní kolo při zatáčení
         , motor_id_left(1)
         , motor_id_right(4)
         , motor_max_power_pct(100)
@@ -77,6 +79,8 @@ struct rkConfig {
     float rozdil_v_kolech_levy = 1; //!< Korekční faktor pro levé kolo, použito na vyrovnání rozdílných kol. Výchozí: `0.99` (pro 6V motory může být potřeba menší hodnota, např. 0.95)
     float rozdil_v_kolech_pravy = 1; //!< Korekční faktor pro pravé kolo, použito na vyrovnání rozdílných kol. Výchozí: `1.0`
     float roztec_kol; //!< Rozteč kol robota v mm, použito na počítání ujeté vzdálenosti při zatáčení. Výchozí: `200` mm.
+    float konstanta_radius_vnejsi_kolo = 1.035f; // Korekční faktor pro vnější kolo při zatáčení
+    float konstanta_radius_vnitrni_kolo = 1.0084f; // Korekční faktor pro vnitřní kolo při zatáčení
     uint8_t motor_id_left; //!< Které M číslo motoru patří levému, podle čísla na desce. Výchozí: `2`
     uint8_t motor_id_right; //!< Které M číslo motoru patří pravému, podle čísla na desce. Výchozí: `1`
     uint8_t motor_max_power_pct; //!< Limit výkonu motoru v procentech od 0 do 100. Ovlivňuje všechny režimy motorů. Výchozí: `60`
@@ -369,6 +373,10 @@ void backward(float mm, float speed);
 void turn_on_spot_left(float angle, float speed);
 
 void turn_on_spot_right(float angle, float speed);
+
+void radius_right(float radius, float angle, float speed);
+
+void radius_left(float radius, float angle, float speed);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**@}*/
 /**

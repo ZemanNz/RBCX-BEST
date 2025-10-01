@@ -228,7 +228,12 @@ void turn_on_spot_left(float angle, float speed){
 void turn_on_spot_right(float angle, float speed){
     gCtx.motors().turn_on_spot_right(angle, speed);
 }
-
+void radius_right(float radius, float angle, float speed){
+    gCtx.motors().radius_right(radius, angle, speed);
+}
+void radius_left(float radius, float angle, float speed){
+    gCtx.motors().radius_left(radius, angle, speed);
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void rkLedRed(bool on) {

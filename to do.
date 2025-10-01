@@ -6,8 +6,10 @@ udelat funkce pro ovladani na dalku (s,w,a,d), (<>)
 
 
 # co mame a hned je potreba udelat: 
-* forward a backward funkce
-* konzultovat ty funkce na to toceni na miste ----- >>>> popsat a zkouset
+* forward a backward funkce                                                                                                 -----asi done
+* konzultovat ty funkce na to toceni na miste ----- >>>> popsat a zkouset                                                   -----asi done
 * udelat funkce radius asi taky se zrychlovanim ...... konzultovat
-* udelat funkce na jeti zpet na tlacitko ---> to se zadefinujev robotce ---> io pin ,zase bude p regulator
+* udelat funkce na jeti zpet na tlacitko(jedno, 2, 3....) ---> to se zadefinujev robotce ---> io pin ,zase bude p regulator
 * udelat funkce forward_acc a backward_acc ---> zrychlovaci a spomalovaci funkce ---> lepsi pro delsi vzdalenosti
+* udelat swad tlacitka ---> pres wifi a taky to heske graficke tentonons...
+* udelat wifi vypisy...

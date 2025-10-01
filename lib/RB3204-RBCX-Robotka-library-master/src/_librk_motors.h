@@ -40,6 +40,8 @@ public:
     void backward(float mm, float speed);
     void turn_on_spot_left(float angle, float speed);
     void turn_on_spot_right(float angle, float speed);
+    void radius_right(float radius, float angle, float speed);
+    void radius_left(float radius, float angle, float speed);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     rb::MotorId idLeft() const { return m_id_left; }
     rb::MotorId idRight() const { return m_id_right; }
@@ -57,6 +59,8 @@ private:
     float roztec_kol; // v mm
     float rozdil_v_kolech_levy; // Korekční faktor pro levé kolo
     float rozdil_v_kolech_pravy; // Korekční faktor pro pravé kolo
+    float konstanta_radius_vnejsi_kolo = 1.035f; // Korekční faktor pro vnější kolo při zatáčení
+    float konstanta_radius_vnitrni_kolo = 1.0084f; // Korekční faktor pro vnitřní kolo při zatáčení
 
     struct DualCb {
         DualCb(dual_callback_t&& cb)
