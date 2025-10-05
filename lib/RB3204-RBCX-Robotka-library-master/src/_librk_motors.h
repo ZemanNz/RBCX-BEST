@@ -42,6 +42,8 @@ public:
     void turn_on_spot_right(float angle, float speed);
     void radius_right(float radius, float angle, float speed);
     void radius_left(float radius, float angle, float speed);
+    void forward_acc(float mm, float speed);
+    void backward_acc(float mm, float speed);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     rb::MotorId idLeft() const { return m_id_left; }
     rb::MotorId idRight() const { return m_id_right; }

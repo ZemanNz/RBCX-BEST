@@ -185,10 +185,12 @@ void Motors::forward(float mm, float speed) {
     // Reset pozic
     man.motor(m_id_left).setCurrentPosition(0);
     man.motor(m_id_right).setCurrentPosition(0);
-    
     int target_ticks = mmToTicks(mm);
     int left_pos = 0;
     int right_pos = 0;
+    float pocet_mereni=0.0f;
+    float soucet_error=0.0f;
+    float integral=0.0f;
     std::cout << "Target ticks: " << target_ticks << std::endl;
     // Základní rychlosti s přihlédnutím k polaritě
     float base_speed_left = m_polarity_switch_left ? -speed : speed;
@@ -210,6 +212,11 @@ void Motors::forward(float mm, float speed) {
         std::cout << "Left pos: " << left_pos << ", Right pos: " << right_pos << std::endl;
         // P regulátor - pracuje s absolutními hodnotami pozic
         int error = abs(left_pos) - abs(right_pos);
+        pocet_mereni += 1.0f;
+        soucet_error += error;
+        integral = (soucet_error / pocet_mereni);
+        std::cout << "Průměrná chyba: " << (integral) << " ticků" << std::endl;
+        error = integral + error; // Použití průměrné chyby pro korekci
         float correction = error * m_kp;
         correction = std::max(-m_max_correction, std::min(correction, m_max_correction));
         
@@ -923,6 +930,177 @@ void Motors::radius_left(float radius, float angle, float speed) {
     
     std::cout << "Radius left completed!" << std::endl;
 }
+
+void Motors::forward_acc(float mm, float speed) {
+    auto& man = rb::Manager::get();
+    
+    float m_kp = 0.18f;
+    float m_min_speed = 18.0f; // ZVÝŠENO NA 18%
+    float m_max_correction = 7.0f;
+    
+    // Reset pozic
+    man.motor(m_id_left).setCurrentPosition(0);
+    man.motor(m_id_right).setCurrentPosition(0);
+    
+    int target_ticks = mmToTicks(mm);
+    int left_pos = 0;
+    int right_pos = 0;
+    float pocet_mereni=0.0f;
+    float soucet_error=0.0f;
+    float integral=0.0f;
+    // Proměnné pro plynulé zrychlení/zpomalení
+    float current_speed_left = 0;
+    float current_speed_right = 0;
+    const float acceleration = 1.5f;
+    const float acceleration_phase = 0.3f;
+    float deceleration_start;
+    if(mm > 1000){
+        deceleration_start = 0.75f; // Pozdější zpomalování pro delší vzdálenosti
+    } else {
+        deceleration_start = 0.6f; // Dřívější zpomalování pro kratší vzdálenosti
+    }
+    
+    // Základní rychlosti s přihlédnutím k polaritě
+    float target_speed_left = m_polarity_switch_left ? -speed : speed;
+    float target_speed_right = m_polarity_switch_right ? -speed : speed;
+    
+    unsigned long start_time = millis();
+    int timeoutMs = timeout_ms(mm, speed) * 2;
+    
+    std::cout << "🎯 forward_acc START - " << mm << "mm, " << speed << "%, cílových " << target_ticks << " ticků" << std::endl;
+    std::cout << "🎯 Target speeds - L: " << target_speed_left << "%, R: " << target_speed_right << "%" << std::endl;
+    
+    while((target_ticks > abs(left_pos) || target_ticks > abs(right_pos)) && 
+          (millis() - start_time < timeoutMs)) {
+        
+        // Čtení pozic
+        man.motor(m_id_right).requestInfo([&](rb::Motor& info) {
+            right_pos = info.position();
+        });
+        man.motor(m_id_left).requestInfo([&](rb::Motor& info) {
+            left_pos = info.position();
+        });
+        
+        
+        // Výpočet pokroku
+        float progress = (abs(left_pos) + abs(right_pos)) / 2.0f;
+        float progress_ratio = progress / target_ticks;
+        
+        // PODMÍNKA PRO BRZKÉ UKONČENÍ
+        if (progress_ratio > 0.998f) {
+            std::cout << "🎯 BRZKÉ UKONČENÍ - pokrok: " << (progress_ratio * 100) << "%" << std::endl;
+            break;
+        }
+        
+        // PLYNULÉ ZRYCHLENÍ A ZPOMALENÍ
+        if (progress_ratio < acceleration_phase) {
+            // FÁZE ZRYCHLENÍ (0-30%)
+            current_speed_left = approachValue(current_speed_left, target_speed_left, acceleration);
+            current_speed_right = approachValue(current_speed_right, target_speed_right, acceleration);
+            std::cout << "⬆️ ZRYCHLENÍ - " << (progress_ratio * 100) << "% - L: " << current_speed_left << "%, R: " << current_speed_right << "%" << std::endl;
+        } 
+        else if (progress_ratio < deceleration_start) {
+            // FÁZE KONSTANTNÍ RYCHLOSTI (30-80%)
+            current_speed_left = target_speed_left;
+            current_speed_right = target_speed_right;
+            std::cout << "⚡ KONSTANTNÍ - " << (progress_ratio * 100) << "% - L: " << current_speed_left << "%, R: " << current_speed_right << "%" << std::endl;
+        } 
+        else {
+            // FÁZE ZPOMALENÍ (80-100%)
+            float remaining = target_ticks - progress;
+            float total_decel_distance = target_ticks * (1.0f - deceleration_start);
+            
+            // VÝPOČET ZPOMALOVACÍ RYCHLOSTI - lineární pokles
+            float decel_ratio = remaining / total_decel_distance;
+            
+            // ODDĚLENÉ VÝPOČTY PRO KAŽDÝ MOTOR PODLE JEHO POLARITY
+            float decel_speed_left = target_speed_left * decel_ratio;
+            float decel_speed_right = target_speed_right * decel_ratio;
+            
+            // ZAJIŠTĚNÍ MINIMÁLNÍ RYCHLOSTI - PRO KAŽDÝ MOTOR ZVLÁŠŤ
+            if (abs(decel_speed_left) < m_min_speed && abs(decel_speed_left) > 0) {
+                decel_speed_left = (decel_speed_left > 0) ? m_min_speed : -m_min_speed;
+            }
+            if (abs(decel_speed_right) < m_min_speed && abs(decel_speed_right) > 0) {
+                decel_speed_right = (decel_speed_right > 0) ? m_min_speed : -m_min_speed;
+            }
+            
+            // ODDĚLENÉ PŘIŘAZENÍ PRO KAŽDÝ MOTOR
+            current_speed_left = approachValue(current_speed_left, decel_speed_left, acceleration);
+            current_speed_right = approachValue(current_speed_right, decel_speed_right, acceleration);
+            
+            std::cout << "⬇️ ZPOMALENÍ - " << (progress_ratio * 100) << "% - Cílové rychlosti: L: " << decel_speed_left << "%, R: " << decel_speed_right << "%" << std::endl;
+        }
+        
+        // P REGULÁTOR - vyrovnávání rychlosti motorů
+        int error = abs(left_pos) - abs(right_pos);
+        float correction = error * m_kp;
+        correction = std::max(-m_max_correction, std::min(correction, m_max_correction));
+        
+        // Aplikace korekce - POUZE PŘI DOSTATEČNÉ RYCHLOSTI A PŘED ZPOMALOVÁNÍM
+        float speed_left_corrected = current_speed_left;
+        float speed_right_corrected = current_speed_right;
+        
+        // OMEZENÍ P REGULÁTORU - aplikujeme pouze když:
+        // 1. Nejsme ve fázi zpomalování
+        // 2. Rychlost je dostatečně vysoká (alespoň 25% cílové rychlosti)
+        // 3. Chyba je významná (alespoň 5 ticků)
+        bool should_apply_correction = (progress_ratio < (deceleration_start + 0.1f)) && 
+                                      (abs(current_speed_left) > abs(target_speed_left) * 0.2f) &&
+                                      (abs(current_speed_right) > abs(target_speed_right) * 0.2f);
+        
+        if (should_apply_correction) {
+            pocet_mereni++;
+            soucet_error += error;
+            integral = (soucet_error / pocet_mereni);
+            std::cout << "Průměrná chyba: " << (integral) << " ticků" << std::endl;
+            error = integral + error; // Použití průměrné chyby pro korekci
+            if (error > 0) {
+                // Levý je napřed - zpomalit levý
+                if (m_polarity_switch_left) {
+                    speed_left_corrected += correction;
+                } else {
+                    speed_left_corrected -= correction;
+                }
+                std::cout << "🔄 KOREKCE - Levý napřed o " << error << " ticků, korekce: " << correction << "%" << std::endl;
+            } else if (error < 0) {
+                // Pravý je napřed - zpomalit pravý
+                if (m_polarity_switch_right) {
+                    speed_right_corrected -= correction;
+                } else {
+                    speed_right_corrected += correction;
+                }
+                std::cout << "🔄 KOREKCE - Pravý napřed o " << abs(error) << " ticků, korekce: " << correction << "%" << std::endl;
+            } 
+        }      
+        // Zajištění minimální rychlosti
+        if (abs(speed_left_corrected) < m_min_speed && abs(speed_left_corrected) > 0) {
+            speed_left_corrected = (speed_left_corrected > 0) ? m_min_speed : -m_min_speed;
+            std::cout << "📏 MINIMÁLNÍ RYCHLOST LEVÝ: " << speed_left_corrected << "%" << std::endl;
+        }
+        if (abs(speed_right_corrected) < m_min_speed && abs(speed_right_corrected) > 0) {
+            speed_right_corrected = (speed_right_corrected > 0) ? m_min_speed : -m_min_speed;
+            std::cout << "📏 MINIMÁLNÍ RYCHLOST PRAVÝ: " << speed_right_corrected << "%" << std::endl;
+        }
+        
+        // Nastavení výkonu motorů s korekčními faktory
+        man.motor(m_id_left).power(pctToSpeed(speed_left_corrected * rozdil_v_kolech_levy));
+        man.motor(m_id_right).power(pctToSpeed(speed_right_corrected * rozdil_v_kolech_pravy));
+        
+        std::cout << "📊 POZICE - L: " << left_pos << " ticků, R: " << right_pos << " ticků, Pokrok: " << (progress_ratio * 100) << "%" << std::endl;
+        std::cout << "🎛️  VÝKON - L: " << (speed_left_corrected * rozdil_v_kolech_levy) << "%, R: " << (speed_right_corrected * rozdil_v_kolech_pravy) << "%" << std::endl;
+        std::cout << "----------------------------------------" << std::endl;
+        
+        delay(15);
+    }
+    
+    // Konečné zastavení
+    man.motor(m_id_left).power(0);
+    man.motor(m_id_right).power(0);
+    
+    std::cout << "✅ forward_acc UKONČENO - Pozice L: " << left_pos << ", R: " << right_pos << ", Cíl: " << target_ticks << std::endl;
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 int32_t Motors::scale(int32_t val) {

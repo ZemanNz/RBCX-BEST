@@ -234,6 +234,12 @@ void radius_right(float radius, float angle, float speed){
 void radius_left(float radius, float angle, float speed){
     gCtx.motors().radius_left(radius, angle, speed);
 }
+void forward_acc(float mm, float speed){
+    gCtx.motors().forward_acc(mm, speed);
+}
+void backward_acc(float mm, float speed){
+    gCtx.motors().backward_acc(mm, speed);
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void rkLedRed(bool on) {

@@ -21,14 +21,15 @@ while (true){
         printf("Button ON is pressed!\n");
         rkLedBlue(true); // Turn off blue LED
         delay(1000);
-        radius_left(180,360, 60);
+        forward(1500, 40);
         rkLedBlue(false); // Turn off blue LED
     }
     if(rkButtonRight()){
         printf("Button OFF is pressed!\n");
         rkLedGreen(true); // Turn off blue LED
         delay(1000);
-        radius_left(120, 90, 40);
+        forward(2000, 50);
+        rkLedGreen(false); // Turn off blue LED
         rkLedGreen(false); // Turn off blue LED
     }
     //forward(2000, 60);

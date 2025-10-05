@@ -57,7 +57,7 @@ struct rkPinsConfig {
 struct rkConfig {
     rkConfig()
         : prevod_motoru(1979.3f) // pro 12v ==  41.62486f * 48.f, pro 6v == 1981.3f
-        , rozdil_v_kolech_levy(0.9989f)// Korekční faktor pro levé kolo treba vetsi pneu
+        , rozdil_v_kolech_levy(0.9983f)// Korekční faktor pro levé kolo treba vetsi pneu
         , rozdil_v_kolech_pravy(1.0f)// Korekční faktor pro pravé kolo napr. mensi pneu
         , roztec_kol(135.0) // v mm
         , konstanta_radius_vnejsi_kolo(1.035f) // Korekční faktor pro vnější kolo při zatáčení
@@ -377,6 +377,10 @@ void turn_on_spot_right(float angle, float speed);
 void radius_right(float radius, float angle, float speed);
 
 void radius_left(float radius, float angle, float speed);
+
+void forward_acc(float mm, float speed);
+
+void backward_acc(float mm, float speed);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**@}*/
 /**
