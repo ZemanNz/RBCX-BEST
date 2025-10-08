@@ -13,12 +13,16 @@ void setup() {
     rkLedYellow(true); // Turn on yellow LED
     delay(1000);
     rkLedRed(false); // Turn off red LED
-
+    print_wifi("Robotka started!\n");
+    print_wifi("WiFi connected!\n");
+    print_wifi("IP address: ");
+    handleWebClients();
     // forward(1000, 100);
     //rkMotorsSetPower(100, 100);
 while (true){
     if (rkButtonIsPressed(BTN_LEFT)) {
         printf("Button ON is pressed!\n");
+        print_wifi("Button ON is pressed!\n");
         rkLedBlue(true); // Turn off blue LED
         delay(1000);
         forward(1500, 40);
@@ -26,6 +30,7 @@ while (true){
     }
     if(rkButtonRight()){
         printf("Button OFF is pressed!\n");
+        print_wifi("Button OFF is pressed!\n");
         rkLedGreen(true); // Turn off blue LED
         delay(1000);
         forward(2000, 50);
@@ -33,6 +38,7 @@ while (true){
         rkLedGreen(false); // Turn off blue LED
     }
     //forward(2000, 60);
+    handleWebClients();
     delay(50);
     }
 }//230- dole 0 -nahore

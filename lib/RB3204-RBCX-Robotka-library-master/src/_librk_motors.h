@@ -5,6 +5,9 @@
 #include <mutex>
 #include <stdint.h>
 
+#include <WiFi.h>
+#include <WebServer.h>
+
 #include "RBCXPinout.h"
 #include "robotka.h"
 
@@ -45,6 +48,12 @@ public:
     void forward_acc(float mm, float speed);
     void backward_acc(float mm, float speed);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    void initWifi(const char* ssid, const char* password);
+    void print_wifi(const String& message);
+    void print_wifi(const char* message);
+    void printf_wifi(const char* format, ...);
+    void handleWebClient();
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     rb::MotorId idLeft() const { return m_id_left; }
     rb::MotorId idRight() const { return m_id_right; }
 
@@ -55,6 +64,8 @@ private:
     static int16_t pctToPower(int8_t pct);
     int16_t pctToSpeed(float pct) const;
     int32_t mmToTicks(float mm) const;
+    int32_t mmToTicks_left(float mm) const;
+    int32_t mmToTicks_right(float mm) const;
     float ticksToMm(int32_t ticks) const;
     float approachValue(float current, float target, float step);
     float prevod_motoru; 
@@ -63,6 +74,10 @@ private:
     float rozdil_v_kolech_pravy; // Korekční faktor pro pravé kolo
     float konstanta_radius_vnejsi_kolo = 1.035f; // Korekční faktor pro vnější kolo při zatáčení
     float konstanta_radius_vnitrni_kolo = 1.0084f; // Korekční faktor pro vnitřní kolo při zatáčení
+
+    bool m_wifi_initialized = false;
+    String m_wifi_log_buffer;
+    WebServer* m_server = nullptr;
 
     struct DualCb {
         DualCb(dual_callback_t&& cb)

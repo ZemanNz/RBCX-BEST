@@ -466,3 +466,10 @@ lx16a::SmartServoBus& rkSmartServoBus(uint8_t servo_count) {
     static rk::SmartServoBusInitializer init(servo_count);
     return init.bus();
 }
+
+void print_wifi(const char* message) {
+    gCtx.motors().print_wifi(message);
+}
+void handleWebClients() {
+    gCtx.motors().handleWebClient();
+}

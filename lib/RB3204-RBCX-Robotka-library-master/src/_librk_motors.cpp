@@ -47,6 +47,10 @@ void Motors::init(const rkConfig& cfg) {
         man.motor(m_id_left).setConfig(motorConf);
         man.motor(m_id_right).setConfig(motorConf);
     }
+    // WiFi inicializace
+    if (cfg.enable_wifi_log && cfg.wifi_ssid && cfg.wifi_password) {
+        initWifi(cfg.wifi_ssid, cfg.wifi_password);
+    }
 }
 
 void Motors::setPower(int8_t left, int8_t right) {
@@ -176,6 +180,92 @@ int Motors::timeout_ms(float mm, float speed){
     return static_cast<int>(295 * mm / speed);
 }
 
+// void Motors::forward(float mm, float speed) {
+//     auto& man = rb::Manager::get();
+    
+//     float m_kp = 0.23f; // Proporcionální konstanta
+//     float m_min_speed = 20.0f; // Minimální rychlost motorů
+//     float m_max_correction = 10.0f; // Maximální korekce rychlosti
+//     // Reset pozic
+//     man.motor(m_id_left).setCurrentPosition(0);
+//     man.motor(m_id_right).setCurrentPosition(0);
+//     int target_ticks = mmToTicks(mm);
+//     int left_pos = 0;
+//     int right_pos = 0;
+//     float pocet_mereni=0.0f;
+//     float soucet_error=0.0f;
+//     float integral=0.0f;
+//     std::cout << "Target ticks: " << target_ticks << std::endl;
+//     // Základní rychlosti s přihlédnutím k polaritě
+//     float base_speed_left = m_polarity_switch_left ? -speed : speed;
+//     float base_speed_right = m_polarity_switch_right ? -speed : speed;
+    
+//     unsigned long start_time = millis();
+//     int timeoutMs = timeout_ms(mm, speed);
+    
+//     while((target_ticks > abs(left_pos) || target_ticks > abs(right_pos)) && 
+//           (millis() - start_time < timeoutMs)) {
+        
+//         // Čtení pozic
+//         man.motor(m_id_left).requestInfo([&](rb::Motor& info) {
+//              left_pos = info.position();
+//           });
+//         man.motor(m_id_right).requestInfo([&](rb::Motor& info) {
+//              right_pos = info.position();
+//           });
+//         std::cout << "Left pos: " << left_pos << ", Right pos: " << right_pos << std::endl;
+//         // P regulátor - pracuje s absolutními hodnotami pozic
+//         int error = abs(left_pos) - abs(right_pos);
+//         pocet_mereni += 1.0f;
+//         soucet_error += error;
+//         integral = (soucet_error / pocet_mereni);
+//         std::cout << "Průměrná chyba: " << (integral) << " ticků" << std::endl;
+//         error = integral + error; // Použití průměrné chyby pro korekci
+//         float correction = error * m_kp;
+//         correction = std::max(-m_max_correction, std::min(correction, m_max_correction));
+        
+//         // Výpočet korigovaných rychlostí
+//         float speed_left = base_speed_left;
+//         float speed_right = base_speed_right;
+        
+//         // Aplikace korekce podle polarity
+//         if (error > 0) {
+//             // Levý je napřed - zpomalit levý
+//             if (m_polarity_switch_left) {
+//                 speed_left += correction;  // Přidat k záporné rychlosti = zpomalit
+//             } else {
+//                 speed_left -= correction;  // Odečíst od kladné rychlosti = zpomalit
+//             }
+//         } else if (error < 0) {
+//             // Pravý je napřed - zpomalit pravý
+//             if (m_polarity_switch_right) {
+//                 speed_right -= correction;  // Odečíst od záporné rychlosti = zpomalit
+//             } else {
+//                 speed_right += correction;  // Přidat ke kladné rychlosti = zpomalit
+//             }
+//         }
+        
+//         // Zajištění minimální rychlosti
+//         if (abs(speed_left) < m_min_speed && abs(speed_left) > 0) {
+//             speed_left = (speed_left > 0) ? m_min_speed : -m_min_speed;
+//         }
+//         if (abs(speed_right) < m_min_speed && abs(speed_right) > 0) {
+//             speed_right = (speed_right > 0) ? m_min_speed : -m_min_speed;
+//         }
+        
+//         // Nastavení výkonu motorů
+//         man.motor(m_id_left).power(pctToSpeed(speed_left * rozdil_v_kolech_levy));
+//         man.motor(m_id_right).power(pctToSpeed(speed_right * rozdil_v_kolech_pravy));
+//         std::cout << "Speed left: " << speed_left << ", Speed right: " << speed_right << std::endl;
+//         delay(10);
+//     }
+    
+//     // Zastavení motorů
+//     man.motor(m_id_left).power(0);
+//     man.motor(m_id_right).power(0);
+// }
+
+
 void Motors::forward(float mm, float speed) {
     auto& man = rb::Manager::get();
     
@@ -185,13 +275,14 @@ void Motors::forward(float mm, float speed) {
     // Reset pozic
     man.motor(m_id_left).setCurrentPosition(0);
     man.motor(m_id_right).setCurrentPosition(0);
-    int target_ticks = mmToTicks(mm);
+    int target_ticks_left = mmToTicks_left(mm);
+    int target_ticks_right = mmToTicks_right(mm);
     int left_pos = 0;
     int right_pos = 0;
     float pocet_mereni=0.0f;
     float soucet_error=0.0f;
     float integral=0.0f;
-    std::cout << "Target ticks: " << target_ticks << std::endl;
+    std::cout << "Target ticks left: " << target_ticks_left << "tick right" << target_ticks_right << std::endl;
     // Základní rychlosti s přihlédnutím k polaritě
     float base_speed_left = m_polarity_switch_left ? -speed : speed;
     float base_speed_right = m_polarity_switch_right ? -speed : speed;
@@ -199,7 +290,7 @@ void Motors::forward(float mm, float speed) {
     unsigned long start_time = millis();
     int timeoutMs = timeout_ms(mm, speed);
     
-    while((target_ticks > abs(left_pos) || target_ticks > abs(right_pos)) && 
+    while((target_ticks_left > abs(left_pos) || target_ticks_right> abs(right_pos)) && 
           (millis() - start_time < timeoutMs)) {
         
         // Čtení pozic
@@ -211,7 +302,7 @@ void Motors::forward(float mm, float speed) {
           });
         std::cout << "Left pos: " << left_pos << ", Right pos: " << right_pos << std::endl;
         // P regulátor - pracuje s absolutními hodnotami pozic
-        int error = abs(left_pos) - abs(right_pos);
+        int error = abs(left_pos * rozdil_v_kolech_pravy) - abs(right_pos * rozdil_v_kolech_levy);
         pocet_mereni += 1.0f;
         soucet_error += error;
         integral = (soucet_error / pocet_mereni);
@@ -1114,13 +1205,214 @@ int16_t Motors::pctToPower(int8_t pct) {
 int16_t Motors::pctToSpeed(float pct) const {
     return rb::clamp(static_cast<int16_t>(pct * m_max_speed / 100), static_cast<int16_t>(-INT16_MAX), static_cast<int16_t>(INT16_MAX));
 }
-
 int32_t Motors::mmToTicks(float mm) const {
     return (mm / m_wheel_circumference) * prevod_motoru;
 }
-
+int32_t Motors::mmToTicks_left(float mm) const {
+    return (mm / m_wheel_circumference) * prevod_motoru * rozdil_v_kolech_levy;
+}
+int32_t Motors::mmToTicks_right(float mm) const {
+    return (mm / m_wheel_circumference) * prevod_motoru * rozdil_v_kolech_pravy;
+}
 float Motors::ticksToMm(int32_t ticks) const {
     return float(ticks) / prevod_motoru * m_wheel_circumference;
+}
+
+
+// WiFi inicializace
+// WiFi inicializace
+void Motors::initWifi(const char* ssid, const char* password) {
+    std::cout << "Inicializace WiFi..." << std::endl;
+    
+    WiFi.begin(ssid, password);
+    
+    int attempts = 0;
+    while (WiFi.status() != WL_CONNECTED && attempts < 20) {
+        delay(1000);
+        attempts++;
+        std::cout << ".";
+    }
+    std::cout << std::endl;
+    
+    if (WiFi.status() == WL_CONNECTED) {
+        m_wifi_initialized = true;
+        m_server = new WebServer(8080);
+        
+        std::cout << "WiFi pripojeno!" << std::endl;
+        std::cout << "IP: " << WiFi.localIP().toString().c_str() << std::endl;
+        // DŮLEŽITÉ: Vypsat celou adresu s portem
+        std::cout << "Web server spusten na: http://" << WiFi.localIP().toString().c_str() << ":8080" << std::endl;
+        
+        // Nastavení webových stránek - ZJEDNODUŠENÁ VERZE S AUTO-OBNOVOVÁNÍM
+        m_server->on("/", [this]() {
+            std::cout << "HTTP GET / received" << std::endl;
+            String html = R"rawliteral(
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Robot Log</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: white;
+            color: black;
+        }
+        #log {
+            background: white;
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 80vh;
+            overflow-y: auto;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .controls {
+            margin: 10px 0;
+        }
+        button {
+            padding: 8px 15px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Robot Log</h1>
+    <div><strong>Adresa:</strong> http://)rawliteral" + WiFi.localIP().toString() + R"rawliteral(:8080</div>
+    
+    <div class="controls">
+        <button onclick="toggleAutoRefresh()">Vypnout auto-obnovování</button>
+    </div>
+    
+    <div id="log">Loading...</div>
+
+    <script>
+        let autoRefresh = true;
+        let refreshInterval = setInterval(updateLog, 500);
+        
+        function updateLog() {
+            if (!autoRefresh) return;
+            
+            fetch('/log')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('log').textContent = data;
+                    // Automaticky scrolluj dolů
+                    let logElement = document.getElementById('log');
+                    logElement.scrollTop = logElement.scrollHeight;
+                })
+                .catch(err => console.error('Error:', err));
+        }
+        
+        function toggleAutoRefresh() {
+            autoRefresh = !autoRefresh;
+            const button = document.querySelector('button');
+            
+            if (autoRefresh) {
+                button.textContent = 'Vypnout auto-obnovování';
+                refreshInterval = setInterval(updateLog, 500);
+            } else {
+                button.textContent = 'Zapnout auto-obnovování';
+                clearInterval(refreshInterval);
+            }
+        }
+        
+        // První načtení
+        updateLog();
+    </script>
+</body>
+</html>
+)rawliteral";
+            m_server->send(200, "text/html", html);
+        });
+        
+        m_server->on("/log", [this]() {
+            m_server->send(200, "text/plain", m_wifi_log_buffer);
+        });
+        
+        m_server->on("/clear", [this]() {
+            m_wifi_log_buffer = "";
+            m_server->send(200, "text/plain", "Log cleared");
+        });
+
+        m_server->on("/test", [this]() {
+            m_server->send(200, "text/plain", "Robot WiFi test OK!");
+        });
+
+        m_server->onNotFound([this]() {
+            m_server->send(404, "text/plain", "Path not found");
+        });
+        
+        m_server->begin();
+        printf_wifi("Web server started on http://%s:8080", WiFi.localIP().toString().c_str());
+    } else {
+        std::cout << "WiFi se nepodařilo připojit!" << std::endl;
+    }
+}
+
+// Základní print funkce
+void Motors::print_wifi(const String& message) {
+    if (!m_wifi_initialized) return;
+    
+    // Pokud zpráva obsahuje \n, rozděl ji na více řádků
+    int startIndex = 0;
+    int newLineIndex;
+    
+    do {
+        newLineIndex = message.indexOf('\n', startIndex);
+        String line;
+        
+        if (newLineIndex == -1) {
+            line = message.substring(startIndex);
+        } else {
+            line = message.substring(startIndex, newLineIndex);
+        }
+        
+        // Přidat časové razítko pouze pokud řádek není prázdný
+        if (line.length() > 0) {
+            String timestamp = "[" + String(millis() / 1000.0, 1) + "s] ";
+            m_wifi_log_buffer += timestamp + line + "\n";
+        }
+        
+        startIndex = newLineIndex + 1;
+    } while (newLineIndex != -1);
+    
+    // Omezení velikosti bufferu
+    if (m_wifi_log_buffer.length() > 8000) {
+        int newStart = m_wifi_log_buffer.indexOf('\n', m_wifi_log_buffer.length() - 7000);
+        if (newStart != -1) {
+            m_wifi_log_buffer = m_wifi_log_buffer.substring(newStart + 1);
+        }
+    }
+}
+
+
+// Přetížení pro const char*
+void Motors::print_wifi(const char* message) {
+    print_wifi(String(message));
+}
+
+// Formátovaný výpis (printf style)
+void Motors::printf_wifi(const char* format, ...) {
+    if (!m_wifi_initialized) return;
+    
+    char buffer[512];
+    va_list args;
+    va_start(args, format);
+    vsnprintf(buffer, sizeof(buffer), format, args);
+    va_end(args);
+    
+    print_wifi(String(buffer));
+}
+
+// Zpracování webových požadavků
+void Motors::handleWebClient() {
+    if (m_wifi_initialized && m_server) {
+        m_server->handleClient();
+    }
 }
 
 }; // namespacer rk
