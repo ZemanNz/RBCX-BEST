@@ -47,6 +47,7 @@ public:
     void radius_left(float radius, float angle, float speed);
     void forward_acc(float mm, float speed);
     void backward_acc(float mm, float speed);
+    void back_buttons(float speed);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     void initWifi(const char* ssid, const char* password);
     void print_wifi(const String& message);
@@ -99,6 +100,9 @@ private:
     int32_t m_max_speed;
     bool m_polarity_switch_left;
     bool m_polarity_switch_right;
+    byte Button1;
+    byte Button2;
+
 };
 
 }; // namespace rk

@@ -240,6 +240,9 @@ void forward_acc(float mm, float speed){
 void backward_acc(float mm, float speed){
     gCtx.motors().backward_acc(mm, speed);
 }
+void back_buttons(float speed){
+    gCtx.motors().back_buttons(speed);
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void rkLedRed(bool on) {

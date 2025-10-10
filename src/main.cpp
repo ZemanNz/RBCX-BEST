@@ -25,7 +25,7 @@ while (true){
         print_wifi("Button ON is pressed!\n");
         rkLedBlue(true); // Turn off blue LED
         delay(1000);
-        forward(1500, 40);
+        forward(1500,40);
         rkLedBlue(false); // Turn off blue LED
     }
     if(rkButtonRight()){
@@ -33,7 +33,7 @@ while (true){
         print_wifi("Button OFF is pressed!\n");
         rkLedGreen(true); // Turn off blue LED
         delay(1000);
-        forward(2000, 50);
+        forward(2000, 75);
         rkLedGreen(false); // Turn off blue LED
         rkLedGreen(false); // Turn off blue LED
     }

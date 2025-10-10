@@ -62,6 +62,8 @@ struct rkConfig {
         , roztec_kol(135.0) // v mm
         , konstanta_radius_vnejsi_kolo(1.035f) // Korekční faktor pro vnější kolo při zatáčení
         , konstanta_radius_vnitrni_kolo(1.0084f) // Korekční faktor pro vnitřní kolo při zatáčení
+        , Button1(14)
+        , Button2(35)
         , motor_id_left(1)
         , motor_id_right(4)
         , motor_max_power_pct(100)
@@ -84,6 +86,8 @@ struct rkConfig {
     float roztec_kol; //!< Rozteč kol robota v mm, použito na počítání ujeté vzdálenosti při zatáčení. Výchozí: `200` mm.
     float konstanta_radius_vnejsi_kolo = 1.035f; // Korekční faktor pro vnější kolo při zatáčení
     float konstanta_radius_vnitrni_kolo = 1.0084f; // Korekční faktor pro vnitřní kolo při zatáčení
+    byte Button1; //!< Číslo pinu pro tlačítko 1 (levé tlačítko na desce). Výchozí: `NULL` (tlačítko není použito)
+    byte Button2; //!< Číslo pinu pro tlačítko 2 (
     uint8_t motor_id_left; //!< Které M číslo motoru patří levému, podle čísla na desce. Výchozí: `2`
     uint8_t motor_id_right; //!< Které M číslo motoru patří pravému, podle čísla na desce. Výchozí: `1`
     uint8_t motor_max_power_pct; //!< Limit výkonu motoru v procentech od 0 do 100. Ovlivňuje všechny režimy motorů. Výchozí: `60`
@@ -388,6 +392,8 @@ void radius_left(float radius, float angle, float speed);
 void forward_acc(float mm, float speed);
 
 void backward_acc(float mm, float speed);
+
+void back_buttons(float speed);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**@}*/
 /**
