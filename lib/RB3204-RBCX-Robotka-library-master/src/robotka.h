@@ -57,7 +57,7 @@ struct rkPinsConfig {
 struct rkConfig {
     rkConfig()
         : prevod_motoru(1979.3f) // pro 12v ==  41.62486f * 48.f, pro 6v == 1981.3f
-        , rozdil_v_kolech_levy(0.98f)// Korekční faktor pro levé kolo treba vetsi pneu   rozdil_v_kolech_levy(0.996f)
+        , rozdil_v_kolech_levy(0.996f)// Korekční faktor pro levé kolo treba vetsi pneu   rozdil_v_kolech_levy(0.996f)
         , rozdil_v_kolech_pravy(1.0f)// Korekční faktor pro pravé kolo napr. mensi pneu
         , roztec_kol(135.0) // v mm
         , konstanta_radius_vnejsi_kolo(1.035f) // Korekční faktor pro vnější kolo při zatáčení
@@ -75,7 +75,8 @@ struct rkConfig {
         , motor_max_acceleration(50000)
         , stupid_servo_min(-1.65f)
         , stupid_servo_max(1.65f)
-        , enable_wifi_log(true)
+        , enable_wifi_log(false)
+        , enable_wifi_control_swad(true)
         , wifi_ssid("zemcom")
         , wifi_password("radekzeman") {
     }
@@ -119,6 +120,7 @@ struct rkConfig {
     float stupid_servo_max; //!< Horní hranice signálu pro hloupá serva, která se rovná 90 stupňům. Výchozí: `1.65`
 
     bool enable_wifi_log; //!< Povolení WiFi logování. Výchozí: `false`
+    bool enable_wifi_control_swad; //!< Povolení WiFi ovládání přes SWAD. Výchozí: `false`
     const char* wifi_ssid; //!< SSID WiFi sítě pro připojení. Výchozí: `nullptr`
     const char* wifi_password; //!< Heslo WiFi sítě pro připojení. Výchozí: `nullptr`
 
@@ -825,9 +827,15 @@ void rkServosDisable(uint8_t id);
  * \return reference na SmartServoBus objekt, vrací pokaždé tu stejnou referenci.
  */
 lx16a::SmartServoBus& rkSmartServoBus(uint8_t servo_count);
+////////////////////////////////////////////////////////////////
 
 void print_wifi(const char* message);
 void handleWebClients();
+
+
+//////////////////////////////////////////////////////
+void wifi_control_swad();
+//////////////////////////////////////////////////////
 /**@}*/
 
 #endif // LIBRB_

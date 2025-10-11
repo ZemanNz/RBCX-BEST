@@ -9,11 +9,12 @@ udelat funkce pro ovladani na dalku (s,w,a,d), (<>)
 * forward a backward funkce                                                                                                 -----asi done
 * konzultovat ty funkce na to toceni na miste ----- >>>> popsat a zkouset                                                   -----asi done
 * udelat funkce radius asi taky se zrychlovanim ...... konzultovat                                                          -----asi done
-* udelat funkce na jeti zpet na tlacitko(jedno, 2, 3....) ---> to se zadefinujev robotce ---> io pin ,zase bude p regulator
+* udelat funkce na jeti zpet na tlacitko(jedno, 2, 3....) ---> to se zadefinujev robotce ---> io pin ,zase bude p regulator -----asi done
 * udelat funkce forward_acc a backward_acc ---> zrychlovaci a spomalovaci funkce ---> lepsi pro delsi vzdalenosti           -----mozna vymysled ti i slozku, ktera by to upravovala hezcejc
 * udelat swad tlacitka ---> pres wifi a taky to heske graficke tentonons...
-* udelat wifi vypisy... 
+* udelat wifi vypisy...                                                                                                     -----asi done
 * vymyslet tu presnost ----> bud na kazdou funkci dat do robotky konstanty, nebo to nejak vymyslet..... ---> mozna na to ted strat a udelat to s tim wifi vypisem...
 * udelat spomalovaci funkci ale upravit podle predesleho bodu...
 * presnost zkusit udelat tak ze budeme nastavovat podle polomeru kol ---> kazdy kolo bude muset ujet jinej pocet tiku ---> a pid bude dorovnavat do jejich pomeru-----
 ----> treba jeden ma ujet 100 a druhej 50 ---> zatim co prvni mel ujet 50 tak t´druhej 25, ale ujel 23 tak mu pridam ---> zatim u funkce forward, ale jeste potreba doladit, byl by dobrej podle vystupu z wifi ---> takze to drive
+* mozna udelat tan terminal na prikazy pres wifi jako do robotky.cpp
