@@ -52,7 +52,13 @@ void Context::setup(const rkConfig& cfg) {
 
     m_motors.init(cfg);
 
+    if(cfg.enable_wifi_control_wasd && cfg.wifi_ssid && cfg.wifi_password){
+        m_wifi.setupWiFiControl(cfg);
+    }
 
+    if(cfg.enable_wifi_terminal && cfg.wifi_ssid && cfg.wifi_password){
+        m_wifi.setupWiFiControl(cfg);
+    }
     const auto& v = man.coprocFwVersion();
     printf("STM32 FW version: %06x %.8s%s\n", v.number, v.revision,
         v.dirty ? "-dirty" : "");

@@ -3,6 +3,7 @@
 #include <atomic>
 
 #include "_librk_motors.h"
+#include "wifi_control.h"
 
 namespace rk {
 
@@ -15,6 +16,8 @@ public:
 
     rb::Protocol* prot() const { return m_prot; }
     Motors& motors() { return m_motors; }
+
+    Wifi& wifi() { return m_wifi; }
 
     adc1_channel_t irChanLeft() const { return m_ir_left; }
     adc1_channel_t irChanRight() const { return m_ir_right; }
@@ -29,6 +32,7 @@ private:
     void initIrSensors();
 
     Motors m_motors;
+    Wifi m_wifi;
     rb::Protocol* m_prot;
 
     std::atomic<bool> m_initialized;

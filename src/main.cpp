@@ -37,6 +37,22 @@ while (true){
         rkLedGreen(false); // Turn off blue LED
         rkLedGreen(false); // Turn off blue LED
     }
+    if(rkButtonUp()){
+        printf("Button UP is pressed!\n");
+        print_wifi("Button UP is pressed!\n");
+        rkLedYellow(true); // Turn off blue LED
+        delay(1000);
+        wifi_control_wasd();
+        rkLedYellow(false); // Turn off blue LED
+    }
+    if(rkButtonDown()){
+        printf("Button DOWN is pressed!\n");
+        print_wifi("Button DOWN is pressed!\n");
+        rkLedRed(true); // Turn off blue LED
+        delay(1000);
+        wifi_terminal();
+        rkLedRed(false); // Turn off blue LED
+    }
     //forward(2000, 60);
     handleWebClients();
     delay(50);

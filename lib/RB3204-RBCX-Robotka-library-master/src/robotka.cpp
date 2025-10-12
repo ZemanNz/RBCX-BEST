@@ -476,3 +476,20 @@ void print_wifi(const char* message) {
 void handleWebClients() {
     gCtx.motors().handleWebClient();
 }
+
+void wifi_control_wasd() {
+    
+    // Hlavní smyčka pro obsluhu webových klientů
+    bool still = true;
+    while(still) {
+        still = rk::Wifi::handleWebClients();
+        delay(50);
+    }
+}
+
+void wifi_terminal() {
+    while(true){
+        rk::Wifi::handleWebClients_terminal();
+        delay(50);
+    }
+}

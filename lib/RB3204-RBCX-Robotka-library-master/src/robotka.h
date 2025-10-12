@@ -76,7 +76,8 @@ struct rkConfig {
         , stupid_servo_min(-1.65f)
         , stupid_servo_max(1.65f)
         , enable_wifi_log(false)
-        , enable_wifi_control_swad(true)
+        , enable_wifi_control_wasd(false)
+        , enable_wifi_terminal(true)
         , wifi_ssid("zemcom")
         , wifi_password("radekzeman") {
     }
@@ -120,7 +121,8 @@ struct rkConfig {
     float stupid_servo_max; //!< Horní hranice signálu pro hloupá serva, která se rovná 90 stupňům. Výchozí: `1.65`
 
     bool enable_wifi_log; //!< Povolení WiFi logování. Výchozí: `false`
-    bool enable_wifi_control_swad; //!< Povolení WiFi ovládání přes SWAD. Výchozí: `false`
+    bool enable_wifi_control_wasd; //!< Povolení WiFi ovládání přes SWAD. Výchozí: `false`
+    bool enable_wifi_terminal; //!< Povolení WiFi terminálu. Výchozí: `false`
     const char* wifi_ssid; //!< SSID WiFi sítě pro připojení. Výchozí: `nullptr`
     const char* wifi_password; //!< Heslo WiFi sítě pro připojení. Výchozí: `nullptr`
 
@@ -834,7 +836,11 @@ void handleWebClients();
 
 
 //////////////////////////////////////////////////////
-void wifi_control_swad();
+void wifi_control_wasd();
+
+///////////////////////////////
+void wifi_terminal();
+
 //////////////////////////////////////////////////////
 /**@}*/
 
