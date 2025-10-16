@@ -92,7 +92,7 @@ void rkMotorsSetPowerById(uint8_t id, int8_t power) {
 }
 
 void rkMotorsSetSpeed(int8_t left, int8_t right) {
-    gCtx.motors().setSpeed(left, right);
+    gCtx.motors().setPower(left, right);
 }
 
 void rkMotorsSetSpeedLeft(int8_t speed) {

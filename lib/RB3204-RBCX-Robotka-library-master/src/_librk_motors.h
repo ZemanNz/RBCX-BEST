@@ -63,7 +63,7 @@ private:
 
     static int32_t scale(int32_t val);
     static int16_t pctToPower(int8_t pct);
-    int16_t pctToSpeed(float pct) const;
+    int16_t pctToSpeed(float pct);
     int32_t mmToTicks(float mm) const;
     int32_t mmToTicks_left(float mm) const;
     int32_t mmToTicks_right(float mm) const;
@@ -73,6 +73,8 @@ private:
     float roztec_kol; // v mm
     float rozdil_v_kolech_levy; // Korekční faktor pro levé kolo
     float rozdil_v_kolech_pravy; // Korekční faktor pro pravé kolo
+    float left_wheel_diameter;
+    float right_wheel_diameter;
     float konstanta_radius_vnejsi_kolo = 1.035f; // Korekční faktor pro vnější kolo při zatáčení
     float konstanta_radius_vnitrni_kolo = 1.0084f; // Korekční faktor pro vnitřní kolo při zatáčení
 
@@ -97,6 +99,8 @@ private:
     rb::MotorId m_id_left;
     rb::MotorId m_id_right;
     float m_wheel_circumference;
+    float m_wheel_circumference_left;
+    float m_wheel_circumference_right;
     int32_t m_max_speed;
     bool m_polarity_switch_left;
     bool m_polarity_switch_right;

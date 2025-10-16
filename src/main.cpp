@@ -13,10 +13,6 @@ void setup() {
     rkLedYellow(true); // Turn on yellow LED
     delay(1000);
     rkLedRed(false); // Turn off red LED
-    print_wifi("Robotka started!\n");
-    print_wifi("WiFi connected!\n");
-    print_wifi("IP address: ");
-    handleWebClients();
     // forward(1000, 100);
     //rkMotorsSetPower(100, 100);
 while (true){
