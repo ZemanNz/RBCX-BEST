@@ -1,24 +1,50 @@
-predelat funkce z motor commands.... , do ty rbcx knhovny...
-upravit readme, udelat ty funkce lepsi... hledat na internetu atd, standa, krivka, adam ma  dobry funkce
-udelat nejake nastavitelne promene jako roztec, sirka kol.... typ motoru
-udelat funkce pro ovladani na dalku (s,w,a,d), (<>)
+# co je hned potreba udelat: 
+
+* vymyslet tu presnost ----> bud na kazdou funkci dat do robotky konstanty, nebo to nejak vymyslet..... ---> mozna na to ted strat a udelat to s tim wifi vypisem...
+
+* presnost zkusit udelat tak ze budeme nastavovat podle polomeru kol ---> kazdy kolo bude muset ujet jinej pocet tiku ---> a pid bude dorovnavat do jejich pomeru-----
+----> treba jeden ma ujet 100 a druhej 50 ---> zatim co prvni mel ujet 50 tak t´druhej 25, ale ujel 23 tak mu pridam ---> zatim u funkce forward, ale jeste potreba doladit, byl by dobrej podle vystupu z wifi ---> takze to drive
+
+* mozna udelat tan terminal na prikazy pres wifi jako do robotky.cpp                                 
+
+* potom tu presnost dale resit.....  mozna to nechat na vyslednyho robota...
+
+* udelat dokumentaci knihiovny....  -----> readme        
+
+* mozna by byla fajn funkce, ktera by mela jet pomoci 2 ultrazvuku rovne vedle zdi
 
 
 
-# co mame a hned je potreba udelat: 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# co je hotovo: 
+
 * forward a backward funkce                                                                                                 -----asi done
 * konzultovat ty funkce na to toceni na miste ----- >>>> popsat a zkouset                                                   -----asi done
 * udelat funkce radius asi taky se zrychlovanim ...... konzultovat                                                          -----asi done
 * udelat funkce na jeti zpet na tlacitko(jedno, 2, 3....) ---> to se zadefinujev robotce ---> io pin ,zase bude p regulator -----asi done
 * udelat funkce forward_acc a backward_acc ---> zrychlovaci a spomalovaci funkce ---> lepsi pro delsi vzdalenosti           -----mozna vymysled ti i slozku, ktera by to upravovala hezcejc
 * udelat swad tlacitka ---> pres wifi a taky to heske graficke tentonons...                                                 -----asi done
-* udelat wifi vypisy...                                                                                                     -----asi done
-* vymyslet tu presnost ----> bud na kazdou funkci dat do robotky konstanty, nebo to nejak vymyslet..... ---> mozna na to ted strat a udelat to s tim wifi vypisem...
+* udelat wifi vypisy...   
 * udelat spomalovaci funkci ale upravit podle predesleho bodu...
-* presnost zkusit udelat tak ze budeme nastavovat podle polomeru kol ---> kazdy kolo bude muset ujet jinej pocet tiku ---> a pid bude dorovnavat do jejich pomeru-----
-----> treba jeden ma ujet 100 a druhej 50 ---> zatim co prvni mel ujet 50 tak t´druhej 25, ale ujel 23 tak mu pridam ---> zatim u funkce forward, ale jeste potreba doladit, byl by dobrej podle vystupu z wifi ---> takze to drive
-* mozna udelat tan terminal na prikazy pres wifi jako do robotky.cpp                                 
-
-* chtelo by to tu presnost delat postupne a logicky, takze treba prvne zkousek pres wifi terminal co se stane kdy levymu dam 39 a pravymu 40......
-* potom tu presnost dale resit.....
-* udelat dokumentaci knihiovny....                       -----asi done
+* chtelo by to tu presnost delat postupne a logicky, takze treba prvne zkousek pres wifi terminal co se stane kdy levymu dam 39 a pravymu 40......--- to je na hovno, ty motory reaguji na zmenu rychlosti tak o 5 %
+predelat funkce z motor commands.... , do ty rbcx knhovny...
+upravit readme, udelat ty funkce lepsi... hledat na internetu atd, standa, krivka, adam ma  dobry funkce
+udelat nejake nastavitelne promene jako roztec, sirka kol.... typ motoru
+udelat funkce pro ovladani na dalku (s,w,a,d), (<>)

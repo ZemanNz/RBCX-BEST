@@ -57,8 +57,8 @@ struct rkPinsConfig {
 struct rkConfig {
     rkConfig()
         : prevod_motoru(1979.3f) // pro 12v ==  41.62486f * 48.f, pro 6v == 1981.3f
-        // , rozdil_v_kolech_levy(0.996f)// Korekční faktor pro levé kolo treba vetsi pneu   rozdil_v_kolech_levy(0.996f)
-        // , rozdil_v_kolech_pravy(1.0f)// Korekční faktor pro pravé kolo napr. mensi pneu
+        , rozdil_v_kolech_levy(0.996f)// Korekční faktor pro levé kolo treba vetsi pneu   rozdil_v_kolech_levy(0.996f)
+        , rozdil_v_kolech_pravy(1.0f)// Korekční faktor pro pravé kolo napr. mensi pneu
         , left_wheel_diameter(62.3) // v mm
         , right_wheel_diameter(61.1) // v mm
         , roztec_kol(135.0) // v mm
@@ -83,19 +83,90 @@ struct rkConfig {
         , wifi_ssid("zemcom")
         , wifi_password("radekzeman") {
     }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * \brief prevod_motoru - počet ticků enkodéru na jeden mm.
+     * 
+     * Používá se pro přepočet ujeté vzdálenosti na počet ticků enkodéru.
+     * 
+     * Výchozí hodnota je pro 6V motory s koly o průměru 62mm je ´1979.3f´.
+     * 
+     * Vypočítáte tak, že zadáte at ujede robot treba 1000mm s zmerite kolik realne ujedete a touto hodnotou vydelite tuto konstantu.
+     */
+    float prevod_motoru;
 
-    float prevod_motoru; //!< Převodový poměr motoru, výchozí: 41.62486f * 48.f pro 12V, 40.4124852f * 48.f pro 6V
-    float left_wheel_diameter; //!< Průměr levého kola robota v mm, použito na počítání ujeté vzdálenosti. Výchozí: `62.1` mm.
-    float right_wheel_diameter; //!< Průměr pravého kola robota v mm, použito na počítání ujeté vzdálenosti. Výchozí: `62.0` mm.
-    float rozdil_v_kolech_levy = 1; //!< Korekční faktor pro levé kolo, použito na vyrovnání rozdílných kol. Výchozí: `0.99` (pro 6V motory může být potřeba menší hodnota, např. 0.95)
+    /**
+     * \brief left_wheel_diameter - Průměr levého kola robota v mm.
+     * 
+     * Výchozí hodnota je `62.1` mm.
+     * 
+     * Rozdíl mezi koly vyrovnáte nastavením této hodnoty.
+     */
+    float left_wheel_diameter;
+
+    /**
+     * \brief right_wheel_diameter - Průměr pravého kola robota v mm.
+     * 
+     * Výchozí hodnota je `62.0` mm.
+     * 
+     * Rozdíl mezi koly vyrovnáte nastavením této hodnoty.
+     */
+    float right_wheel_diameter;
+
+    /**
+     * \brief Korekční faktor pro levé kolo, použito na vyrovnání rozdílných kol.
+     * 
+     * Výchozí hodnota je `0.996` (pro 6V motory
+     * může být potřeba menší hodnota, např. 0.95).
+     */
+    float rozdil_v_kolech_levy = 1;
+
+    /**
+     * \brief Korekční faktor pro pravé kolo, použito na vyrovnání rozdílných kol.
+     * 
+     * Výchozí hodnota je `1.0` (pro 6V motory
+     * může být potřeba JINÁ hodnota, např. 9.998).
+     */
     float rozdil_v_kolech_pravy = 1; //!< Korekční faktor pro pravé kolo, použito na vyrovnání rozdílných kol. Výchozí: `1.0`
-    float roztec_kol; //!< Rozteč kol robota v mm, použito na počítání ujeté vzdálenosti při zatáčení. Výchozí: `200` mm.
-    float konstanta_radius_vnejsi_kolo = 1.035f; // Korekční faktor pro vnější kolo při zatáčení
-    float konstanta_radius_vnitrni_kolo = 1.0084f; // Korekční faktor pro vnitřní kolo při zatáčení
-    byte Button1; //!< Číslo pinu pro tlačítko 1 (levé tlačítko na desce). Výchozí: `NULL` (tlačítko není použito)
-    byte Button2; //!< Číslo pinu pro tlačítko 2 (
+
+    /**
+     * \brief Rozteč kol robota v mm, použito na počítání ujeté vzdálenosti při zatáčení.
+     * 
+     * Pokud jsou kola široká, počítejte spíše s menšímy hodnotami.
+     */
+    float roztec_kol;
+
+    /**
+     * \brief Korekční faktor pro vnější kolo při zatáčení
+     * 
+     * Výchozí hodnota je `1.035f`.
+     */
+    float konstanta_radius_vnejsi_kolo = 1.035f;
+    /**
+     * \brief Korekční faktor pro vnitřní kolo při zatáčení
+     * 
+     * Výchozí hodnota je `1.0084f`.
+     */
+    float konstanta_radius_vnitrni_kolo = 1.0084f;
+
+    /**
+     * \brief Číslo GPIO pro tlačítko v zadu robota na zastavení až se dotkne zdi
+     * 
+     * Výchozí hodnota je `14`, možné je pouýžít třeba 17,34, 35 ...  Ale můžete nastavit na `NULL`, pokud tlačítko nechcete používat.
+     */
+    byte Button1;
+
+    /**
+     * \brief Číslo GPIO pro tlačítko v zadu robota na zastavení až se dotkne zdi
+     * 
+     * Výchozí hodnota je `35`, možné je pouýžít třeba 14,17,34 ...  Ale můžete nastavit na `NULL`, pokud tlačítko nechcete používat.
+     */
+    byte Button2;
+
+
     uint8_t motor_id_left; //!< Které M číslo motoru patří levému, podle čísla na desce. Výchozí: `2`
     uint8_t motor_id_right; //!< Které M číslo motoru patří pravému, podle čísla na desce. Výchozí: `1`
+
     uint8_t motor_max_power_pct; //!< Limit výkonu motoru v procentech od 0 do 100. Ovlivňuje všechny režimy motorů. Výchozí: `60`
     bool motor_polarity_switch_left; //!< Prohození polarity levého motoru. Výchozí: `false`
     bool motor_polarity_switch_right; //!< Prohození polarity pravého motoru. Výchozí: `true`
@@ -124,11 +195,11 @@ struct rkConfig {
     float stupid_servo_min; //!< Spodní hranice signálu pro hloupá serva, která se robvná -90 stupňům. Výchozí: `-1.65`
     float stupid_servo_max; //!< Horní hranice signálu pro hloupá serva, která se rovná 90 stupňům. Výchozí: `1.65`
 
-    bool enable_wifi_log; //!< Povolení WiFi logování. Výchozí: `false`
-    bool enable_wifi_control_wasd; //!< Povolení WiFi ovládání přes SWAD. Výchozí: `false`
-    bool enable_wifi_terminal; //!< Povolení WiFi terminálu. Výchozí: `false`
-    const char* wifi_ssid; //!< SSID WiFi sítě pro připojení. Výchozí: `nullptr`
-    const char* wifi_password; //!< Heslo WiFi sítě pro připojení. Výchozí: `nullptr`
+    bool enable_wifi_log; //!< Povolení WiFi logování. Výchozí: `false` ---> Jestli se má na začátku inicializovat wifi, bez toho nepojedou wifi logy.
+    bool enable_wifi_control_wasd; //!< Povolení WiFi ovládání přes SWAD. Výchozí: `false` ---> Jestli se má na začátku inicializovat wifi, bez toho nepojedou wifi ovládání přes wasd.
+    bool enable_wifi_terminal; //!< Povolení WiFi terminálu. Výchozí: `false` ---> Jestli se má na začátku inicializovat wifi, bez toho nepojedou wifi terminál.
+    const char* wifi_ssid; //!< SSID WiFi sítě pro připojení. Výchozí: `nullptr`  ----> Jmeno wifi na kterou se ma robot pripojit
+    const char* wifi_password; //!< Heslo WiFi sítě pro připojení. Výchozí: `nullptr` ---> Heslo wifi na kterou se ma robot pripojit
 
 
     rkPinsConfig pins; //!< Konfigurace pinů pro periferie, viz rkPinsConfig
@@ -385,22 +456,108 @@ void rkMotorsSetPositionById(uint8_t id, float positionMm = 0.f);
  */
 void rkMotorsJoystick(int32_t x, int32_t y);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * \brief Pohyb robota vpřed (pokud máte správně nastavený polarity switch) o zadanou vzdálenost v mm  a rychlost v %. (blokující)
+ * 
+ * Tato funkc hned nastavý rychlost motorů ---> robot s sebou může trochu trhnout na začátku pohybu. ---->  Použít raději forward_acc pro plynulý rozjezd.
+ * 
+ * Robot využívá P - regulátor.
+ * 
+ * Timeout si robot vypočítá podle rychlosti a vzdálenosti s rezervou.
+ */
 void forward(float mm, float speed);
 
+/**
+ * \brief Pohyb robota vzad (pokud máte správně nastavený polarity switch) o zadanou vzdálenost v mm a rychlost v %. (blokující)
+ * 
+ * Tato funkc hned nastavý rychlost motorů ---> robot s sebou může trochu trhnout na začátku pohybu. ---->  Použít raději backward_acc pro plynulý rozjezd.
+ * 
+ * Robot využívá P - regulátor.
+ * 
+ * Timeout si robot vypočítá podle rychlosti a vzdálenosti s rezervou.
+ */
 void backward(float mm, float speed);
 
+/**
+ * \brief Otočení se robota na místě proti směru hodinových ručiček.
+ * 
+ * Úhel od 0 do 360, a doporučujeme rychlost do 60%
+ * 
+ * Robot využívá P - regulátor.
+ * 
+ * Timeout je nastavený na 10 sekund.
+ */
 void turn_on_spot_left(float angle, float speed);
 
+/**
+ * \brief Otočení se robota na místě po směru hodinových ručiček.
+ * 
+ * Úhel od 0 do 360, a doporučujeme rychlost do 60%
+ * 
+ * Robot využívá P - regulátor.
+ * 
+ * Timeout je nastavený na 10 sekund.
+ */
 void turn_on_spot_right(float angle, float speed);
 
+/**
+ * \brief Robot jede rádius do prava.
+ * 
+ * radius == vzdálenost od stredu otáčení k vnitřnímu kolu
+ * 
+ * Úhel od 0 do 360, a doporučujeme rychlost do 60%
+ * 
+ * Robot využívá P - regulátor.
+ * 
+ * Timeout je nastavený na 10 sekund.
+ */
 void radius_right(float radius, float angle, float speed);
 
+/**
+ * \brief Robot jede rádius do leva.
+ * 
+ * radius == vzdálenost od stredu otáčení k vnitřnímu kolu
+ * 
+ * Úhel od 0 do 360, a doporučujeme rychlost do 60%
+ * 
+ * Robot využívá P - regulátor.
+ * 
+ * Timeout je nastavený na 10 sekund.
+ */
 void radius_left(float radius, float angle, float speed);
 
+/**
+ * \brief Pohyb robota vpřed se zrychkením a zpomalením (robot s sebou necukne)
+ * 
+ * Provelmi malé vzdálenosti neefektivní
+ * 
+ * Robot využívá P - regulátor.
+ * 
+ * Timeout je vypočítaný stejně jako u forward jen vynásoben 2.
+ */
 void forward_acc(float mm, float speed);
 
+/**
+ * \brief Pohyb robota vzad se zrychkením a zpomalením (robot s sebou necukne)
+ * 
+ * Provelmi malé vzdálenosti neefektivní
+ * 
+ * Robot využívá P - regulátor.
+ * 
+ * Timeout je vypočítaný stejně jako u forward jen vynásoben 2.
+ */
 void backward_acc(float mm, float speed);
 
+/**
+ * \brief Pohyb robota vzad, dokud nenarazí oběma tlačítky na zeď
+ * 
+ * Timeout je 10 000 ms == 10 sekund, pokud chcete zmenit tak v _librk_motors.cpp v teto funkci zmente int timeoutMs = 10000;
+ * 
+ * Pokud bylo stisknuto jedno tlacitko na druhe se bude cekat jen 2 sekundy.
+ * 
+ * Při couváni jede robut s P - regulátorem.
+ */
 void back_buttons(float speed);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**@}*/
@@ -835,14 +992,48 @@ void rkServosDisable(uint8_t id);
 lx16a::SmartServoBus& rkSmartServoBus(uint8_t servo_count);
 ////////////////////////////////////////////////////////////////
 
+/**
+ * \brief Při inicializaci robota a pokud je zapnuté enable_wifi_log se do serial monitoru vypise ip adresa, na niž se posilaji výpisy , které napíšete do tehle funkce.
+ * 
+ * Můžete napsat třeba : ´printf_wifi(" Start forward - %.1f mm, %.1f%% speed", mm, speed)´
+ */
 void print_wifi(const char* message);
+
+/**
+ * \brief Při používání print_wifi musíte ve smyčce volat tuto funkci s nejakým delay(), pokud ne tak se nebudou posílát hodnoty ---> web se nebude refreshovat
+ * 
+ * Buď to tedy volat ve smyčce třeba v main, nebo vytvořit vlákno.
+ */
 void handleWebClients();
 
 
 //////////////////////////////////////////////////////
+
+/**
+ * \brief Po zavolání této funkce se dostanete do nekonecne smycky, kterou jde zrusit jen z "ovladače" klavesou P
+ * 
+ * Funkce slouží k ovládání robota na dálku přes wasd nebo šipky.
+ * 
+ * Jako ovladač je potřeba spustit na svém počítači soubor jmenem "robot_controller_wasd" , ktery najdete v RBCX-controller -----> tak jak to tam je nejspiš jen na linuxu
+ * 
+ * V "robot_controller_wasd" je potreba zadat ip adresa robota, bude vypsana v serial monitoru při inicializaci.
+ * 
+ * V "robot_controller_wasd" je nabídka co lze delat např je mozne si definovat funkce jako FUNC1.
+ * Pro nastavení co se bude delat pro FUNC1 jdete do lib/RB3204-RBCX-Robotka-library-master/src/wifi_control.cpp/Wifi::handleWebClients()
+ */
 void wifi_control_wasd();
 
 ///////////////////////////////
+
+/**
+ * \brief Po zavolání této funkce se dostanete do nekonecne smycky.
+ * 
+ * Funkce slouží k ovládání robota na dálku přes terminál ---> můžete zadat např. forward(1000, 50) a příkaz se vykonná
+ * 
+ * Jako ovladač je potřeba spustit na svém počítači soubor jmenem "robot_controller_terminal" , ktery najdete v RBCX-controller -----> tak jak to tam je nejspiš jen na linuxu
+ * 
+ * V "robot_controller_terminal" je potreba zadat ip adresa robota, bude vypsana v serial monitoru při inicializaci.
+ */
 void wifi_terminal();
 
 //////////////////////////////////////////////////////

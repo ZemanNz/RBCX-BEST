@@ -330,7 +330,7 @@ void Wifi::handleWebClients_terminal() {
             printf("🔴 VYPNU MOTORY\n");
             rkMotorsSetPower(0, 0);
             
-        } else if (strcmp(incomingPacket, "stop()") == 0) {
+        } else if (strcmp(incomingPacket, "stop") == 0) {
             printf("⏹️ OKAMŽITÉ ZASTAVENÍ\n");
             rkMotorsSetPower(0, 0);
             

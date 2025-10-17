@@ -1054,42 +1054,6 @@ void Motors::turn_on_spot_right(float angle, float speed) {
     man.motor(m_id_right).power(0);
 }
 
-// void Motors::turn_on_spot_right(float angle, float speed) {
-//     auto& man = rb::Manager::get();
-    
-//     // Reset pozic
-//     man.motor(m_id_left).setCurrentPosition(0);
-//     man.motor(m_id_right).setCurrentPosition(0);
-
-//     int target_ticks = mmToTicks((M_PI * roztec_kol) * (angle / 360.0f));
-//     int left_pos = 0;
-//     int right_pos = 0;
-//     std::cout << "Target ticks: " << target_ticks << std::endl;
-//     // Základní rychlosti s přihlédnutím k polaritě
-//     float base_speed_left = m_polarity_switch_left ? -speed : speed;
-//     float base_speed_right = m_polarity_switch_right ? speed : -speed;
-
-//     float speed_left = base_speed_left;
-//     float speed_right = base_speed_right;
-
-//     man.motor(m_id_left).power(pctToSpeed(speed_left));
-//     man.motor(m_id_right).power(pctToSpeed(speed_right));
-
-//     while(target_ticks > (abs(left_pos) +50) || target_ticks > (abs(right_pos) + 50)) {
-//         man.motor(m_id_left).requestInfo([&](rb::Motor& info) {
-//              left_pos = info.position();
-//           });
-//         man.motor(m_id_right).requestInfo([&](rb::Motor& info) {
-//              right_pos = info.position();
-//           });
-//         std::cout << "Left pos: " << left_pos << ", Right pos: " << right_pos << std::endl;
-//         delay(10);
-//     }
-//     man.motor(m_id_left).power(0);
-//     man.motor(m_id_right).power(0);
-// }
-
-
 void Motors::radius_right(float radius, float angle, float speed) {
     auto& man = rb::Manager::get();
     
@@ -1579,15 +1543,17 @@ void Motors::back_buttons(float speed) {
         delay(10);
         if(digitalRead(Button1) == LOW ) {
             std::cout << "TLACITKO 1 STISKNUTO" << std::endl;
-            break;
+            start_time = millis();
+            timeoutMs = 2000;
         }
         if(digitalRead(Button2) == LOW ) {
             std::cout << "TLACITKO 2 STISKNUTO" << std::endl;
-            break;
+            start_time = millis();
+            timeoutMs = 2000;
         }
     }
     if(digitalRead(Button1) == LOW && digitalRead(Button2) == LOW ) {
-        std::cout << "TLACITKA Stisknuta" << std::endl;
+        std::cout << "OBE TLACITKA Stisknuta" << std::endl;
     }
     // Zastavení motorů
     man.motor(m_id_left).power(0);
