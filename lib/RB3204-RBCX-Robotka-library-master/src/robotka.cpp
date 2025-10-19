@@ -3,6 +3,7 @@
 #include <Adafruit_TCS34725.h>
 #include "_librk_context.h"
 #include "_librk_smart_servo.h"
+#include "smart_servo.h"
 #include "robotka.h"
 #ifdef USE_VL53L0X
 #include <Adafruit_VL53L0X.h>
@@ -470,37 +471,24 @@ lx16a::SmartServoBus& rkSmartServoBus(uint8_t servo_count) {
     return init.bus();
 }
 
+
 // Smart Servo funkce
-void rkSmartServoInit(lx16a::SmartServoBus& bus, int id, int low, int high) {
-    bus.setAutoStop(id, false);
-    bus.limit(id, lx16a::Angle::deg(low), lx16a::Angle::deg(high));
-    bus.setAutoStopParams(
-        lx16a::SmartServoBus::AutoStopParams{
-            .max_diff_centideg = 400,
-            .max_diff_readings = 2,
-        });
-    printf("Smart Servo %d inicializováno (limity: %d°-%d°)\n", id, low, high);
+void rkSmartServoInit(int id, int low, int high) {
+    rk::smart_servo::rkSmartServoInit(id, low, high);
 }
 
-void rkSmartServoMove(lx16a::SmartServoBus& bus, int id, int angle, int speed) {
-    if (angle < 0 || angle > 240) {
-        printf("Chyba: Úhel musí být v rozsahu 0–240 stupňů.\n");
-        return;
-    }
-    bus.setAutoStop(id, false);
-    bus.set(id, lx16a::Angle::deg(angle), speed);
-    printf("Smart Servo %d move na %d stupňů rychlostí %d\n", id, angle, speed);
+void rkSmartServoMove(int id, int angle, int speed) {
+    rk::smart_servo::rkSmartServoMove(id,angle,speed);
 }
 
-void rkSmartServoSoftMove(lx16a::SmartServoBus& bus, int id, int angle, int speed) {
-    if (angle < 0 || angle > 240) {
-        Serial.println("Chyba: Úhel musí být v rozsahu 0–240 stupňů.");
-        return;
-    }
-    bus.setAutoStop(id, true);
-    bus.set(id, lx16a::Angle::deg(angle), speed);
-    printf("Smart Servo %d soft_move na %d stupňů rychlostí %d\n", id, angle, speed);
+void rkSmartServoSoftMove(int id, int angle, int speed) {
+    rk::smart_servo::rkSmartServoSoftMove(id, angle, speed);
 }
+
+byte rkSmartServoPosition(uint8_t id) {
+    return rk::smart_servo::rkSmartServosPosicion(id);
+}
+
 
 void print_wifi(const char* message) {
     gCtx.motors().print_wifi(message);
@@ -712,6 +700,121 @@ static void processCommand(const String &cmd) {
         Serial.println("back_buttons zavoláno");
         return;
     }
+
+    // SMART SERVO INIT - rkSmartServoInit(id, low, high)
+    if (cmd.startsWith("servo_init(")) {
+        float params[3] = {0, 0, 240}; // id, low, high (default values)
+        int start = cmd.indexOf('(') + 1;
+        int end = cmd.indexOf(')');
+        if (start < 1 || end < 0) {
+            Serial.println("Chybný formát servo_init");
+            return;
+        }
+        String paramStr = cmd.substring(start, end);
+        
+        // Zjisti počet parametrů
+        int paramCount = 1;
+        for (int i = 0; i < paramStr.length(); i++) {
+            if (paramStr.charAt(i) == ',') paramCount++;
+        }
+        
+        if (!parseParams(paramStr, params, paramCount)) {
+            Serial.println("Chyba v parametrech servo_init");
+            return;
+        }
+        
+        int id = (int)params[0];
+        int low = (paramCount > 1) ? (int)params[1] : 0;
+        int high = (paramCount > 2) ? (int)params[2] : 240;
+        
+        rkSmartServoInit(id, low, high);
+        Serial.println("servo_init zavoláno");
+        return;
+    }
+    
+    // SMART SERVO MOVE - rkSmartServoMove(id, angle, speed)
+    if (cmd.startsWith("servo_move(")) {
+        float params[3] = {0, 0, 200}; // id, angle, speed (default values)
+        int start = cmd.indexOf('(') + 1;
+        int end = cmd.indexOf(')');
+        if (start < 1 || end < 0) {
+            Serial.println("Chybný formát servo_move");
+            return;
+        }
+        String paramStr = cmd.substring(start, end);
+        
+        // Zjisti počet parametrů
+        int paramCount = 1;
+        for (int i = 0; i < paramStr.length(); i++) {
+            if (paramStr.charAt(i) == ',') paramCount++;
+        }
+        
+        if (!parseParams(paramStr, params, paramCount)) {
+            Serial.println("Chyba v parametrech servo_move");
+            return;
+        }
+        
+        int id = (int)params[0];
+        int angle = (int)params[1];
+        int speed = (paramCount > 2) ? (int)params[2] : 200;
+        
+        rkSmartServoMove(id, angle, speed);
+        Serial.println("servo_move zavoláno");
+        return;
+    }
+    
+    // SMART SERVO SOFT MOVE - rkSmartServoSoftMove(id, angle, speed)
+    if (cmd.startsWith("servo_soft_move(")) {
+        float params[3] = {0, 0, 200}; // id, angle, speed (default values)
+        int start = cmd.indexOf('(') + 1;
+        int end = cmd.indexOf(')');
+        if (start < 1 || end < 0) {
+            Serial.println("Chybný formát servo_soft_move");
+            return;
+        }
+        String paramStr = cmd.substring(start, end);
+        
+        // Zjisti počet parametrů
+        int paramCount = 1;
+        for (int i = 0; i < paramStr.length(); i++) {
+            if (paramStr.charAt(i) == ',') paramCount++;
+        }
+        
+        if (!parseParams(paramStr, params, paramCount)) {
+            Serial.println("Chyba v parametrech servo_soft_move");
+            return;
+        }
+        
+        int id = (int)params[0];
+        int angle = (int)params[1];
+        int speed = (paramCount > 2) ? (int)params[2] : 200;
+        
+        rkSmartServoSoftMove(id, angle, speed);
+        Serial.println("servo_soft_move zavoláno");
+        return;
+    }
+    
+    // SMART SERVO POSITION - rkSmartServoPosition(id)
+    if (cmd.startsWith("servo_position(")) {
+        float params[1];
+        int start = cmd.indexOf('(') + 1;
+        int end = cmd.indexOf(')');
+        if (start < 1 || end < 0) {
+            Serial.println("Chybný formát servo_position");
+            return;
+        }
+        String paramStr = cmd.substring(start, end);
+        if (!parseParams(paramStr, params, 1)) {
+            Serial.println("Chyba v parametrech servo_position");
+            return;
+        }
+        
+        int id = (int)params[0];
+        byte position = rkSmartServoPosition(id);
+        Serial.printf("Smart Servo %d pozice: %d°\n", id, position);
+        return;
+    }
+    
     
     Serial.println("Neznámý příkaz");
 }
@@ -725,6 +828,7 @@ void rkSerialTerminal() {
     
     Serial.println("=== ROBOTKA SERIAL TERMINAL ===");
     Serial.println("Dostupné příkazy:");
+    Serial.println("=== POHYB ROBOTA ===");
     Serial.println("forward(mm, speed)           - např. forward(1000, 50)");
     Serial.println("forward_acc(mm, speed)       - např. forward_acc(800, 50)");
     Serial.println("backward(mm, speed)          - např. backward(800, 40)");
@@ -734,6 +838,11 @@ void rkSerialTerminal() {
     Serial.println("radius_left(radius, angle, speed) - např. radius_left(200, 90, 40)");
     Serial.println("radius_right(radius, angle, speed)- např. radius_right(200, 90, 40)");
     Serial.println("back_buttons(speed)          - např. back_buttons(30)");
+    Serial.println("=== SMART SERVA ===");
+    Serial.println("servo_init(id, [low, high])  - např. servo_init(1) nebo servo_init(1, 0, 180)");
+    Serial.println("servo_move(id, angle, [speed]) - např. servo_move(1, 90) nebo servo_move(1, 90, 300)");
+    Serial.println("servo_soft_move(id, angle, [speed]) - např. servo_soft_move(1, 90, 150)");
+    Serial.println("servo_position(id)           - např. servo_position(1)");
     Serial.println("Zadej příkaz:");
     
     while(true) {

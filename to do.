@@ -7,14 +7,20 @@
 
 * potom tu presnost dale neresit.....  mozna to nechat na vyslednyho robota...
 
+
+
+
 * udelat dokumentaci knihiovny....  -----> readme        
 
 * mozna by byla fajn funkce, ktera by mela jet pomoci 2 ultrazvuku rovne vedle zdi
 
-* examply !!! 
+* examply !!!  --- wasd, terminal, uart
 
+* mozna udelat lepe ty smart serva ---> at se nemusi auto &bus = rkSmartServoBus(2); a da se k tomu pristupovat vsude     ---asi done
 
+* preskouset ty smart serva ve stredu
 
+* do knihovny zaimplementovat uart komunikaci --- z toho co je tady + medved v praze atd.
 
 
 

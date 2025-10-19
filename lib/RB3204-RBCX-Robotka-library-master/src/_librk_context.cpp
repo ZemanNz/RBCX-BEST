@@ -49,6 +49,9 @@ void Context::setup(const rkConfig& cfg) {
 
     m_stupid_servo_min = cfg.stupid_servo_min;
     m_stupid_servo_max = cfg.stupid_servo_max;
+    if(cfg.pocet_chytrych_serv > 0){
+        m_smart_s.init(cfg);
+    }
 
     m_motors.init(cfg);
 

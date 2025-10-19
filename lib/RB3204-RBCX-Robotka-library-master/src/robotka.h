@@ -77,6 +77,7 @@ struct rkConfig {
         , motor_max_acceleration(50000)
         , stupid_servo_min(-1.65f)
         , stupid_servo_max(1.65f)
+        , pocet_chytrych_serv(0)
         , enable_wifi_log(false)
         , enable_wifi_control_wasd(false)
         , enable_wifi_terminal(false)
@@ -195,12 +196,13 @@ struct rkConfig {
     float stupid_servo_min; //!< Spodní hranice signálu pro hloupá serva, která se robvná -90 stupňům. Výchozí: `-1.65`
     float stupid_servo_max; //!< Horní hranice signálu pro hloupá serva, která se rovná 90 stupňům. Výchozí: `1.65`
 
+    int8_t pocet_chytrych_serv;
+
     bool enable_wifi_log; //!< Povolení WiFi logování. Výchozí: `false` ---> Jestli se má na začátku inicializovat wifi, bez toho nepojedou wifi logy.
     bool enable_wifi_control_wasd; //!< Povolení WiFi ovládání přes SWAD. Výchozí: `false` ---> Jestli se má na začátku inicializovat wifi, bez toho nepojedou wifi ovládání přes wasd.
     bool enable_wifi_terminal; //!< Povolení WiFi terminálu. Výchozí: `false` ---> Jestli se má na začátku inicializovat wifi, bez toho nepojedou wifi terminál.
     const char* wifi_ssid; //!< SSID WiFi sítě pro připojení. Výchozí: `nullptr`  ----> Jmeno wifi na kterou se ma robot pripojit
     const char* wifi_password; //!< Heslo WiFi sítě pro připojení. Výchozí: `nullptr` ---> Heslo wifi na kterou se ma robot pripojit
-
 
     rkPinsConfig pins; //!< Konfigurace pinů pro periferie, viz rkPinsConfig
 };
@@ -1003,7 +1005,7 @@ lx16a::SmartServoBus& rkSmartServoBus(uint8_t servo_count);
  * @param low Dolní limit úhlu v ° (výchozí 0)
  * @param high Horní limit úhlu v ° (výchozí 240)
  */
-void rkSmartServoInit(lx16a::SmartServoBus& bus, int id, int low = 0, int high = 240);
+void rkSmartServoInit(int id, int low = 0, int high = 240);
 
 /**
  * \brief Rychlý pohyb serva bez regulace
@@ -1013,7 +1015,7 @@ void rkSmartServoInit(lx16a::SmartServoBus& bus, int id, int low = 0, int high =
  * @param angle Cílový úhel v ° (0-240)
  * @param speed Rychlost (výchozí 200)
  */
-void rkSmartServoMove(lx16a::SmartServoBus& bus, int id, int angle, int speed = 200);
+void rkSmartServoMove(int id, int angle, int speed = 200);
 
 /**
  * \brief Plynulý pohyb serva s ochranou proti zaseknutí
@@ -1023,7 +1025,15 @@ void rkSmartServoMove(lx16a::SmartServoBus& bus, int id, int angle, int speed = 
  * @param angle Cílový úhel v ° (0-240)
  * @param speed Rychlost (výchozí 200)
  */
-void rkSmartServoSoftMove(lx16a::SmartServoBus& bus, int id, int angle, int speed = 200);
+void rkSmartServoSoftMove(int id, int angle, int speed = 200);
+
+/**
+ * \brief Přečte aktuální pozici smart serva
+ * 
+ * @param bus Reference na SmartServoBus
+ * @param id ID serva 1 nebo 0
+ */
+byte rkSmartServosPosicion (int id);
 ////////////////////////////////////////////////////////////////
 
 /**

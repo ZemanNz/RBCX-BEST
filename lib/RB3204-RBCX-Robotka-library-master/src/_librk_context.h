@@ -4,6 +4,7 @@
 
 #include "_librk_motors.h"
 #include "wifi_control.h"
+#include "smart_servo.h"
 
 namespace rk {
 
@@ -19,6 +20,8 @@ public:
 
     Wifi& wifi() { return m_wifi; }
 
+    smart_servo& smart_s() {return m_smart_s;}
+
     adc1_channel_t irChanLeft() const { return m_ir_left; }
     adc1_channel_t irChanRight() const { return m_ir_right; }
 
@@ -33,6 +36,7 @@ private:
 
     Motors m_motors;
     Wifi m_wifi;
+    smart_servo m_smart_s;
     rb::Protocol* m_prot;
 
     std::atomic<bool> m_initialized;
