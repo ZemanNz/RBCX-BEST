@@ -5,15 +5,13 @@
 * presnost zkusit udelat tak ze budeme nastavovat podle polomeru kol ---> kazdy kolo bude muset ujet jinej pocet tiku ---> a pid bude dorovnavat do jejich pomeru-----
 ----> treba jeden ma ujet 100 a druhej 50 ---> zatim co prvni mel ujet 50 tak t´druhej 25, ale ujel 23 tak mu pridam ---> zatim u funkce forward, ale jeste potreba doladit, byl by dobrej podle vystupu z wifi ---> takze to drive
 
-* mozna udelat tan terminal na prikazy pres wifi jako do robotky.cpp                                 
-
-* potom tu presnost dale resit.....  mozna to nechat na vyslednyho robota...
+* potom tu presnost dale neresit.....  mozna to nechat na vyslednyho robota...
 
 * udelat dokumentaci knihiovny....  -----> readme        
 
 * mozna by byla fajn funkce, ktera by mela jet pomoci 2 ultrazvuku rovne vedle zdi
 
-
+* examply !!! 
 
 
 

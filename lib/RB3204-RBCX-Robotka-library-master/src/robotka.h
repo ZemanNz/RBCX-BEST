@@ -79,7 +79,7 @@ struct rkConfig {
         , stupid_servo_max(1.65f)
         , enable_wifi_log(false)
         , enable_wifi_control_wasd(false)
-        , enable_wifi_terminal(true)
+        , enable_wifi_terminal(false)
         , wifi_ssid("zemcom")
         , wifi_password("radekzeman") {
     }
@@ -95,6 +95,22 @@ struct rkConfig {
      */
     float prevod_motoru;
 
+    /**
+     * \brief Korekční faktor pro levé kolo, použito na vyrovnání rozdílných kol.
+     * 
+     * Výchozí hodnota je `0.996` (pro 6V motory
+     * může být potřeba menší hodnota, např. 0.95).
+     */
+    float rozdil_v_kolech_levy;
+
+    /**
+     * \brief Korekční faktor pro pravé kolo, použito na vyrovnání rozdílných kol.
+     * 
+     * Výchozí hodnota je `1.0` (pro 6V motory
+     * může být potřeba JINÁ hodnota, např. 9.998).
+     */
+    float rozdil_v_kolech_pravy ; //!< Korekční faktor pro pravé kolo, použito na vyrovnání rozdílných kol. Výchozí: `1.0`
+    
     /**
      * \brief left_wheel_diameter - Průměr levého kola robota v mm.
      * 
@@ -112,22 +128,6 @@ struct rkConfig {
      * Rozdíl mezi koly vyrovnáte nastavením této hodnoty.
      */
     float right_wheel_diameter;
-
-    /**
-     * \brief Korekční faktor pro levé kolo, použito na vyrovnání rozdílných kol.
-     * 
-     * Výchozí hodnota je `0.996` (pro 6V motory
-     * může být potřeba menší hodnota, např. 0.95).
-     */
-    float rozdil_v_kolech_levy = 1;
-
-    /**
-     * \brief Korekční faktor pro pravé kolo, použito na vyrovnání rozdílných kol.
-     * 
-     * Výchozí hodnota je `1.0` (pro 6V motory
-     * může být potřeba JINÁ hodnota, např. 9.998).
-     */
-    float rozdil_v_kolech_pravy = 1; //!< Korekční faktor pro pravé kolo, použito na vyrovnání rozdílných kol. Výchozí: `1.0`
 
     /**
      * \brief Rozteč kol robota v mm, použito na počítání ujeté vzdálenosti při zatáčení.
@@ -990,6 +990,40 @@ void rkServosDisable(uint8_t id);
  * \return reference na SmartServoBus objekt, vrací pokaždé tu stejnou referenci.
  */
 lx16a::SmartServoBus& rkSmartServoBus(uint8_t servo_count);
+
+/**
+ * \brief Smart Servo funkce
+ */
+
+/**
+ * \brief Inicializace smart serva
+ * 
+ * @param bus Reference na SmartServoBus
+ * @param id ID serva (0–253)
+ * @param low Dolní limit úhlu v ° (výchozí 0)
+ * @param high Horní limit úhlu v ° (výchozí 240)
+ */
+void rkSmartServoInit(lx16a::SmartServoBus& bus, int id, int low = 0, int high = 240);
+
+/**
+ * \brief Rychlý pohyb serva bez regulace
+ * 
+ * @param bus Reference na SmartServoBus
+ * @param id ID serva (0–253)
+ * @param angle Cílový úhel v ° (0-240)
+ * @param speed Rychlost (výchozí 200)
+ */
+void rkSmartServoMove(lx16a::SmartServoBus& bus, int id, int angle, int speed = 200);
+
+/**
+ * \brief Plynulý pohyb serva s ochranou proti zaseknutí
+ * 
+ * @param bus Reference na SmartServoBus
+ * @param id ID serva (0–253)
+ * @param angle Cílový úhel v ° (0-240)
+ * @param speed Rychlost (výchozí 200)
+ */
+void rkSmartServoSoftMove(lx16a::SmartServoBus& bus, int id, int angle, int speed = 200);
 ////////////////////////////////////////////////////////////////
 
 /**
@@ -1036,6 +1070,27 @@ void wifi_control_wasd();
  */
 void wifi_terminal();
 
+//////////////////////////////////////////////////////
+/**
+ * \brief Spustí serialový terminál pro příkazy motorů
+ * 
+ * Tato funkce běží nekonečně a čeká na příkazy ze sériového portu.
+ * POZOR: Serial musí být inicializován v main.cpp (Serial.begin(115200))
+ * 
+ * Dostupné příkazy:
+ * - forward(mm, speed)
+ * - forward_acc(mm, speed)
+ * - backward(mm, speed) 
+ * - backward_acc(mm, speed)
+ * - turn_on_spot_left(angle, speed)
+ * - turn_on_spot_right(angle, speed)
+ * - radius_left(radius, angle, speed)
+ * - radius_right(radius, angle, speed)
+ * - back_buttons(speed)
+ * 
+ * Pokud si chcete doplnit prikazy tak v lib/RB3204-RBCX-Robotka-library-master/src/robotka.cpp/processCommand()
+ */
+void rkSerialTerminal();
 //////////////////////////////////////////////////////
 /**@}*/
 

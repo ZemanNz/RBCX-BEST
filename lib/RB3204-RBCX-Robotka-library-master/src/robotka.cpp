@@ -470,6 +470,38 @@ lx16a::SmartServoBus& rkSmartServoBus(uint8_t servo_count) {
     return init.bus();
 }
 
+// Smart Servo funkce
+void rkSmartServoInit(lx16a::SmartServoBus& bus, int id, int low, int high) {
+    bus.setAutoStop(id, false);
+    bus.limit(id, lx16a::Angle::deg(low), lx16a::Angle::deg(high));
+    bus.setAutoStopParams(
+        lx16a::SmartServoBus::AutoStopParams{
+            .max_diff_centideg = 400,
+            .max_diff_readings = 2,
+        });
+    printf("Smart Servo %d inicializováno (limity: %d°-%d°)\n", id, low, high);
+}
+
+void rkSmartServoMove(lx16a::SmartServoBus& bus, int id, int angle, int speed) {
+    if (angle < 0 || angle > 240) {
+        printf("Chyba: Úhel musí být v rozsahu 0–240 stupňů.\n");
+        return;
+    }
+    bus.setAutoStop(id, false);
+    bus.set(id, lx16a::Angle::deg(angle), speed);
+    printf("Smart Servo %d move na %d stupňů rychlostí %d\n", id, angle, speed);
+}
+
+void rkSmartServoSoftMove(lx16a::SmartServoBus& bus, int id, int angle, int speed) {
+    if (angle < 0 || angle > 240) {
+        Serial.println("Chyba: Úhel musí být v rozsahu 0–240 stupňů.");
+        return;
+    }
+    bus.setAutoStop(id, true);
+    bus.set(id, lx16a::Angle::deg(angle), speed);
+    printf("Smart Servo %d soft_move na %d stupňů rychlostí %d\n", id, angle, speed);
+}
+
 void print_wifi(const char* message) {
     gCtx.motors().print_wifi(message);
 }
@@ -491,5 +523,227 @@ void wifi_terminal() {
     while(true){
         rk::Wifi::handleWebClients_terminal();
         delay(50);
+    }
+}
+// Pomocná funkce pro parsování parametrů
+static bool parseParams(const String& params, float* out, int count) {
+    int idx = 0, last = 0;
+    for (int i = 0; i < count; ++i) {
+        idx = params.indexOf(',', last);
+        String val = (idx == -1) ? params.substring(last) : params.substring(last, idx);
+        val.trim();
+        if (!val.length()) return false;
+        out[i] = val.toFloat();
+        last = idx + 1;
+        if (idx == -1 && i < count - 1) return false;
+    }
+    return true;
+}
+
+// Funkce pro zpracování příkazů
+static void processCommand(const String &cmd) {
+    // FORWARD - forward(mm, speed)
+    if (cmd.startsWith("forward(")) {
+        float params[2];
+        int start = cmd.indexOf('(') + 1;
+        int end = cmd.indexOf(')');
+        if (start < 1 || end < 0) {
+            Serial.println("Chybný formát forward");
+            return;
+        }
+        String paramStr = cmd.substring(start, end);
+        if (!parseParams(paramStr, params, 2)) {
+            Serial.println("Chyba v parametrech forward");
+            return;
+        }
+        forward(params[0], params[1]);
+        Serial.println("forward zavoláno");
+        return;
+    }
+    
+    // FORWARD_ACC - forward_acc(mm, speed)
+    if (cmd.startsWith("forward_acc(")) {
+        float params[2];
+        int start = cmd.indexOf('(') + 1;
+        int end = cmd.indexOf(')');
+        if (start < 1 || end < 0) {
+            Serial.println("Chybný formát forward_acc");
+            return;
+        }
+        String paramStr = cmd.substring(start, end);
+        if (!parseParams(paramStr, params, 2)) {
+            Serial.println("Chyba v parametrech forward_acc");
+            return;
+        }
+        forward_acc(params[0], params[1]);
+        Serial.println("forward_acc zavoláno");
+        return;
+    }
+    
+    // BACKWARD - backward(mm, speed)
+    if (cmd.startsWith("backward(")) {
+        float params[2];
+        int start = cmd.indexOf('(') + 1;
+        int end = cmd.indexOf(')');
+        if (start < 1 || end < 0) {
+            Serial.println("Chybný formát backward");
+            return;
+        }
+        String paramStr = cmd.substring(start, end);
+        if (!parseParams(paramStr, params, 2)) {
+            Serial.println("Chyba v parametrech backward");
+            return;
+        }
+        backward(params[0], params[1]);
+        Serial.println("backward zavoláno");
+        return;
+    }
+    
+    // BACKWARD_ACC - backward_acc(mm, speed)
+    if (cmd.startsWith("backward_acc(")) {
+        float params[2];
+        int start = cmd.indexOf('(') + 1;
+        int end = cmd.indexOf(')');
+        if (start < 1 || end < 0) {
+            Serial.println("Chybný formát backward_acc");
+            return;
+        }
+        String paramStr = cmd.substring(start, end);
+        if (!parseParams(paramStr, params, 2)) {
+            Serial.println("Chyba v parametrech backward_acc");
+            return;
+        }
+        backward_acc(params[0], params[1]);
+        Serial.println("backward_acc zavoláno");
+        return;
+    }
+    
+    // TURN_ON_SPOT_LEFT - turn_on_spot_left(angle, speed)
+    if (cmd.startsWith("turn_on_spot_left(")) {
+        float params[2];
+        int start = cmd.indexOf('(') + 1;
+        int end = cmd.indexOf(')');
+        if (start < 1 || end < 0) {
+            Serial.println("Chybný formát turn_on_spot_left");
+            return;
+        }
+        String paramStr = cmd.substring(start, end);
+        if (!parseParams(paramStr, params, 2)) {
+            Serial.println("Chyba v parametrech turn_on_spot_left");
+            return;
+        }
+        turn_on_spot_left(params[0], params[1]);
+        Serial.println("turn_on_spot_left zavoláno");
+        return;
+    }
+    
+    // TURN_ON_SPOT_RIGHT - turn_on_spot_right(angle, speed)
+    if (cmd.startsWith("turn_on_spot_right(")) {
+        float params[2];
+        int start = cmd.indexOf('(') + 1;
+        int end = cmd.indexOf(')');
+        if (start < 1 || end < 0) {
+            Serial.println("Chybný formát turn_on_spot_right");
+            return;
+        }
+        String paramStr = cmd.substring(start, end);
+        if (!parseParams(paramStr, params, 2)) {
+            Serial.println("Chyba v parametrech turn_on_spot_right");
+            return;
+        }
+        turn_on_spot_right(params[0], params[1]);
+        Serial.println("turn_on_spot_right zavoláno");
+        return;
+    }
+    
+    // RADIUS_LEFT - radius_left(radius, angle, speed)
+    if (cmd.startsWith("radius_left(")) {
+        float params[3];
+        int start = cmd.indexOf('(') + 1;
+        int end = cmd.indexOf(')');
+        if (start < 1 || end < 0) {
+            Serial.println("Chybný formát radius_left");
+            return;
+        }
+        String paramStr = cmd.substring(start, end);
+        if (!parseParams(paramStr, params, 3)) {
+            Serial.println("Chyba v parametrech radius_left");
+            return;
+        }
+        radius_left(params[0], params[1], params[2]);
+        Serial.println("radius_left zavoláno");
+        return;
+    }
+    
+    // RADIUS_RIGHT - radius_right(radius, angle, speed)
+    if (cmd.startsWith("radius_right(")) {
+        float params[3];
+        int start = cmd.indexOf('(') + 1;
+        int end = cmd.indexOf(')');
+        if (start < 1 || end < 0) {
+            Serial.println("Chybný formát radius_right");
+            return;
+        }
+        String paramStr = cmd.substring(start, end);
+        if (!parseParams(paramStr, params, 3)) {
+            Serial.println("Chyba v parametrech radius_right");
+            return;
+        }
+        radius_right(params[0], params[1], params[2]);
+        Serial.println("radius_right zavoláno");
+        return;
+    }
+    
+    // BACK_BUTTONS - back_buttons(speed)
+    if (cmd.startsWith("back_buttons(")) {
+        float params[1];
+        int start = cmd.indexOf('(') + 1;
+        int end = cmd.indexOf(')');
+        if (start < 1 || end < 0) {
+            Serial.println("Chybný formát back_buttons");
+            return;
+        }
+        String paramStr = cmd.substring(start, end);
+        if (!parseParams(paramStr, params, 1)) {
+            Serial.println("Chyba v parametrech back_buttons");
+            return;
+        }
+        back_buttons(params[0]);
+        Serial.println("back_buttons zavoláno");
+        return;
+    }
+    
+    Serial.println("Neznámý příkaz");
+}
+
+void rkSerialTerminal() {
+    // Kontrola, zda je Serial inicializován
+    if (!Serial) {
+        ESP_LOGE(TAG, "Serial není inicializován! Volej Serial.begin(115200) v setup()");
+        return;
+    }
+    
+    Serial.println("=== ROBOTKA SERIAL TERMINAL ===");
+    Serial.println("Dostupné příkazy:");
+    Serial.println("forward(mm, speed)           - např. forward(1000, 50)");
+    Serial.println("forward_acc(mm, speed)       - např. forward_acc(800, 50)");
+    Serial.println("backward(mm, speed)          - např. backward(800, 40)");
+    Serial.println("backward_acc(mm, speed)      - např. backward_acc(600, 40)");
+    Serial.println("turn_on_spot_left(angle, speed) - např. turn_on_spot_left(90, 40)");
+    Serial.println("turn_on_spot_right(angle, speed)- např. turn_on_spot_right(90, 40)");
+    Serial.println("radius_left(radius, angle, speed) - např. radius_left(200, 90, 40)");
+    Serial.println("radius_right(radius, angle, speed)- např. radius_right(200, 90, 40)");
+    Serial.println("back_buttons(speed)          - např. back_buttons(30)");
+    Serial.println("Zadej příkaz:");
+    
+    while(true) {
+        if (Serial.available()) {
+            String line = Serial.readStringUntil('\n');
+            line.trim();
+            if (line.length() > 0) {
+                processCommand(line);
+            }
+        }
+        delay(15);
     }
 }
