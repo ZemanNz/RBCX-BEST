@@ -10,19 +10,15 @@
 
 
 
-* udelat dokumentaci knihiovny....  -----> readme        
+* udelat dokumentaci knihiovny....  -----> readme   --- ano udelat 
 
-* mozna by byla fajn funkce, ktera by mela jet pomoci 2 ultrazvuku rovne vedle zdi
+* mozna by byla fajn funkce, ktera by mela jet pomoci 2 ultrazvuku rovne vedle zdi -- ano udelat --- wall_following
 
-* examply !!!  --- wasd, terminal, uart
+* examply !!!  --- wasd, terminal, uart --- ano udelat
 
-* mozna udelat lepe ty smart serva ---> at se nemusi auto &bus = rkSmartServoBus(2); a da se k tomu pristupovat vsude     ---asi done
+* do knihovny zaimplementovat uart komunikaci --- z toho co je tady + medved v praze atd.  - udelat
 
-* preskouset ty smart serva ve stredu
-
-* do knihovny zaimplementovat uart komunikaci --- z toho co je tady + medved v praze atd.
-
-
+* jestli cas tak wasd pres wifi generoanou robotem
 
 
 
@@ -52,3 +48,5 @@ predelat funkce z motor commands.... , do ty rbcx knhovny...
 upravit readme, udelat ty funkce lepsi... hledat na internetu atd, standa, krivka, adam ma  dobry funkce
 udelat nejake nastavitelne promene jako roztec, sirka kol.... typ motoru
 udelat funkce pro ovladani na dalku (s,w,a,d), (<>)
+
+* preskouset ty smart serva ve stredu-------------------- done

@@ -1,29 +1,27 @@
-#include "robotka.h"
 #include <Arduino.h>
+#include "robotka.h"
 
 void setup() {
-    Serial.begin(115200);
     rkConfig cfg;
     rkSetup(cfg);
+    printf("Robotka started!\n");
     
-    Serial.println("Vyber režim:");
-    Serial.println("1 - Tlačítka (default)");
-    Serial.println("2 - Serial terminal (BTN_LEFT)");
-}
+    rkLedRed(true); // Turn on red LED
+    rkLedBlue(true); // Turn on blue LED
 
-void loop() {
-    // Režim tlačítek
-    if (rkButtonIsPressed(BTN_ON)) {
-        forward(1000, 50);
-    }
-    else if (rkButtonIsPressed(BTN_RIGHT)) {
-        backward(800, 40);
-    }
-    // Přepnutí do serial terminálu
-    else if (rkButtonIsPressed(BTN_LEFT)) {
-        Serial.println("Přepínám do serial terminálu...");
-        rkSerialTerminal();
-    }
+
+    rkSmartServoInit(0, 0, 240);
+    rkSmartServoInit(1, 0, 240);
+    wifi_control_wasd();
     
-    delay(100);
+}
+void loop() {
+    if (rkButtonIsPressed(BTN_UP)) {
+        rkSmartServoMove(0,60);
+        rkSmartServoMove(1,200);
+    }
+    if (rkButtonIsPressed(BTN_DOWN)) {
+        rkSmartServoMove(0,160);
+        rkSmartServoMove(1,120);
+    } 
 }

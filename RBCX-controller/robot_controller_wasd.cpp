@@ -66,7 +66,7 @@ int main() {
     robotAddr.sin_port = htons(1234);  // Port musí sedět s robotem
     
     // 👇 SEM DOSAĎ IP ADRESU ROBOTA (tu co vidíš v sériové konzoli)
-    if (inet_pton(AF_INET, "192.168.2.56", &robotAddr.sin_addr) <= 0) {
+    if (inet_pton(AF_INET, "192.168.137.237", &robotAddr.sin_addr) <= 0) {
         std::cerr << "Neplatná IP adresa!" << std::endl;
         close(sock);
         return 1;

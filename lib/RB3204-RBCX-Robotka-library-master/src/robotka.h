@@ -77,12 +77,12 @@ struct rkConfig {
         , motor_max_acceleration(50000)
         , stupid_servo_min(-1.65f)
         , stupid_servo_max(1.65f)
-        , pocet_chytrych_serv(0)
+        , pocet_chytrych_serv(2)
         , enable_wifi_log(false)
-        , enable_wifi_control_wasd(false)
+        , enable_wifi_control_wasd(true)
         , enable_wifi_terminal(false)
-        , wifi_ssid("zemcom")
-        , wifi_password("radekzeman") {
+        , wifi_ssid("NTB 6730")
+        , wifi_password("asdfasdf") {
     }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
@@ -561,6 +561,17 @@ void backward_acc(float mm, float speed);
  * Při couváni jede robut s P - regulátorem.
  */
 void back_buttons(float speed);
+
+/**
+ * \brief Pohyb robota vpřed, a jede podél zdi pomocí dvou senzorů vzdálenosti
+ * 
+ * Timeout je 10 000 ms == 10 sekund, pokud chcete zmenit tak v _librk_motors.cpp v teto funkci zmente int timeoutMs = 10000;
+ * 
+ * Pokud bylo stisknuto jedno tlacitko na druhe se bude cekat jen 2 sekundy.
+ * 
+ * Při couváni jede robut s P - regulátorem.
+ */
+void wall_following(float speed);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**@}*/
 /**

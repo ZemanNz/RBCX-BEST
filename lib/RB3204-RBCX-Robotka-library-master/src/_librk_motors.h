@@ -48,6 +48,7 @@ public:
     void forward_acc(float mm, float speed);
     void backward_acc(float mm, float speed);
     void back_buttons(float speed);
+    void wall_following(float speed, float distance_of_wal);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     void initWifi(const char* ssid, const char* password);
     void print_wifi(const String& message);

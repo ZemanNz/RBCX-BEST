@@ -1560,6 +1560,10 @@ void Motors::back_buttons(float speed) {
     man.motor(m_id_right).power(0);
 }
 
+void wall_following(float speed, float distance_of_wal){
+    
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 int32_t Motors::scale(int32_t val) {
