@@ -16,12 +16,5 @@ void setup() {
     
 }
 void loop() {
-    if (rkButtonIsPressed(BTN_UP)) {
-        rkSmartServoMove(0,60);
-        rkSmartServoMove(1,200);
-    }
-    if (rkButtonIsPressed(BTN_DOWN)) {
-        rkSmartServoMove(0,160);
-        rkSmartServoMove(1,120);
-    } 
+
 }

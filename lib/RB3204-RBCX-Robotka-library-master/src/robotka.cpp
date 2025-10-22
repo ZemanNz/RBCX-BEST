@@ -856,3 +856,127 @@ void rkSerialTerminal() {
         delay(15);
     }
 }
+
+// UART proměnné
+enum RxState { WAIT_SYNC0, WAIT_SYNC1, READ_PAYLOAD };
+
+static HardwareSerial* uartSerial = &Serial1;
+static bool uartInitialized = false;
+
+bool rkUartInit(int baudRate, int rxPin, int txPin) {
+    if (uartInitialized) {
+        ESP_LOGW(TAG, "UART již byl inicializován");
+        return true;
+    }
+    
+    uartSerial->begin(baudRate, SERIAL_8N1, rxPin, txPin);
+    uartInitialized = true;
+    ESP_LOGI(TAG, "UART inicializován: RX=%d, TX=%d, baud=%d", rxPin, txPin, baudRate);
+    return true;
+}
+
+bool rkUartReceive_blocking(void* msg, size_t msgSize, uint32_t timeoutMs) {
+    if (!uartInitialized || msg == nullptr) {
+        return false;
+    }
+    
+    const uint8_t SYNC0 = 0xAA;
+    const uint8_t SYNC1 = 0x55;
+    
+    RxState state = WAIT_SYNC0;
+    
+    uint8_t* buffer = (uint8_t*)msg;
+    size_t bytesRead = 0;
+    uint32_t startTime = millis();
+    
+    while ((millis() - startTime) < timeoutMs) {
+        if (uartSerial->available()) {
+            uint8_t c = uartSerial->read();
+            
+            switch (state) {
+                case WAIT_SYNC0:
+                    if (c == SYNC0) state = WAIT_SYNC1;
+                    break;
+                    
+                case WAIT_SYNC1:
+                    if (c == SYNC1) {
+                        state = READ_PAYLOAD;
+                        bytesRead = 0;
+                    } else {
+                        state = (c == SYNC0) ? WAIT_SYNC1 : WAIT_SYNC0;
+                    }
+                    break;
+                    
+                case READ_PAYLOAD:
+                    buffer[bytesRead++] = c;
+                    if (bytesRead >= msgSize) {
+                        return true; // Úspěšně přijato
+                    }
+                    break;
+            }
+        }
+        delay(1); // Malé zpoždění pro snížení zátěže CPU
+    }
+    
+    return false; // Timeout
+}
+
+bool rkUartReceive(void* msg, size_t msgSize) {
+    if (!uartInitialized || msg == nullptr) {
+        return false;
+    }
+    
+    const uint8_t SYNC0 = 0xAA;
+    const uint8_t SYNC1 = 0x55;
+    
+    static RxState state = WAIT_SYNC0;
+    static size_t bytesRead = 0;
+    static uint8_t* buffer = (uint8_t*)msg;
+    
+    while (uartSerial->available()) {
+        uint8_t c = uartSerial->read();
+        
+        switch (state) {
+            case WAIT_SYNC0:
+                if (c == SYNC0) state = WAIT_SYNC1;
+                break;
+                
+            case WAIT_SYNC1:
+                if (c == SYNC1) {
+                    state = READ_PAYLOAD;
+                    bytesRead = 0;
+                } else {
+                    state = (c == SYNC0) ? WAIT_SYNC1 : WAIT_SYNC0;
+                }
+                break;
+                
+            case READ_PAYLOAD:
+                buffer[bytesRead++] = c;
+                if (bytesRead >= msgSize) {
+                    state = WAIT_SYNC0;
+                    return true;
+                }
+                break;
+        }
+    }
+    
+    return false;
+}
+
+size_t rkUartSend(const void* msg, size_t msgSize) {
+    if (!uartInitialized || msg == nullptr) {
+        return 0;
+    }
+    
+    const uint8_t SYNC0 = 0xAA;
+    const uint8_t SYNC1 = 0x55;
+    
+    // Odeslání synchronizačních bytů
+    uartSerial->write(SYNC0);
+    uartSerial->write(SYNC1);
+    
+    // Odeslání dat
+    size_t bytesWritten = uartSerial->write((const uint8_t*)msg, msgSize);
+    
+    return bytesWritten + 2; // +2 za sync byty
+}

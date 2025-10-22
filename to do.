@@ -14,10 +14,6 @@
 
 * mozna by byla fajn funkce, ktera by mela jet pomoci 2 ultrazvuku rovne vedle zdi -- ano udelat --- wall_following
 
-* examply !!!  --- wasd, terminal, uart --- ano udelat
-
-* do knihovny zaimplementovat uart komunikaci --- z toho co je tady + medved v praze atd.  - udelat
-
 * jestli cas tak wasd pres wifi generoanou robotem
 
 
@@ -50,3 +46,6 @@ udelat nejake nastavitelne promene jako roztec, sirka kol.... typ motoru
 udelat funkce pro ovladani na dalku (s,w,a,d), (<>)
 
 * preskouset ty smart serva ve stredu-------------------- done
+* examply !!!  --- wasd, terminal, uart --- ano udelat                                      ----- asi done
+
+* do knihovny zaimplementovat uart komunikaci --- z toho co je tady + medved v praze atd.  - udelat    --- asi done

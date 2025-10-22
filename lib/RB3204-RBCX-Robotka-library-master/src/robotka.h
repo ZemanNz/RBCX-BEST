@@ -79,7 +79,7 @@ struct rkConfig {
         , stupid_servo_max(1.65f)
         , pocet_chytrych_serv(2)
         , enable_wifi_log(false)
-        , enable_wifi_control_wasd(true)
+        , enable_wifi_control_wasd(false)
         , enable_wifi_terminal(false)
         , wifi_ssid("NTB 6730")
         , wifi_password("asdfasdf") {
@@ -1112,6 +1112,51 @@ void wifi_terminal();
  * Pokud si chcete doplnit prikazy tak v lib/RB3204-RBCX-Robotka-library-master/src/robotka.cpp/processCommand()
  */
 void rkSerialTerminal();
+/////////////////////////////////////////////////////////////////
+/**
+ * \defgroup uart UART Komunikace
+ * 
+ * Funkce pro UART komunikaci s externími zařízeními.
+ * @{
+ */
+
+/**
+ * \brief Inicializace UART komunikace
+ * 
+ * @param baudRate Rychlost komunikace (default: 115200)
+ * @param rxPin RX pin (default: 16)
+ * @param txPin TX pin (default: 17)
+ * @return true pokud inicializace proběhla úspěšně
+ */
+bool rkUartInit(int baudRate = 115200, int rxPin = 16, int txPin = 17);
+
+/**
+ * \brief Přijetí UART zprávy (blokující)
+ * 
+ * @param msg Ukazatel na strukturu, kam se uloží přijatá data
+ * @param timeoutMs Timeout v milisekundách (default: 1000)
+ * @return true pokud byla zpráva úspěšně přijata
+ */
+bool rkUartReceive_blocking(void* msg, size_t msgSize, uint32_t timeoutMs = 1000);
+
+/**
+ * \brief Přijetí UART zprávy (neblokující)
+ * 
+ * @param msg Ukazatel na strukturu, kam se uloží přijatá data
+ * @return true pokud byla zpráva úspěšně přijata
+ */
+bool rkUartReceive(void* msg, size_t msgSize);
+
+/**
+ * \brief Odeslání UART zprávy
+ * 
+ * @param msg Ukazatel na strukturu s daty k odeslání
+ * @param msgSize Velikost struktury v bytech
+ * @return počet odeslaných bytů
+ */
+size_t rkUartSend(const void* msg, size_t msgSize);
+
+
 //////////////////////////////////////////////////////
 /**@}*/
 
