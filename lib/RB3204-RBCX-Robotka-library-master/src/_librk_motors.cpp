@@ -1560,8 +1560,88 @@ void Motors::back_buttons(float speed) {
     man.motor(m_id_right).power(0);
 }
 
-void wall_following(float speed, float distance_of_wal){
+// Univerzální funkce pro následování zdi s libovolnými senzory
+void Motors::wall_following(float speed, float distance_of_wall, 
+                   std::function<float()> left_sensor, 
+                   std::function<float()> right_sensor) {
+
+                
+    auto& man = rb::Manager::get();
     
+    // Regulační parametry
+    float kp = 0.8f;  // Proporcionální konstanta pro korekci
+    float min_speed = 20.0f;  // Minimální rychlost motorů
+    float max_correction = 12.0f;  // Maximální korekce rychlosti
+    
+    // Reset pozic
+    man.motor(m_id_left).setCurrentPosition(0);
+    man.motor(m_id_right).setCurrentPosition(0);
+    
+    Serial.println("Wall following started - press any button to stop");
+    
+    // Hlavní smyčka pro následování zdi
+    while(true) {
+        // Měření vzdáleností na obou stranách pomocí předaných senzorových funkcí
+        float distance_left = left_sensor();
+        float distance_right = right_sensor();
+        
+        // Ošetření neplatných hodnot
+        if (distance_left <= 0 || distance_left > 5000) distance_left = distance_of_wall;
+        if (distance_right <= 0 || distance_right > 5000) distance_right = distance_of_wall;
+        
+        // Výpočet chyby - rozdíl od požadované vzdálenosti
+        float error = distance_of_wall - ((distance_left + distance_right) / 2.0f);
+        
+        // Výpočet korekce pomocí P regulátoru
+        float correction = error * kp;
+        correction = std::max(-max_correction, std::min(correction, max_correction));
+        
+        float base_speed_left = m_polarity_switch_left ? speed : -speed;
+        float base_speed_right = m_polarity_switch_right ? speed : -speed;
+        
+        // Aplikace korekce na motory
+        float speed_left = base_speed_left;
+        float speed_right = base_speed_right;
+        
+        if (error > 0) {
+            // Jsme příliš daleko od zdi - zatáčíme směrem ke zdi
+            speed_left += correction;
+            speed_right -= correction;
+        } else {
+            // Jsme příliš blízko zdi - zatáčíme od zdi
+            speed_left -= correction;
+            speed_right += correction;
+        }
+        
+        // Zajištění minimální rychlosti
+        if (fabs(speed_left) < min_speed && fabs(speed_left) > 0) {
+            speed_left = (speed_left > 0) ? min_speed : -min_speed;
+        }
+        if (fabs(speed_right) < min_speed && fabs(speed_right) > 0) {
+            speed_right = (speed_right > 0) ? min_speed : -min_speed;
+        }
+        
+        // Omezení maximální rychlosti
+        speed_left = std::max(-100.0f, std::min(speed_left, 100.0f));
+        speed_right = std::max(-100.0f, std::min(speed_right, 100.0f));
+        
+        // Nastavení výkonu motorů
+        man.motor(m_id_left).power(pctToSpeed(speed_left));
+        man.motor(m_id_right).power(pctToSpeed(speed_right));
+        
+        // Krátké zpoždění pro stabilizaci
+        delay(50);
+        
+        // Možnost přerušení pomocí tlačítka
+        if (rkButtonIsPressed(BTN_LEFT) || rkButtonIsPressed(BTN_RIGHT) || rkButtonIsPressed(BTN_UP)) {
+            break;
+        }
+    }
+    
+    // Zastavení motorů po ukončení
+    man.motor(m_id_left).power(0);
+    man.motor(m_id_right).power(0);
+    Serial.println("Wall following stopped");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////

@@ -244,6 +244,11 @@ void backward_acc(float mm, float speed){
 void back_buttons(float speed){
     gCtx.motors().back_buttons(speed);
 }
+void wall_following(float speed, float distance_of_wall, 
+                   std::function<float()> left_sensor, 
+                   std::function<float()> right_sensor){
+    gCtx.motors().wall_following(speed, distance_of_wall, left_sensor, right_sensor);
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void rkLedRed(bool on) {

@@ -9,26 +9,27 @@ WiFiUDP udp;
 unsigned int localPort = 1234; // Port pro UDP server
 
 void Wifi::setupWiFiControl(const rkConfig& cfg) {
-    const char* ssid = cfg.wifi_ssid;
-    const char* password = cfg.wifi_password;
+    const char* ap_ssid = cfg.wifi_ssid;      // Název WiFi sítě
+    const char* ap_password = cfg.wifi_password;  // Heslo WiFi sítě (minimálně 8 znaků)
     
-    // Připojení k Wi-Fi
-    printf("Connecting to WiFi SSID: %s\n", ssid);
-    WiFi.begin(ssid, password);
+    // Vytvoření WiFi access pointu
+    printf("Creating WiFi Access Point...\n");
     
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        printf(".");
-    }
-    
-    printf("\nWiFi connected!\n");
-    printf("IP address: ");
-    printf("%s\n", WiFi.localIP().toString().c_str());
+    WiFi.mode(WIFI_AP);
+    WiFi.softAP(ap_ssid, ap_password);
+
+    IPAddress myIP = WiFi.softAPIP();
+    printf("AP IP address: ");
+    printf("%s\n", myIP.toString().c_str());
     
     // Spuštění UDP serveru
     udp.begin(localPort);
     printf("UDP server started on port %d\n", localPort);
-    printf("Waiting for commands...\n");
+    printf("Ready for connections!\n");
+    printf("To connect:\n");
+    printf("1. Connect to WiFi network '%s'\n", ap_ssid);
+    printf("2. Use password: %s\n", ap_password);
+    printf("3. Robot IP address is: %s\n", myIP.toString().c_str());
 }
 byte cout=0;
 

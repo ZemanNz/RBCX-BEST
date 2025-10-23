@@ -79,10 +79,10 @@ struct rkConfig {
         , stupid_servo_max(1.65f)
         , pocet_chytrych_serv(2)
         , enable_wifi_log(false)
-        , enable_wifi_control_wasd(false)
+        , enable_wifi_control_wasd(true)
         , enable_wifi_terminal(false)
-        , wifi_ssid("NTB 6730")
-        , wifi_password("asdfasdf") {
+        , wifi_ssid("robot123")             // pro wasd a wifi_terminal je to jmeno wifi ktere robot vytvori!!! , pro logovani je to wifi ke ktere se pripoji
+        , wifi_password("1234") {       // pro wasd a wifi_terminal je to heslo wifi ktere robot vytvori!!! , pro logovani je to wifi ke ktere se pripoji
     }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
@@ -567,11 +567,11 @@ void back_buttons(float speed);
  * 
  * Timeout je 10 000 ms == 10 sekund, pokud chcete zmenit tak v _librk_motors.cpp v teto funkci zmente int timeoutMs = 10000;
  * 
- * Pokud bylo stisknuto jedno tlacitko na druhe se bude cekat jen 2 sekundy.
- * 
- * Při couváni jede robut s P - regulátorem.
+ * Při pohybu jede robut s P - regulátorem.
  */
-void wall_following(float speed);
+void wall_following(float speed, float distance_of_wall, 
+                   std::function<float()> left_sensor, 
+                   std::function<float()> right_sensor);;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**@}*/
 /**
@@ -1065,16 +1065,25 @@ void handleWebClients();
 //////////////////////////////////////////////////////
 
 /**
- * \brief Po zavolání této funkce se dostanete do nekonecne smycky, kterou jde zrusit jen z "ovladače" klavesou P
+ * \brief Po zavolání této funkce se dostanete do nekonečné smyčky ovládání robota přes WiFi, kterou lze ukončit klávesou P z ovladače
  * 
- * Funkce slouží k ovládání robota na dálku přes wasd nebo šipky.
+ * Robot vytvoří vlastní WiFi síť s následujícím nastavením:
+ * - SSID (jméno sítě): nastaveno v cfg.wifi_ssid (výchozí "robot123")
+ * - Heslo: nastaveno v cfg.wifi_password (výchozí "1234")
+ * - IP adresa robota: 192.168.4.1
  * 
- * Jako ovladač je potřeba spustit na svém počítači soubor jmenem "robot_controller_wasd" , ktery najdete v RBCX-controller -----> tak jak to tam je nejspiš jen na linuxu
+ * Postup připojení:
+ * 1. Připojte se na WiFi síť vytvořenou robotem
+ * 2. Spusťte program "robot_controller_wasd" z RBCX-controller
+ * 3. V programu použijte IP adresu 192.168.4.1
  * 
- * V "robot_controller_wasd" je potreba zadat ip adresa robota, bude vypsana v serial monitoru při inicializaci.
+ * Ovládání:
+ * - WASD nebo šipky pro pohyb robota
+ * - P pro ukončení ovládání
+ * - Klávesy L,K,J,H,G,M,N,B pro spuštění vlastních funkcí
  * 
- * V "robot_controller_wasd" je nabídka co lze delat např je mozne si definovat funkce jako FUNC1.
- * Pro nastavení co se bude delat pro FUNC1 jdete do lib/RB3204-RBCX-Robotka-library-master/src/wifi_control.cpp/Wifi::handleWebClients()
+ * Pro úpravu vlastních funkcí (FUNC1-FUNC8) upravte soubor:
+ * lib/RB3204-RBCX-Robotka-library-master/src/wifi_control.cpp v metodě Wifi::handleWebClients()
  */
 void wifi_control_wasd();
 
@@ -1085,9 +1094,15 @@ void wifi_control_wasd();
  * 
  * Funkce slouží k ovládání robota na dálku přes terminál ---> můžete zadat např. forward(1000, 50) a příkaz se vykonná
  * 
- * Jako ovladač je potřeba spustit na svém počítači soubor jmenem "robot_controller_terminal" , ktery najdete v RBCX-controller -----> tak jak to tam je nejspiš jen na linuxu
+ * Robot vytvoří vlastní WiFi síť s následujícím nastavením:
+ * - SSID (jméno sítě): nastaveno v cfg.wifi_ssid (výchozí "robot123")
+ * - Heslo: nastaveno v cfg.wifi_password (výchozí "1234")
+ * - IP adresa robota: 192.168.4.1
  * 
- * V "robot_controller_terminal" je potreba zadat ip adresa robota, bude vypsana v serial monitoru při inicializaci.
+ * Postup připojení:
+ * 1. Připojte se na WiFi síť vytvořenou robotem
+ * 2. Spusťte program "robot_controller_wasd" z RBCX-controller-----> tak jak to tam je nejspiš jen na linuxu
+ * 3. V programu použijte IP adresu 192.168.4.1
  */
 void wifi_terminal();
 
