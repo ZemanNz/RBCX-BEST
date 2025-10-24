@@ -65,7 +65,7 @@ Projekt **RBCX-UPGRADE** zlepšuje práci s knihovnou RBCX-Robotka-library přid
    pio run --target upload # Nahrání na desku (vypněte Serial Monitor před nahráním !!!)
    pio run --target clean  # Vyčištění sestavení
    ```
-![" "](./obrazky/SharedScreenshot.jpg)
+![" "](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/SharedScreenshot.jpg)
 ---
 
 ## 🔧 Ovládání tlačítek a LED
@@ -103,8 +103,8 @@ rkLedBlue(false);  // Vypnutí modré LED
 - **GPIO piny:**
   - GPIO27: Pin vzdálenější od středu desky.
   - GPIO14: Pin blíže ke středu desky.
-![" "](./obrazky/SENZORY-15-edit.jpg)
-![" "](./obrazky/SENZORY-25-edit.jpg)
+![" "](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/SENZORY-15-edit.jpg)
+![" "](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/SENZORY-25-edit.jpg)
 - **Doporučení:**
   - Při připojování periférií dbejte na správné napájecí napětí (3.3V nebo 5V podle specifikace).
   - Pro další piny a podrobnosti konzultujte dokumentaci desky.
@@ -183,7 +183,7 @@ UART (Universal Asynchronous Receiver/Transmitter) je jednoduché rozhraní pro 
 
 ### 📸 Zapojení UART na desce RBCX
 
-![](./obrazky/UART_RBCX.jpg)
+![](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/UART_RBCX.jpg)
 
 *(Na obrázku je vidět připojení vodičů k RBCX desce na UART2(na desve ESP UART2, RX a TX piny vedle IO5)(v codu: rx:16, tx:17).)*
 
