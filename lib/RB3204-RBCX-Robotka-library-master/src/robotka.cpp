@@ -512,7 +512,7 @@ void wifi_control_wasd() {
     }
 }
 
-void wifi_terminal() {
+void wifi_control_terminal() {
     while(true){
         rk::Wifi::handleWebClients_terminal();
         delay(50);

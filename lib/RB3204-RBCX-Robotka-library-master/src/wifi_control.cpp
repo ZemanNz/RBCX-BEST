@@ -55,10 +55,10 @@ bool Wifi::handleWebClients() {
             return false;
             
         } else if (strcmp(incomingPacket, "FORWARD") == 0) {
-            rkMotorsSetPower(50, 50);
+            rkMotorsSetPower(60, 60);
             
         } else if (strcmp(incomingPacket, "BACKWARD") == 0) {
-            rkMotorsSetPower(-50, -50);
+            rkMotorsSetPower(-60, -60);
             
         } else if (strcmp(incomingPacket, "LEFT") == 0) {
             rkMotorsSetPower(-20, 20);

@@ -77,12 +77,12 @@ struct rkConfig {
         , motor_max_acceleration(50000)
         , stupid_servo_min(-1.65f)
         , stupid_servo_max(1.65f)
-        , pocet_chytrych_serv(2)
+        , pocet_chytrych_serv(0)
         , enable_wifi_log(false)
-        , enable_wifi_control_wasd(true)
-        , enable_wifi_terminal(false)
-        , wifi_ssid("robot123")             // pro wasd a wifi_terminal je to jmeno wifi ktere robot vytvori!!! , pro logovani je to wifi ke ktere se pripoji
-        , wifi_password("1234") {       // pro wasd a wifi_terminal je to heslo wifi ktere robot vytvori!!! , pro logovani je to wifi ke ktere se pripoji
+        , enable_wifi_control_wasd(false)
+        , enable_wifi_terminal(true)
+        , wifi_ssid("robot_zeman")        // pro wasd a wifi_terminal je to jmeno wifi ktere robot vytvori!!! , pro logovani je to wifi ke ktere se pripoji ----> bacha to jmeno musi byt nejak dlouhy, jinak vam to nepujde prejmenovat
+        , wifi_password("robot_zeman") {       // pro wasd a wifi_terminal je to heslo wifi ktere robot vytvori!!! , pro logovani je to wifi ke ktere se pripoji ----> bacha to heslo musi byt nejak dlouhy, jinak vam to nepujde prejmenovat
     }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
@@ -1078,7 +1078,7 @@ void handleWebClients();
  * 3. V programu použijte IP adresu 192.168.4.1
  * 
  * Ovládání:
- * - WASD nebo šipky pro pohyb robota
+ * - WASD nebo šipky pro pohyb robota ---- (sipka doprede --> 60% , otaceni po 20% ----> lze nastavit, viz dale)
  * - P pro ukončení ovládání
  * - Klávesy L,K,J,H,G,M,N,B pro spuštění vlastních funkcí
  * 
@@ -1101,10 +1101,10 @@ void wifi_control_wasd();
  * 
  * Postup připojení:
  * 1. Připojte se na WiFi síť vytvořenou robotem
- * 2. Spusťte program "robot_controller_wasd" z RBCX-controller-----> tak jak to tam je nejspiš jen na linuxu
+ * 2. Spusťte program "robot_controller_terminal" z RBCX-controller-----> tak jak to tam je nejspiš jen na linuxu
  * 3. V programu použijte IP adresu 192.168.4.1
  */
-void wifi_terminal();
+void wifi_control_terminal();
 
 //////////////////////////////////////////////////////
 /**
