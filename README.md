@@ -4,7 +4,7 @@
 
 Cílem projektu **RBCX-UPGRADE** je vylepšit funkčnost knihovny Robotka. Projekt přináší nové funkce a optimalizace, které zlepšují použitelnost a efektivitu knihovny, ale převážně je osekaný a odlehčený.
 
-![RBCX Front View](./obrazky/rbcx-front.png)
+![RBCX Front View](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/rbcx-front.png)
 
 ### Klíčové vlastnosti:
 
