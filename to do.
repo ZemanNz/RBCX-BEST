@@ -12,10 +12,9 @@
 
 * udelat dokumentaci knihiovny....  -----> readme   --- ano udelat 
 
-* vyzkouset zase to wasd  a terminal s wifi delanou robotem..........
-
 * vyzkouset wall_following a poupravit, potom pridat do examplu na jizdu....... 
 
+* vyzkouset uart funkce s jinym esp...
 
 
 
@@ -47,3 +46,5 @@ udelat funkce pro ovladani na dalku (s,w,a,d), (<>)
 * examply !!!  --- wasd, terminal, uart --- ano udelat                                      ----- asi done
 
 * do knihovny zaimplementovat uart komunikaci --- z toho co je tady + medved v praze atd.  - udelat    --- asi done
+* vyzkouset zase to wasd  a terminal s wifi delanou robotem..........
+
