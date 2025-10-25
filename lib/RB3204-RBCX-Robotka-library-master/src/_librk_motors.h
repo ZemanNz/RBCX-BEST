@@ -48,9 +48,9 @@ public:
     void forward_acc(float mm, float speed);
     void backward_acc(float mm, float speed);
     void back_buttons(float speed);
-    void wall_following(float speed, float distance_of_wall, 
-                   std::function<float()> left_sensor, 
-                   std::function<float()> right_sensor);
+    void wall_following(float distance_to_drive, float speed, float distance_of_wall, bool is_wall_on_right,
+                   std::function<int()> first_sensor, 
+                   std::function<int()> second_sensor);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     void initWifi(const char* ssid, const char* password);
     void print_wifi(const String& message);

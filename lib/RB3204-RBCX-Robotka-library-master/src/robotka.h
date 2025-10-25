@@ -78,11 +78,11 @@ struct rkConfig {
         , stupid_servo_min(-1.65f)
         , stupid_servo_max(1.65f)
         , pocet_chytrych_serv(0)
-        , enable_wifi_log(false)
+        , enable_wifi_log(true)
         , enable_wifi_control_wasd(false)
         , enable_wifi_terminal(false)
-        , wifi_ssid("robot_zeman")        // pro wasd a wifi_terminal je to jmeno wifi ktere robot vytvori!!! , pro logovani je to wifi ke ktere se pripoji ----> bacha to jmeno musi byt nejak dlouhy, jinak vam to nepujde prejmenovat
-        , wifi_password("robot_zeman") {       // pro wasd a wifi_terminal je to heslo wifi ktere robot vytvori!!! , pro logovani je to wifi ke ktere se pripoji ----> bacha to heslo musi byt nejak dlouhy, jinak vam to nepujde prejmenovat
+        , wifi_ssid("zemcom")        // pro wasd a wifi_terminal je to jmeno wifi ktere robot vytvori!!! , pro logovani je to wifi ke ktere se pripoji ----> bacha to jmeno musi byt nejak dlouhy, jinak vam to nepujde prejmenovat
+        , wifi_password("radekzeman") {       // pro wasd a wifi_terminal je to heslo wifi ktere robot vytvori!!! , pro logovani je to wifi ke ktere se pripoji ----> bacha to heslo musi byt nejak dlouhy, jinak vam to nepujde prejmenovat
     }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
@@ -569,9 +569,9 @@ void back_buttons(float speed);
  * 
  * Při pohybu jede robut s P - regulátorem.
  */
-void wall_following(float speed, float distance_of_wall, 
-                   std::function<float()> left_sensor, 
-                   std::function<float()> right_sensor);;
+void wall_following(float distance_to_drive, float speed, float distance_of_wall, bool is_wall_on_right,
+                   std::function<uint32_t()> first_sensor, 
+                   std::function<uint32_t()> second_sensor);;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**@}*/
 /**
@@ -1052,7 +1052,7 @@ byte rkSmartServosPosicion (int id);
  * 
  * Můžete napsat třeba : ´printf_wifi(" Start forward - %.1f mm, %.1f%% speed", mm, speed)´
  */
-void print_wifi(const char* message);
+void printf_wifi(const char* format, ...);
 
 /**
  * \brief Při používání print_wifi musíte ve smyčce volat tuto funkci s nejakým delay(), pokud ne tak se nebudou posílát hodnoty ---> web se nebude refreshovat

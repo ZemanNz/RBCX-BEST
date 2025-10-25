@@ -244,10 +244,10 @@ void backward_acc(float mm, float speed){
 void back_buttons(float speed){
     gCtx.motors().back_buttons(speed);
 }
-void wall_following(float speed, float distance_of_wall, 
-                   std::function<float()> left_sensor, 
-                   std::function<float()> right_sensor){
-    gCtx.motors().wall_following(speed, distance_of_wall, left_sensor, right_sensor);
+void wall_following(float distance_to_drive,float speed, float distance_of_wall, bool is_wall_on_right,
+                   std::function<uint32_t()> first_sensor, 
+                   std::function<uint32_t()> second_sensor){
+    gCtx.motors().wall_following(distance_to_drive, speed, distance_of_wall, is_wall_on_right, first_sensor, second_sensor);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -495,8 +495,19 @@ byte rkSmartServoPosition(uint8_t id) {
 }
 
 
-void print_wifi(const char* message) {
-    gCtx.motors().print_wifi(message);
+void printf_wifi(const char* format, ...) {
+    va_list args;
+    va_start(args, format);
+    int len = vsnprintf(nullptr, 0, format, args);
+    va_end(args);
+
+    std::string buf;
+    buf.resize(len + 1);
+    va_start(args, format);
+    vsnprintf(&buf[0], buf.size(), format, args);
+    va_end(args);
+
+    gCtx.motors().printf_wifi(buf.c_str());
 }
 void handleWebClients() {
     gCtx.motors().handleWebClient();
