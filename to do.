@@ -16,8 +16,19 @@
 
 * zdokumentovat ten uart zkrz novy fotky v osekana robotka
 
+* udelat funkci na srovnani podle zdi s ultrazvukama ---- vzdy 2 senzory ---- > dve funkce pro zadek a bok ---. orient_to_wall---> pomale se bude otacedt dokud nebude stejna hodnota +- cm
 
 
+
+
+
+# co udelat zitra nedele 26: 
+
+* ty dve rovnavaci funkce
+
+* tu wall folowing nejak slusne pozitelny.... ---- proste problem s motorama nevim jak to vyresit
+
+* udelat nejako final verzi tech pohybu...
 
 
 

@@ -15,8 +15,8 @@ void loop() {
 
     printf("Zadní Ultrasonic: %d mm\n", rkUltraMeasure(1));
     printf("Přední Ultrasonic: %d mm\n", rkUltraMeasure(2));
-    printf_wifi("Zadní Ultrasonic: %d mm", rkUltraMeasure(1));
-    printf_wifi("Přední Ultrasonic: %d mm", rkUltraMeasure(2));
+    // printf_wifi("Zadní Ultrasonic: %d mm", rkUltraMeasure(1));
+    // printf_wifi("Přední Ultrasonic: %d mm", rkUltraMeasure(2));
     delay(300);
     if(rkButtonIsPressed(BTN_ON)){
         rkLedGreen(true); // Turn on green LED
@@ -26,5 +26,4 @@ void loop() {
                    []() -> uint32_t { return rkUltraMeasure(1); }); 
         rkLedGreen(false); // Turn off green LED
     }
-    handleWebClients();
 }

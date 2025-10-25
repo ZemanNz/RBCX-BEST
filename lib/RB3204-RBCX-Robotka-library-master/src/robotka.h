@@ -78,7 +78,7 @@ struct rkConfig {
         , stupid_servo_min(-1.65f)
         , stupid_servo_max(1.65f)
         , pocet_chytrych_serv(0)
-        , enable_wifi_log(true)
+        , enable_wifi_log(false)
         , enable_wifi_control_wasd(false)
         , enable_wifi_terminal(false)
         , wifi_ssid("zemcom")        // pro wasd a wifi_terminal je to jmeno wifi ktere robot vytvori!!! , pro logovani je to wifi ke ktere se pripoji ----> bacha to jmeno musi byt nejak dlouhy, jinak vam to nepujde prejmenovat
@@ -571,7 +571,16 @@ void back_buttons(float speed);
  */
 void wall_following(float distance_to_drive, float speed, float distance_of_wall, bool is_wall_on_right,
                    std::function<uint32_t()> first_sensor, 
-                   std::function<uint32_t()> second_sensor);;
+                   std::function<uint32_t()> second_sensor);
+
+
+void orient_to_wall_button(bool buttom, std::function<uint32_t()> first_sensor, 
+                   std::function<uint32_t()> second_sensor, float speed = 10);
+
+
+
+void orient_to_wall_site(bool right, std::function<uint32_t()> first_sensor, 
+                   std::function<uint32_t()> second_sensor, float speed = 10);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**@}*/
 /**

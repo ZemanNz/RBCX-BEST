@@ -1953,15 +1953,15 @@ void Motors::wall_following(float distance_to_drive, float speed, float distance
         std::cout << "Speed left: " << speed_left << ", Speed right: " << speed_right << std::endl;
         std::cout << "Front sensor: " << front_distance_senzor << ", Back sensor: " << back_distance_senzor << std::endl;
         std::cout << "----------------------------------------" << std::endl;
-        printf_wifi("celkovy error:  %.1f", celkovy_error);
-        printf_wifi("Error:  %.1f", error);
-        printf_wifi("Correction:  %.1f", correction);
-        printf_wifi("Speed left:  %.1f", speed_left);
-        printf_wifi("Speed right:  %.1f", speed_right);
-        printf_wifi("Front sensor:  %d", front_distance_senzor);
-        printf_wifi("Back sensor:  %d", back_distance_senzor);
-        printf_wifi("-----------------------------");
-        handleWebClients();
+        // printf_wifi("celkovy error:  %.1f", celkovy_error);
+        // printf_wifi("Error:  %.1f", error);
+        // printf_wifi("Correction:  %.1f", correction);
+        // printf_wifi("Speed left:  %.1f", speed_left);
+        // printf_wifi("Speed right:  %.1f", speed_right);
+        // printf_wifi("Front sensor:  %d", front_distance_senzor);
+        // printf_wifi("Back sensor:  %d", back_distance_senzor);
+        // printf_wifi("-----------------------------");
+        // handleWebClients();
         // Krátké zpoždění pro stabilizaci
         delay(50);
         }
@@ -1970,6 +1970,16 @@ void Motors::wall_following(float distance_to_drive, float speed, float distance
     man.motor(m_id_left).power(0);
     man.motor(m_id_right).power(0);
     
+}
+
+void Motors::orient_to_wall_button(bool button, std::function<int()> first_sensor, 
+                                   std::function<int()> second_sensor, float speed) {
+// prvne oddela pocatecni merici chyby , potom si jsisti na jakou stranu se ma otacet, pak se bude pomale oacet a rychle merit --- az bude dostatecne presne takse zastavi, jeste bude mit timeout tak 5 sekund
+}
+
+void Motors::orient_to_wall_site(bool right,std::function<int()> first_sensor, 
+                                   std::function<int()> second_sensor, float speed) {
+// prvne oddela pocatecni merici chyby , potom si jsisti na jakou stranu se ma otacet, pak se bude pomale oacet a rychle merit --- az bude dostatecne presne takse zastavi, jeste bude mit timeout tak 5 sekund
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////

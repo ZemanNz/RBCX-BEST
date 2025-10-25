@@ -117,6 +117,10 @@ void loop() {
         rkLedGreen(true);
         forward(500, 60);
         rkLedGreen(false);
+        delay(1000);
+        wall_following(1300 ,30.0f, 100.0f, true,
+                   []() -> uint32_t { return rkUltraMeasure(2); },
+                   []() -> uint32_t { return rkUltraMeasure(1); }); 
         
         Serial.println("Sequence 5 completed!");
     }
