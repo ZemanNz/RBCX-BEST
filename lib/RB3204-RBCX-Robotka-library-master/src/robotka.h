@@ -80,7 +80,7 @@ struct rkConfig {
         , pocet_chytrych_serv(0)
         , enable_wifi_log(false)
         , enable_wifi_control_wasd(false)
-        , enable_wifi_terminal(true)
+        , enable_wifi_terminal(false)
         , wifi_ssid("robot_zeman")        // pro wasd a wifi_terminal je to jmeno wifi ktere robot vytvori!!! , pro logovani je to wifi ke ktere se pripoji ----> bacha to jmeno musi byt nejak dlouhy, jinak vam to nepujde prejmenovat
         , wifi_password("robot_zeman") {       // pro wasd a wifi_terminal je to heslo wifi ktere robot vytvori!!! , pro logovani je to wifi ke ktere se pripoji ----> bacha to heslo musi byt nejak dlouhy, jinak vam to nepujde prejmenovat
     }
@@ -1132,11 +1132,15 @@ void rkSerialTerminal();
  * \defgroup uart UART Komunikace
  * 
  * Funkce pro UART komunikaci s externími zařízeními.
+ * 
+ * V examplupro UART je code i pro samostatny esp32 který komunikuje s robotkou přes UART
  * @{
  */
 
 /**
  * \brief Inicializace UART komunikace
+ * 
+ * V examplupro UART je code i pro samostatny esp32 který komunikuje s robotkou přes UART
  * 
  * @param baudRate Rychlost komunikace (default: 115200)
  * @param rxPin RX pin (default: 16)
@@ -1167,9 +1171,8 @@ bool rkUartReceive(void* msg, size_t msgSize);
  * 
  * @param msg Ukazatel na strukturu s daty k odeslání
  * @param msgSize Velikost struktury v bytech
- * @return počet odeslaných bytů
  */
-size_t rkUartSend(const void* msg, size_t msgSize);
+void rkUartSend(const void* msg, size_t msgSize);
 
 
 //////////////////////////////////////////////////////

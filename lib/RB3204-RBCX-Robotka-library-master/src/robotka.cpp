@@ -968,9 +968,9 @@ bool rkUartReceive(void* msg, size_t msgSize) {
     return false;
 }
 
-size_t rkUartSend(const void* msg, size_t msgSize) {
+void rkUartSend(const void* msg, size_t msgSize) {
     if (!uartInitialized || msg == nullptr) {
-        return 0;
+        return;
     }
     
     const uint8_t SYNC0 = 0xAA;
@@ -982,6 +982,5 @@ size_t rkUartSend(const void* msg, size_t msgSize) {
     
     // Odeslání dat
     size_t bytesWritten = uartSerial->write((const uint8_t*)msg, msgSize);
-    
-    return bytesWritten + 2; // +2 za sync byty
+    printf("Odesláno %d bytů přes UART\n", bytesWritten);
 }

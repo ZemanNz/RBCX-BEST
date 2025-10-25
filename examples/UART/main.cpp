@@ -7,31 +7,37 @@ typedef struct __attribute__((packed)) {
     uint8_t position; // 0-255
 } SimpleCommand;
 
+SimpleCommand cmd = {1, 128}; // Servo ID 1, střední pozice
+
 void setup() {
     rkConfig cfg;
     rkSetup(cfg);
-    rkUartInit(115200, 16, 17);
+    printf("Robotka started!\n");
     
-    printf("Simple UART receiver ready\n");
-}
+    rkLedRed(true); // Turn on red LED
+    rkLedBlue(true); // Turn on blue LED
 
-void loop() {
-    SimpleCommand cmd;
+    delay(2000); // Wait for 2 seconds
+    rkUartInit();
+
+    delay(100); // Short delay to ensure UART is initialized
+    printf("posilam data...\n");
+    rkUartSend(&cmd, sizeof(cmd));
     
-    // Čekáme na příkaz
-    if (rkUartReceive_blocking(&cmd, sizeof(cmd), 1000)) {
+}
+int start_mil = millis();
+void loop() {
+    
+    if(millis() - start_mil > 3000) {
+        start_mil = millis();
+        printf("posilam data...\n");
+        rkUartSend(&cmd, sizeof(cmd));
+    }
+    if(rkUartReceive(&cmd, sizeof(cmd))) {
         // TADY PRACUJEME S PŘIJATÝMI DATY:
         
         // 1. Výpis na serial
         printf("Servo %d -> Position %d\n", cmd.servo_id, cmd.position);
-        
-        // 2. Ovládání hardware
-        int angle = map(cmd.position, 0, 255, 0, 240);
-        rkSmartServoMove(cmd.servo_id, angle, 100);
-        
-        // 3. Odeslání odpovědi
-        rkUartSend(&cmd, sizeof(cmd));
-    } else {
-        printf("Timeout - žádná data\n");
+
     }
 }
