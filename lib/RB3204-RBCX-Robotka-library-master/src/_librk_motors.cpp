@@ -1019,6 +1019,38 @@ void Motors::backward(float mm, float speed) {
 //     man.motor(m_id_right).power(0);
 // }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void Motors::turn_on_spot_left(float angle, float speed) {
     auto& man = rb::Manager::get();
     
@@ -1051,6 +1083,15 @@ void Motors::turn_on_spot_left(float angle, float speed) {
     unsigned long last_time = millis();
     const unsigned long timeout_ms =10000;
     
+    float progress = 0.0f; 
+    float progress_ratio = 0.0f;
+    float remaining_ratio = 0.0f;
+    float decel_speed = 0.0f;
+    int error = 0;
+    float correction = 0.0f;
+    float speed_left_corrected = 0.0f;
+    float speed_right_corrected = 0.0f;
+    
     while((target_ticks > abs(left_pos) || target_ticks > abs(right_pos)) && 
           (millis() - last_time < timeout_ms)) {
         
@@ -1061,31 +1102,36 @@ void Motors::turn_on_spot_left(float angle, float speed) {
         man.motor(m_id_right).requestInfo([&](rb::Motor& info) {
              right_pos = info.position();
           });
+          
         
         // Výpočet ujeté vzdálenosti (průměr obou kol)
-        float progress = (abs(left_pos) + abs(right_pos)) / 2.0f;
-        float progress_ratio = progress / target_ticks;
+        progress = (abs(left_pos) + abs(right_pos)) / 2.0f;
+        progress_ratio = progress / target_ticks;
         
         // PODMÍNKA PRO BRZKÉ UKONČENÍ - pokud jsme velmi blízko cíle
-        if (abs(left_pos) > target_ticks + 80) {
-            // Jsme velmi blízko cíle (98%) - okamžitě zastavujeme
-            break;
-        }
+        // if (abs(left_pos) > target_ticks + 80) {
+        //     // Jsme velmi blízko cíle (98%) - okamžitě zastavujeme
+        //     break;
+        // }
         
         // PLYNULÉ ZRYCHLENÍ A ZPOMALENÍ
         if (progress_ratio < deceleration_start) {
             // Fáze zrychlení - plynule zrychluj k cílové rychlosti
             current_speed_left = approachValue(current_speed_left, target_speed_left, acceleration);
             current_speed_right = approachValue(current_speed_right, target_speed_right, acceleration);
+            std::cout << "Accelerating - Left Speed: " << current_speed_left << ", Right Speed: " << current_speed_right << std::endl;
+            std::cout << "Progress ratio: " << progress_ratio << std::endl;
         } else {
             // Fáze zpomalení - plynule zpomaluj, ale NE POD MINIMÁLNÍ RYCHLOST
-            float remaining_ratio = 1.0f - progress_ratio;
-            float decel_speed = target_speed_left * (remaining_ratio / (1.0f - deceleration_start));
+            remaining_ratio = 1.0f - progress_ratio;
+            decel_speed = target_speed_left * (remaining_ratio / (1.0f - deceleration_start));
             
             // OMEZENÍ RYCHLOSTI - během zpomalování nikdy neklesneme pod minimum
             if (abs(decel_speed) < m_min_decel_speed) {
                 decel_speed = (decel_speed > 0) ? m_min_decel_speed : -m_min_decel_speed;
             }
+            std::cout << "Decelerating - Target Decel Speed: " << decel_speed << std::endl;
+            std::cout << "Progress ratio: " << progress_ratio << std::endl;
             
             current_speed_left = approachValue(current_speed_left, decel_speed, acceleration * 2.0f);
             current_speed_right = approachValue(current_speed_right, 
@@ -1094,13 +1140,13 @@ void Motors::turn_on_spot_left(float angle, float speed) {
         }
         
         // P REGULÁTOR - vyrovnávání rychlosti motorů
-        int error = abs(left_pos) - abs(right_pos);
-        float correction = error * m_kp;
+        error = abs(left_pos) - abs(right_pos);
+        correction = error * m_kp;
         correction = std::max(-m_max_correction, std::min(correction, m_max_correction));
         
         // Aplikace korekce
-        float speed_left_corrected = current_speed_left;
-        float speed_right_corrected = current_speed_right;
+        speed_left_corrected = current_speed_left;
+        speed_right_corrected = current_speed_right;
         
         if (error > 0) {
             // Levý je napřed - zpomalit levý, zrychlit pravý
@@ -1150,13 +1196,35 @@ void Motors::turn_on_spot_left(float angle, float speed) {
         man.motor(m_id_left).power(pctToSpeed(speed_left_corrected));
         man.motor(m_id_right).power(pctToSpeed(speed_right_corrected));
         
-        delay(10);
+        delay(30);
     }
     
     // Konečné zastavení
     man.motor(m_id_left).power(0);
     man.motor(m_id_right).power(0);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Pomocná funkce pro plynulé přiblížení k hodnotě
 float Motors::approachValue(float current, float target, float step) {
@@ -1296,13 +1364,16 @@ void Motors::turn_on_spot_right(float angle, float speed) {
         man.motor(m_id_left).power(pctToSpeed(speed_left_corrected));
         man.motor(m_id_right).power(pctToSpeed(speed_right_corrected));
         
-        delay(10);
+        delay(30);
     }
     
     // Konečné zastavení
     man.motor(m_id_left).power(0);
     man.motor(m_id_right).power(0);
 }
+
+
+
 
 void Motors::radius_right(float radius, float angle, float speed) {
     auto& man = rb::Manager::get();
@@ -1711,7 +1782,7 @@ void Motors::forward_acc(float mm, float speed) {
 }
 
 void Motors::backward_acc(float mm, float speed) {
-    forward_acc(-mm, speed);
+    forward_acc(mm, -speed);
 }
 
 void Motors::back_buttons(float speed) {
@@ -1864,24 +1935,10 @@ void Motors::wall_following(float distance_to_drive, float speed, float distance
             back_distance_senzor = distance_of_wall;
         }
 
-        // P regulátor
-
-        // if((front_distance_senzor >= distance_of_wall + 18) && (back_distance_senzor >= distance_of_wall + 18)){
-        //     std::cout << "Daleko" << std::endl;
-        //     celkovy_error = front_distance_senzor - distance_of_wall;
-        // }
-        // else if((front_distance_senzor + 18 < distance_of_wall) && (back_distance_senzor + 18 < distance_of_wall)){
-        //     std::cout << "PŘÍLIŠ BLÍZKO ZDI" << std::endl;
-        //     celkovy_error = front_distance_senzor - distance_of_wall;
-        // }
-        // else{
-        //     celkovy_error = 0;
-        // }
-
         celkovy_error = (front_distance_senzor + back_distance_senzor)/2 - distance_of_wall;
         float error = 0;
         if(abs(celkovy_error) > 40){
-            error = celkovy_error * 0.5f;
+            error = celkovy_error * 0.9f;
             std::cout << "Velká chyba: " << error << std::endl;
         }
         else{
@@ -2076,51 +2133,6 @@ void Motors::orient_to_wall(bool button_or_right, std::function<int()> first_sen
     man.motor(m_id_right).power(0);
 
 }
-
-// int predni[3];
-    // int zadni[3];
-    
-    // for(byte i = 0; i < 5; i++){
-    //     if(i %2 == 0){
-    //     predni[i] = first_sensor();
-    //     }
-    //     else{
-    //     zadni[i] = second_sensor();
-    //     }
-    //     delay(60);
-    // }
-    // byte a = 0;
-    // byte b = 0;
-    // for(byte i = 0; i < 6; i++){
-    //     if(i %2 == 0){
-    //     predni[a] = first_sensor();
-    //     a++;
-    //     }
-    //     else{
-    //     zadni[b] = second_sensor();
-    //     b++;
-    //     }
-    //     delay(60);
-    // }
-
-    // std::cout<< "Predni senzory: " << predni[0] << " " << predni[1] << " " << predni[2] << std::endl;
-    // std::cout<< "Zadni senzory: " << zadni[0] << " " << zadni[1] << " " << zadni[2] << std::endl;
-
-    // if(predni[3]> 800 && predni[4] > 800 && predni[5] > 800 && zadni[3]> 800 && zadni[4] > 800 && zadni[5] > 800){
-    //     std::cout<< "Jsme moc daleko, nebo nevim jak se mam srovnat"<<std::endl;
-    //     return;
-    // }
-    // else if(predni[3]< 800 || predni[4] < 800 || predni[5] < 800 || zadni[3]< 800 || zadni[4] < 800 || zadni[5] < 800){
-    //     distance_first = min(std::min(predni[3], predni[4]), predni[5]);
-    //     distance_second = min(std::min(zadni[3], zadni[4]), zadni[5]);
-    //     if(distance_first < distance_second){
-    //         std::cout<< "Predni senzor je blize zdi nez zadni"<<std::endl;
-    //     }
-    //     else{
-    //         std::cout<< "Zadni senzor je blize zdi nez predni, jedeme dopredu"<<std::endl;
-    //     }
-    // }
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
