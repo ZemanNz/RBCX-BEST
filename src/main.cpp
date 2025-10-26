@@ -19,14 +19,14 @@ void loop() {
     // printf_wifi("Zadní Ultrasonic: %d mm", rkUltraMeasure(1));
     // printf_wifi("Přední Ultrasonic: %d mm", rkUltraMeasure(2));
     delay(200);
-    // if(rkButtonIsPressed(BTN_ON)){
-    //     rkLedGreen(true); // Turn on green LED
-    //     delay(1500);
-    //      wall_following(1300 ,30.0f, 100.0f, true,
-    //                []() -> uint32_t { return rkUltraMeasure(2); },
-    //                []() -> uint32_t { return rkUltraMeasure(1); }); 
-    //     rkLedGreen(false); // Turn off green LED
-    // }
+    if(rkButtonIsPressed(BTN_ON)){
+        rkLedGreen(true); // Turn on green LED
+        delay(1500);
+         wall_following(1300 ,60.0f, 100.0f, true,
+                   []() -> uint32_t { return rkUltraMeasure(2); },
+                   []() -> uint32_t { return rkUltraMeasure(1); }); 
+        rkLedGreen(false); // Turn off green LED
+    }
     if(rkButtonIsPressed(BTN_LEFT)){
         rkLedGreen(true); // Turn on green LED
         delay(2000);

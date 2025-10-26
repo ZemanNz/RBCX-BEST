@@ -565,15 +565,30 @@ void back_buttons(float speed);
 /**
  * \brief Pohyb robota vpřed, a jede podél zdi pomocí dvou senzorů vzdálenosti
  * 
- * Timeout je 10 000 ms == 10 sekund, pokud chcete zmenit tak v _librk_motors.cpp v teto funkci zmente int timeoutMs = 10000;
+ * Timeout je vypočítaný jako u forward;
  * 
  * Při pohybu jede robut s P - regulátorem.
+ * 
+ * Nejspise je potreba donastavovat podle aktualniho robota.
  */
 void wall_following(float distance_to_drive, float speed, float distance_of_wall, bool is_wall_on_right,
                    std::function<uint32_t()> first_sensor, 
                    std::function<uint32_t()> second_sensor);
 
 
+/**
+ * \brief Srovnání robota podle zdi pomocí dvou senzorů vzdálenosti
+ * 
+ * Timeout je 5 000 ms == 5 sekund, pokud chcete zmenit tak v _librk_motors.cpp v teto funkci zmente int timeut_ms = 5000;
+ * 
+ * Důležité je aby jste spravne nastavily button_or_right ---> pokud je zed od robota na prave stranenebo vzadu tak nastavte true, pokud je zed na leve strane nebo ve predu tak nastavte false
+ * 
+ * Pokud je robot vyrovnanej na zactku tak se nic nestane.
+ * 
+ * Volte spise nizsi rychlosti do 30 % --- 25% je defaultni hodnota
+ * 
+ * Funkce first_sensor a second_sensor vrací hodnoty v mm ze senzorů vzdálenosti --- ultrazvuky nebo laserový s.
+ */
 void orient_to_wall(bool button_or_right, std::function<uint32_t()> first_sensor, 
                    std::function<uint32_t()> second_sensor, float speed = 25);
 

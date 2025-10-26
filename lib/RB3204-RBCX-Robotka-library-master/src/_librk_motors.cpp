@@ -2043,8 +2043,10 @@ void Motors::orient_to_wall(bool button_or_right, std::function<int()> first_sen
             }
         }
     }
+    unsigned long start_time = millis();
+    int timeut_ms = 5000;
 
-    while(true){
+    while(timeut_ms > millis() - start_time){
         distance_first = first_sensor();
         distance_second = second_sensor();
 
