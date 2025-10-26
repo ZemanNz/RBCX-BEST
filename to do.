@@ -12,8 +12,6 @@
 
 * udelat dokumentaci knihiovny....  -----> readme   --- ano udelat 
 
-* vyzkouset wall_following a poupravit, potom pridat do examplu na jizdu....... 
-
 * zdokumentovat ten uart zkrz novy fotky v osekana robotka
 
 
@@ -21,11 +19,10 @@
 
 
 
-# co udelat zitra nedele 26: 
+# co udelat zitra nedele 26 ---- takze 27 pon: 
 
-* tu wall folowing nejak slusne pozitelny.... ---- proste problem s motorama nevim jak to vyresit
 
-* udelat nejako final verzi tech pohybu...
+* udelat nejako final verzi tech pohybu...   ----> forward a ty turny --- jsou nejaky divny
 
 
 
@@ -54,3 +51,5 @@ udelat funkce pro ovladani na dalku (s,w,a,d), (<>)
 * do knihovny zaimplementovat uart komunikaci --- z toho co je tady + medved v praze atd.  - udelat    --- asi done
 * vyzkouset zase to wasd  a terminal s wifi delanou robotem..........
 * udelat funkci na srovnani podle zdi s ultrazvukama ---- vzdy 2 senzory ---- > dve funkce pro zadek a bok ---. orient_to_wall---> pomale se bude otacedt dokud nebude stejna hodnota +- cm
+* tu wall folowing nejak slusne pozitelny.... ---- proste problem s motorama nevim jak to vyresit
+* vyzkouset wall_following a poupravit, potom pridat do examplu na jizdu....... 

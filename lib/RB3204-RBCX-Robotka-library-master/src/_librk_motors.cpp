@@ -1057,7 +1057,7 @@ void Motors::turn_on_spot_left(float angle, float speed) {
     // Reset pozic
     man.motor(m_id_left).setCurrentPosition(0);
     man.motor(m_id_right).setCurrentPosition(0);
-    float koeficient_korekce = 1.085f; // Korekční faktor pro jemné doladění otáčení
+    float koeficient_korekce = 1.095f; // Korekční faktor pro jemné doladění otáčení
     float distance_per_wheel = (M_PI * roztec_kol) * (angle / 360.0f) * koeficient_korekce; // Vzdálenost, kterou musí každé kolo urazit
     int target_ticks = mmToTicks(distance_per_wheel);
     
@@ -1108,11 +1108,6 @@ void Motors::turn_on_spot_left(float angle, float speed) {
         progress = (abs(left_pos) + abs(right_pos)) / 2.0f;
         progress_ratio = progress / target_ticks;
         
-        // PODMÍNKA PRO BRZKÉ UKONČENÍ - pokud jsme velmi blízko cíle
-        // if (abs(left_pos) > target_ticks + 80) {
-        //     // Jsme velmi blízko cíle (98%) - okamžitě zastavujeme
-        //     break;
-        // }
         
         // PLYNULÉ ZRYCHLENÍ A ZPOMALENÍ
         if (progress_ratio < deceleration_start) {
@@ -1205,7 +1200,9 @@ void Motors::turn_on_spot_left(float angle, float speed) {
 }
 
 
-
+void Motors::turn_on_spot_right(float angle, float speed) {
+    turn_on_spot_left(angle, -speed);
+}
 
 
 
@@ -1236,141 +1233,141 @@ float Motors::approachValue(float current, float target, float step) {
     return current;
 }
 
-void Motors::turn_on_spot_right(float angle, float speed) {
-    auto& man = rb::Manager::get();
+// void Motors::turn_on_spot_right(float angle, float speed) {
+//     auto& man = rb::Manager::get();
     
-    // Reset pozic
-    man.motor(m_id_left).setCurrentPosition(0);
-    man.motor(m_id_right).setCurrentPosition(0);
+//     // Reset pozic
+//     man.motor(m_id_left).setCurrentPosition(0);
+//     man.motor(m_id_right).setCurrentPosition(0);
 
-    float koeficient_korekce = 1.085f; // Korekční faktor pro jemné doladění otáčení
-    float distance_per_wheel = (M_PI * roztec_kol) * (angle / 360.0f) * koeficient_korekce; // Vzdálenost, kterou musí každé kolo urazit
-    int target_ticks = mmToTicks(distance_per_wheel);
+//     float koeficient_korekce = 1.085f; // Korekční faktor pro jemné doladění otáčení
+//     float distance_per_wheel = (M_PI * roztec_kol) * (angle / 360.0f) * koeficient_korekce; // Vzdálenost, kterou musí každé kolo urazit
+//     int target_ticks = mmToTicks(distance_per_wheel);
     
-    int left_pos = 0;
-    int right_pos = 0;
+//     int left_pos = 0;
+//     int right_pos = 0;
     
-    // Parametry regulátoru
-    float m_kp = 0.15f;
-    float m_max_correction = 20.0f;
-    float m_min_speed = 15.0f;
-    float m_min_decel_speed = 12.0f;
+//     // Parametry regulátoru
+//     float m_kp = 0.15f;
+//     float m_max_correction = 20.0f;
+//     float m_min_speed = 15.0f;
+//     float m_min_decel_speed = 12.0f;
     
-    // Proměnné pro plynulé zrychlení/zpomalení
-    float current_speed_left = 0;
-    float current_speed_right = 0;
-    const float acceleration = 2.0f;
-    const float deceleration_start = 0.88f;
+//     // Proměnné pro plynulé zrychlení/zpomalení
+//     float current_speed_left = 0;
+//     float current_speed_right = 0;
+//     const float acceleration = 2.0f;
+//     const float deceleration_start = 0.88f;
     
-    // ZÁKLADNÍ SMĚRY RYCHLOSTI PRO OTÁČENÍ NA MÍSTĚ DOPRAVA - OPACNÉ NEŽ DOLEVA
-    float target_speed_left = m_polarity_switch_left ? -speed : speed;  // Levý dopředu
-    float target_speed_right = m_polarity_switch_right ? speed : -speed; // Pravý dozadu
+//     // ZÁKLADNÍ SMĚRY RYCHLOSTI PRO OTÁČENÍ NA MÍSTĚ DOPRAVA - OPACNÉ NEŽ DOLEVA
+//     float target_speed_left = m_polarity_switch_left ? -speed : speed;  // Levý dopředu
+//     float target_speed_right = m_polarity_switch_right ? speed : -speed; // Pravý dozadu
     
-    unsigned long last_time = millis();
-    const unsigned long timeout_ms = 10000;
+//     unsigned long last_time = millis();
+//     const unsigned long timeout_ms = 10000;
     
-    while((target_ticks > abs(left_pos) || target_ticks > abs(right_pos)) && 
-          (millis() - last_time < timeout_ms)) {
+//     while((target_ticks > abs(left_pos) || target_ticks > abs(right_pos)) && 
+//           (millis() - last_time < timeout_ms)) {
         
-        // Čtení pozic
-        man.motor(m_id_left).requestInfo([&](rb::Motor& info) {
-             left_pos = info.position();
-          });
-        man.motor(m_id_right).requestInfo([&](rb::Motor& info) {
-             right_pos = info.position();
-          });
+//         // Čtení pozic
+//         man.motor(m_id_left).requestInfo([&](rb::Motor& info) {
+//              left_pos = info.position();
+//           });
+//         man.motor(m_id_right).requestInfo([&](rb::Motor& info) {
+//              right_pos = info.position();
+//           });
         
-        // Výpočet ujeté vzdálenosti (průměr obou kol)
-        float progress = (abs(left_pos) + abs(right_pos)) / 2.0f;
-        float progress_ratio = progress / target_ticks;
+//         // Výpočet ujeté vzdálenosti (průměr obou kol)
+//         float progress = (abs(left_pos) + abs(right_pos)) / 2.0f;
+//         float progress_ratio = progress / target_ticks;
         
-        // PODMÍNKA PRO BRZKÉ UKONČENÍ - pokud jsme velmi blízko cíle
-        if (abs(left_pos) > target_ticks + 80) {
-            break;
-        }
+//         // PODMÍNKA PRO BRZKÉ UKONČENÍ - pokud jsme velmi blízko cíle
+//         if (abs(left_pos) > target_ticks + 80) {
+//             break;
+//         }
         
-        // PLYNULÉ ZRYCHLENÍ A ZPOMALENÍ
-        if (progress_ratio < deceleration_start) {
-            current_speed_left = approachValue(current_speed_left, target_speed_left, acceleration);
-            current_speed_right = approachValue(current_speed_right, target_speed_right, acceleration);
-        } else {
-            float remaining_ratio = 1.0f - progress_ratio;
-            float decel_speed = target_speed_left * (remaining_ratio / (1.0f - deceleration_start));
+//         // PLYNULÉ ZRYCHLENÍ A ZPOMALENÍ
+//         if (progress_ratio < deceleration_start) {
+//             current_speed_left = approachValue(current_speed_left, target_speed_left, acceleration);
+//             current_speed_right = approachValue(current_speed_right, target_speed_right, acceleration);
+//         } else {
+//             float remaining_ratio = 1.0f - progress_ratio;
+//             float decel_speed = target_speed_left * (remaining_ratio / (1.0f - deceleration_start));
             
-            if (abs(decel_speed) < m_min_decel_speed) {
-                decel_speed = (decel_speed > 0) ? m_min_decel_speed : -m_min_decel_speed;
-            }
+//             if (abs(decel_speed) < m_min_decel_speed) {
+//                 decel_speed = (decel_speed > 0) ? m_min_decel_speed : -m_min_decel_speed;
+//             }
             
-            current_speed_left = approachValue(current_speed_left, decel_speed, acceleration * 2.0f);
-            current_speed_right = approachValue(current_speed_right, 
-                                              target_speed_right * (remaining_ratio / (1.0f - deceleration_start)), 
-                                              acceleration * 2.0f);
-        }
+//             current_speed_left = approachValue(current_speed_left, decel_speed, acceleration * 2.0f);
+//             current_speed_right = approachValue(current_speed_right, 
+//                                               target_speed_right * (remaining_ratio / (1.0f - deceleration_start)), 
+//                                               acceleration * 2.0f);
+//         }
         
-        // P REGULÁTOR - vyrovnávání rychlosti motorů
-        int error = abs(left_pos) - abs(right_pos);
-        float correction = error * m_kp;
-        correction = std::max(-m_max_correction, std::min(correction, m_max_correction));
+//         // P REGULÁTOR - vyrovnávání rychlosti motorů
+//         int error = abs(left_pos) - abs(right_pos);
+//         float correction = error * m_kp;
+//         correction = std::max(-m_max_correction, std::min(correction, m_max_correction));
         
-        // Aplikace korekce
-        float speed_left_corrected = current_speed_left;
-        float speed_right_corrected = current_speed_right;
+//         // Aplikace korekce
+//         float speed_left_corrected = current_speed_left;
+//         float speed_right_corrected = current_speed_right;
         
-        if (error > 0) {
-            // Levý je napřed - zpomalit levý, zrychlit pravý
-            if (m_polarity_switch_left) {
-                speed_left_corrected += correction;
-            } else {
-                speed_left_corrected -= correction;
-            }
-            if (m_polarity_switch_right) {
-                speed_right_corrected -= correction;
-            } else {
-                speed_right_corrected += correction;
-            }
-        } else if (error < 0) {
-            // Pravý je napřed - zpomalit pravý, zrychlit levý
-            if (m_polarity_switch_left) {
-                speed_left_corrected -= correction;
-            } else {
-                speed_left_corrected += correction;
-            }
-            if (m_polarity_switch_right) {
-                speed_right_corrected += correction;
-            } else {
-                speed_right_corrected -= correction;
-            }
-        }
+//         if (error > 0) {
+//             // Levý je napřed - zpomalit levý, zrychlit pravý
+//             if (m_polarity_switch_left) {
+//                 speed_left_corrected += correction;
+//             } else {
+//                 speed_left_corrected -= correction;
+//             }
+//             if (m_polarity_switch_right) {
+//                 speed_right_corrected -= correction;
+//             } else {
+//                 speed_right_corrected += correction;
+//             }
+//         } else if (error < 0) {
+//             // Pravý je napřed - zpomalit pravý, zrychlit levý
+//             if (m_polarity_switch_left) {
+//                 speed_left_corrected -= correction;
+//             } else {
+//                 speed_left_corrected += correction;
+//             }
+//             if (m_polarity_switch_right) {
+//                 speed_right_corrected += correction;
+//             } else {
+//                 speed_right_corrected -= correction;
+//             }
+//         }
         
-        // Zajištění minimální rychlosti během fáze zrychlení
-        if (progress_ratio < deceleration_start && abs(speed_left_corrected) < m_min_speed) {
-            speed_left_corrected = (speed_left_corrected > 0) ? m_min_speed : -m_min_speed;
-        }
-        if (progress_ratio < deceleration_start && abs(speed_right_corrected) < m_min_speed) {
-            speed_right_corrected = (speed_right_corrected > 0) ? m_min_speed : -m_min_speed;
-        }
+//         // Zajištění minimální rychlosti během fáze zrychlení
+//         if (progress_ratio < deceleration_start && abs(speed_left_corrected) < m_min_speed) {
+//             speed_left_corrected = (speed_left_corrected > 0) ? m_min_speed : -m_min_speed;
+//         }
+//         if (progress_ratio < deceleration_start && abs(speed_right_corrected) < m_min_speed) {
+//             speed_right_corrected = (speed_right_corrected > 0) ? m_min_speed : -m_min_speed;
+//         }
         
-        // Zajištění minimální rychlosti během zpomalování
-        if (progress_ratio >= deceleration_start) {
-            if (abs(speed_left_corrected) < m_min_decel_speed && abs(speed_left_corrected) > 0) {
-                speed_left_corrected = (speed_left_corrected > 0) ? m_min_decel_speed : -m_min_decel_speed;
-            }
-            if (abs(speed_right_corrected) < m_min_decel_speed && abs(speed_right_corrected) > 0) {
-                speed_right_corrected = (speed_right_corrected > 0) ? m_min_decel_speed : -m_min_decel_speed;
-            }
-        }
+//         // Zajištění minimální rychlosti během zpomalování
+//         if (progress_ratio >= deceleration_start) {
+//             if (abs(speed_left_corrected) < m_min_decel_speed && abs(speed_left_corrected) > 0) {
+//                 speed_left_corrected = (speed_left_corrected > 0) ? m_min_decel_speed : -m_min_decel_speed;
+//             }
+//             if (abs(speed_right_corrected) < m_min_decel_speed && abs(speed_right_corrected) > 0) {
+//                 speed_right_corrected = (speed_right_corrected > 0) ? m_min_decel_speed : -m_min_decel_speed;
+//             }
+//         }
         
-        // Nastavení výkonu motorů
-        man.motor(m_id_left).power(pctToSpeed(speed_left_corrected));
-        man.motor(m_id_right).power(pctToSpeed(speed_right_corrected));
+//         // Nastavení výkonu motorů
+//         man.motor(m_id_left).power(pctToSpeed(speed_left_corrected));
+//         man.motor(m_id_right).power(pctToSpeed(speed_right_corrected));
         
-        delay(30);
-    }
+//         delay(30);
+//     }
     
-    // Konečné zastavení
-    man.motor(m_id_left).power(0);
-    man.motor(m_id_right).power(0);
-}
+//     // Konečné zastavení
+//     man.motor(m_id_left).power(0);
+//     man.motor(m_id_right).power(0);
+// }
 
 
 
