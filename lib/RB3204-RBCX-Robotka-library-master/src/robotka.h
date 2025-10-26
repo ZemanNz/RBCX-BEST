@@ -574,13 +574,9 @@ void wall_following(float distance_to_drive, float speed, float distance_of_wall
                    std::function<uint32_t()> second_sensor);
 
 
-void orient_to_wall_button(bool buttom, std::function<uint32_t()> first_sensor, 
-                   std::function<uint32_t()> second_sensor, float speed = 10);
+void orient_to_wall(bool button_or_right, std::function<uint32_t()> first_sensor, 
+                   std::function<uint32_t()> second_sensor, float speed = 25);
 
-
-
-void orient_to_wall_site(bool right, std::function<uint32_t()> first_sensor, 
-                   std::function<uint32_t()> second_sensor, float speed = 10);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**@}*/
 /**

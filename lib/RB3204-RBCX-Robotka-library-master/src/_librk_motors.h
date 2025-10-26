@@ -52,11 +52,9 @@ public:
                    std::function<int()> first_sensor, 
                    std::function<int()> second_sensor);
 
-    void orient_to_wall_button(bool buttom, std::function<int()> first_sensor, 
+    void orient_to_wall(bool buttom_or_right, std::function<int()> first_sensor, 
                    std::function<int()> second_sensor, float speed);
 
-    void orient_to_wall_site(bool right, std::function<int()> first_sensor, 
-                   std::function<int()> second_sensor, float speed);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     void initWifi(const char* ssid, const char* password);
     void print_wifi(const String& message);

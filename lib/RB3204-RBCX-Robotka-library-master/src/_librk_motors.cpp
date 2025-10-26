@@ -1972,15 +1972,153 @@ void Motors::wall_following(float distance_to_drive, float speed, float distance
     
 }
 
-void Motors::orient_to_wall_button(bool button, std::function<int()> first_sensor, 
-                                   std::function<int()> second_sensor, float speed) {
-// prvne oddela pocatecni merici chyby , potom si jsisti na jakou stranu se ma otacet, pak se bude pomale oacet a rychle merit --- az bude dostatecne presne takse zastavi, jeste bude mit timeout tak 5 sekund
+void Motors::orient_to_wall(bool button_or_right, std::function<int()> first_sensor, //first senzor se musi vzdy davat do prava, nebo do predu!!!
+                                   std::function<int()> second_sensor, float speed) { 
+    int distance_first = 0;
+    int distance_second = 0;
+
+    auto& man = rb::Manager::get();
+
+    float speed_left = speed;
+    float speed_right = speed;
+
+    for(byte i = 0; i < 3; i++){
+        distance_first = first_sensor();
+        distance_second = second_sensor();
+        delay(60);
+    }
+
+    distance_first = first_sensor();
+    delay(80);
+    distance_second = second_sensor();
+    std::cout<< "Distance first: " << distance_first << " , Distance second: " << distance_second <<std::endl;
+    if(distance_first > 800 && distance_second > 800){
+        std::cout<< "Jsme moc daleko, nebo nevim jak se mam srovnat"<<std::endl;
+        return;
+    }
+
+    int start_error = distance_first - distance_second;
+
+    if(button_or_right){
+        if(distance_first > distance_second){ //pray kolo couve a levy jede dopredu
+            if(m_polarity_switch_right){
+                speed_right = speed;
+                speed_left = speed;
+            }
+            else{
+                speed_right = -speed;
+                speed_left = -speed;
+            }
+        }
+        else{ //levy kolo couve a pravy jede dopredu
+            if(m_polarity_switch_right){
+                speed_left = -speed;
+                speed_right = -speed;
+            }
+            else{
+                speed_left = speed;
+                speed_right = speed;
+            }
+        }
+    }
+    else{
+        if(distance_first > distance_second){ //pray kolo jede dopredu a levy couve
+            if(m_polarity_switch_right){
+                speed_right = -speed;
+                speed_left = -speed;
+            }
+            else{
+                speed_right = speed;
+                speed_left = speed;
+            }
+        }
+        else{ //levy kolo jede dopredu a pravy couve
+            if(m_polarity_switch_right){
+                speed_left = speed;
+                speed_right = speed;
+            }
+            else{
+                speed_left = -speed;
+                speed_right = -speed;
+            }
+        }
+    }
+
+    while(true){
+        distance_first = first_sensor();
+        distance_second = second_sensor();
+
+        int error = distance_first - distance_second;
+
+        if(abs(error) <= 5){ //nastavit
+            break;
+        }
+
+        if((start_error > 0) && (error > 0)){ //porad stejne
+            man.motor(m_id_left).power(pctToSpeed(speed_left));
+            man.motor(m_id_right).power(pctToSpeed(speed_right));
+        }
+        else if((start_error < 0) && (error < 0)){ //porad stejne
+            man.motor(m_id_left).power(pctToSpeed(speed_left));
+            man.motor(m_id_right).power(pctToSpeed(speed_right));
+        }
+        else{
+            man.motor(m_id_left).power(pctToSpeed(-speed_left)); // prejel to a musi jet zpet
+            man.motor(m_id_right).power(pctToSpeed(-speed_right));
+        }
+
+        delay(30);
+    }
+
+    man.motor(m_id_left).power(0);
+    man.motor(m_id_right).power(0);
+
 }
 
-void Motors::orient_to_wall_site(bool right,std::function<int()> first_sensor, 
-                                   std::function<int()> second_sensor, float speed) {
-// prvne oddela pocatecni merici chyby , potom si jsisti na jakou stranu se ma otacet, pak se bude pomale oacet a rychle merit --- az bude dostatecne presne takse zastavi, jeste bude mit timeout tak 5 sekund
-}
+// int predni[3];
+    // int zadni[3];
+    
+    // for(byte i = 0; i < 5; i++){
+    //     if(i %2 == 0){
+    //     predni[i] = first_sensor();
+    //     }
+    //     else{
+    //     zadni[i] = second_sensor();
+    //     }
+    //     delay(60);
+    // }
+    // byte a = 0;
+    // byte b = 0;
+    // for(byte i = 0; i < 6; i++){
+    //     if(i %2 == 0){
+    //     predni[a] = first_sensor();
+    //     a++;
+    //     }
+    //     else{
+    //     zadni[b] = second_sensor();
+    //     b++;
+    //     }
+    //     delay(60);
+    // }
+
+    // std::cout<< "Predni senzory: " << predni[0] << " " << predni[1] << " " << predni[2] << std::endl;
+    // std::cout<< "Zadni senzory: " << zadni[0] << " " << zadni[1] << " " << zadni[2] << std::endl;
+
+    // if(predni[3]> 800 && predni[4] > 800 && predni[5] > 800 && zadni[3]> 800 && zadni[4] > 800 && zadni[5] > 800){
+    //     std::cout<< "Jsme moc daleko, nebo nevim jak se mam srovnat"<<std::endl;
+    //     return;
+    // }
+    // else if(predni[3]< 800 || predni[4] < 800 || predni[5] < 800 || zadni[3]< 800 || zadni[4] < 800 || zadni[5] < 800){
+    //     distance_first = min(std::min(predni[3], predni[4]), predni[5]);
+    //     distance_second = min(std::min(zadni[3], zadni[4]), zadni[5]);
+    //     if(distance_first < distance_second){
+    //         std::cout<< "Predni senzor je blize zdi nez zadni"<<std::endl;
+    //     }
+    //     else{
+    //         std::cout<< "Zadni senzor je blize zdi nez predni, jedeme dopredu"<<std::endl;
+    //     }
+    // }
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
