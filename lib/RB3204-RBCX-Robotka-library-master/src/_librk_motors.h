@@ -39,6 +39,7 @@ public:
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     int timeout_ms(float mm, float speed);
+    int16_t max_rychlost();
     void forward(float mm, float speed);
     void backward(float mm, float speed);
     void turn_on_spot_left(float angle, float speed);

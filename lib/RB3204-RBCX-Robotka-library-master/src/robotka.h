@@ -75,7 +75,7 @@ struct rkConfig {
         , motor_polarity_switch_right(true)
         , motor_enable_failsafe(false)
         , motor_wheel_diameter(62)
-        , motor_max_ticks_per_second(32767)
+        , motor_max_ticks_per_second(5200) // vyzkousite tak ze spustite funkci max_rychlost() a podle toho nastavite
         , motor_max_acceleration(50000)
         , stupid_servo_min(-1.65f)
         , stupid_servo_max(1.65f)
@@ -476,6 +476,14 @@ void rkMotorsSetPositionById(uint8_t id, float positionMm = 0.f);
  */
 void rkMotorsJoystick(int32_t x, int32_t y);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * \brief Vrátí maximální rychlost robota, to co potom zadate na motor_max_ticks_per_second.
+ * 
+ * Pozor mue chvily trvat a motory se budou tocit.
+ */
+int16_t max_rychlost();
 
 /**
  * \brief Pohyb robota vpřed (pokud máte správně nastavený polarity switch) o zadanou vzdálenost v mm  a rychlost v %. (blokující)

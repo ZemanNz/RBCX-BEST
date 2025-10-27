@@ -93,7 +93,7 @@ void rkMotorsSetPowerById(uint8_t id, int8_t power) {
 }
 
 void rkMotorsSetSpeed(int8_t left, int8_t right) {
-    gCtx.motors().setPower(left, right);
+    gCtx.motors().setSpeed(left, right);
 }
 
 void rkMotorsSetSpeedLeft(int8_t speed) {
@@ -217,6 +217,10 @@ void rkMotorsJoystick(int32_t x, int32_t y) {
     gCtx.motors().joystick(x, y);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int16_t max_rychlost(){
+    return gCtx.motors().max_rychlost();
+}
+
 void forward(float mm, float speed){
     gCtx.motors().forward(mm, speed);
 }

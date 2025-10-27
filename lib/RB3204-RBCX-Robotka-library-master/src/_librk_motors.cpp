@@ -271,6 +271,93 @@ int Motors::timeout_ms(float mm, float speed){
     return static_cast<int>(295 * mm / speed);
 }
 
+int16_t Motors::max_rychlost() {
+    auto& man = rb::Manager::get();
+
+    man.motor(m_id_left).setCurrentPosition(0);
+    man.motor(m_id_right).setCurrentPosition(0);
+
+    int left_pos = 0;
+    int right_pos = 0;
+
+    man.motor(m_id_left).requestInfo([&](rb::Motor& info) {
+       left_pos = info.position();
+        });
+    man.motor(m_id_right).requestInfo([&](rb::Motor& info) {
+        right_pos = info.position();
+        });
+
+    man.motor(m_id_left).power(pctToPower(100));
+    man.motor(m_id_right).power(pctToPower(100));
+
+    int start_time = millis();
+    std::cout << "Starting max speed test..." << std::endl;
+
+    while(abs(left_pos) < 5000 && abs(right_pos) < 5000){
+        
+        man.motor(m_id_left).requestInfo([&](rb::Motor& info) {
+       left_pos = info.position();
+        });
+        man.motor(m_id_right).requestInfo([&](rb::Motor& info) {
+        right_pos = info.position();
+        });
+        delay(5);
+    }
+
+    int stop_time = millis();
+    man.motor(m_id_right).power(0);
+    man.motor(m_id_left).power(0);
+    delay(500);
+    int duration = stop_time - start_time;
+
+    std::cout << "Duration: " << duration << " ms" << std::endl
+
+    << "Left pos: " << left_pos << ", Right pos: " << right_pos << std::endl;
+
+    int16_t a = 3000;
+    int duration_now= 10000;
+    man.motor(m_id_left).setCurrentPosition(0);
+    man.motor(m_id_right).setCurrentPosition(0);
+
+    left_pos = 0;
+    right_pos = 0;
+
+    while(duration_now > duration * 1.07){
+        man.motor(m_id_left).speed(a);
+        man.motor(m_id_right).speed(a);
+
+        int start_time = millis();
+        std::cout << "start time: " << start_time << " ms at speed " << a << std::endl;
+
+        while(abs(left_pos) < 5000 && abs(right_pos) < 5000){
+            
+            man.motor(m_id_left).requestInfo([&](rb::Motor& info) {
+            left_pos = info.position();
+                });
+                man.motor(m_id_right).requestInfo([&](rb::Motor& info) {
+            right_pos = info.position();
+                });
+            delay(5);
+        }
+
+        int stop_time = millis();
+        std::cout << "stop time: " << stop_time << " ms at speed " << a << std::endl;
+        man.motor(m_id_right).power(0);
+        man.motor(m_id_left).power(0);
+        delay(400);
+        man.motor(m_id_left).setCurrentPosition(0);
+        man.motor(m_id_right).setCurrentPosition(0);
+        left_pos = 0;
+        right_pos = 0;
+
+        duration_now = stop_time - start_time;
+        std::cout << "Duration now: " << duration_now << " ms at speed " << a << std::endl;
+        a = a + 200;
+    }
+    return (a - 200);
+
+}
+
 // void Motors::forward(float mm, float speed) {
 //     auto& man = rb::Manager::get();
     
@@ -784,14 +871,16 @@ void Motors::forward(float mm, float speed) {
         }
         
         // Nastavení výkonu motorů
-        man.motor(m_id_left).power(pctToSpeed(speed_left ));
-        man.motor(m_id_right).power(pctToSpeed(speed_right ));
+        man.motor(m_id_left).speed(pctToSpeed(speed_left ));
+        man.motor(m_id_right).speed(pctToSpeed(speed_right ));
         std::cout << "Speed left: " << speed_left << ", Speed right: " << speed_right << std::endl;
         print_wifi("Speed left: " + String(speed_left) + " Speed right: " + String(speed_right) + "\n");
         delay(10);
     }
     
     // Zastavení motorů
+    man.motor(m_id_left).speed(0);
+    man.motor(m_id_right).speed(0);
     man.motor(m_id_left).power(0);
     man.motor(m_id_right).power(0);
 }
@@ -978,8 +1067,8 @@ void Motors::backward(float mm, float speed) {
         }
         
         // Nastavení výkonu motorů
-        man.motor(m_id_left).power(pctToSpeed(speed_left ));
-        man.motor(m_id_right).power(pctToSpeed(speed_right));
+        man.motor(m_id_left).power(pctToPower(speed_left ));
+        man.motor(m_id_right).power(pctToPower(speed_right));
         std::cout << "Speed left: " << speed_left << ", Speed right: " << speed_right << std::endl;
         delay(10);
     }
@@ -988,7 +1077,6 @@ void Motors::backward(float mm, float speed) {
     man.motor(m_id_left).power(0);
     man.motor(m_id_right).power(0);
 }
-
 
 
 
@@ -2048,7 +2136,7 @@ int32_t Motors::scale(int32_t val) {
 }
 
 int16_t Motors::pctToPower(int8_t pct) {
-    return rb::clamp(pct * INT16_MAX / 100, -INT16_MAX, INT16_MAX);
+    return rb::clamp(pct * -INT16_MIN / 100, INT16_MIN, INT16_MAX);
 }
 
 
