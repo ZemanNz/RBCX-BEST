@@ -82,8 +82,10 @@ private:
     float rozdil_v_kolech_pravy; // Korekční faktor pro pravé kolo
     float left_wheel_diameter;
     float right_wheel_diameter;
-    float konstanta_radius_vnejsi_kolo = 1.035f; // Korekční faktor pro vnější kolo při zatáčení
-    float konstanta_radius_vnitrni_kolo = 1.0084f; // Korekční faktor pro vnitřní kolo při zatáčení
+    float konstanta_radius_vnejsi_kolo; // Korekční faktor pro vnější kolo při zatáčení
+    float konstanta_radius_vnitrni_kolo; // Korekční faktor pro vnitřní kolo při zatáčení
+    float korekce_nedotacivosti_left; // Korekce nedotáčivosti při otaceni na miste do leva
+    float korekce_nedotacivosti_right; // Korekce nedotáčivosti při otaceni na miste do prava
 
     bool m_wifi_initialized = false;
     String m_wifi_log_buffer;

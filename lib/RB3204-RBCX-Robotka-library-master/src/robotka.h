@@ -64,6 +64,8 @@ struct rkConfig {
         , roztec_kol(135.0) // v mm
         , konstanta_radius_vnejsi_kolo(1.035f) // Korekční faktor pro vnější kolo při zatáčení
         , konstanta_radius_vnitrni_kolo(1.0084f) // Korekční faktor pro vnitřní kolo při zatáčení
+        , korekce_nedotacivosti_left(1.0f)// Korekce nedotáčivosti při otaceni na miste do leva
+        , korekce_nedotacivosti_right(1.12f)// Korekce nedotáčivosti při otaceni na miste do prava
         , Button1(14)
         , Button2(35)
         , motor_id_left(1)
@@ -143,12 +145,28 @@ struct rkConfig {
      * Výchozí hodnota je `1.035f`.
      */
     float konstanta_radius_vnejsi_kolo = 1.035f;
+
     /**
      * \brief Korekční faktor pro vnitřní kolo při zatáčení
      * 
      * Výchozí hodnota je `1.0084f`.
      */
     float konstanta_radius_vnitrni_kolo = 1.0084f;
+
+
+    /**
+     * \brief Korekce nedotáčivosti při otáčení na místě doleva
+     * 
+     * Výchozí hodnota je `1.1f`.
+     */
+    float korekce_nedotacivosti_left;
+
+    /**
+     * \brief Korekce nedotáčivosti při otáčení na místě doprava
+     * 
+     * Výchozí hodnota je `1.0f`.
+     */
+    float korekce_nedotacivosti_right;
 
     /**
      * \brief Číslo GPIO pro tlačítko v zadu robota na zastavení až se dotkne zdi
