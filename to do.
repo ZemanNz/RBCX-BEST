@@ -19,10 +19,10 @@
 
 
 
-# co udelat zitra nedele 26 ---- takze 27 pon: 
+# co udelat zitra nedele 26 ---- takze 28 ut: 
 
 
-* udelat nejako final verzi tech pohybu...   ----> forward a ty turny --- jsou nejaky divny
+* udelat nejako final verzi tech pohybu...   ----> radius --> zrychlovani a presnost , acc a back_buttons a wall_following -----------------
 
 
 
@@ -53,3 +53,4 @@ udelat funkce pro ovladani na dalku (s,w,a,d), (<>)
 * udelat funkci na srovnani podle zdi s ultrazvukama ---- vzdy 2 senzory ---- > dve funkce pro zadek a bok ---. orient_to_wall---> pomale se bude otacedt dokud nebude stejna hodnota +- cm
 * tu wall folowing nejak slusne pozitelny.... ---- proste problem s motorama nevim jak to vyresit
 * vyzkouset wall_following a poupravit, potom pridat do examplu na jizdu....... 
+*power ---> speed

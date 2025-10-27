@@ -62,8 +62,8 @@ struct rkConfig {
         , left_wheel_diameter(62.2) // v mm
         , right_wheel_diameter(62) // v mm
         , roztec_kol(135.0) // v mm
-        , konstanta_radius_vnejsi_kolo(1.035f) // Korekční faktor pro vnější kolo při zatáčení
-        , konstanta_radius_vnitrni_kolo(1.0084f) // Korekční faktor pro vnitřní kolo při zatáčení
+        , konstanta_radius_vnejsi_kolo(1.059) // Korekční faktor pro vnější kolo při zatáčení
+        , konstanta_radius_vnitrni_kolo(1.0096f) // Korekční faktor pro vnitřní kolo při zatáčení
         , korekce_nedotacivosti_left(1.12f)// Korekce nedotáčivosti při otaceni na miste do leva
         , korekce_nedotacivosti_right(1.12f)// Korekce nedotáčivosti při otaceni na miste do prava
         , Button1(14)

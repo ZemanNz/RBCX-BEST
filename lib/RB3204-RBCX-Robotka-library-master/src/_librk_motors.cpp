@@ -589,7 +589,11 @@ void Motors::turn_on_spot_right(float angle, float speed) {
     float l_speed = 0.0f;
     float r_speed = 0.0f;
 
-    while(target_ticks > (abs(left_pos) +5) || target_ticks > (abs(right_pos) + 5)) {
+    unsigned long start_time = millis();
+    const int timeoutMs = 10000; // 10 second timeout
+    
+    while((target_ticks > (abs(left_pos) +5) || target_ticks > (abs(right_pos) + 5)) && 
+          (millis() - start_time < timeoutMs)) {
         man.motor(m_id_left).requestInfo([&](rb::Motor& info) {
              left_pos = info.position();
           });
@@ -721,7 +725,11 @@ void Motors::turn_on_spot_left(float angle, float speed) {
     float l_speed = 0.0f;
     float r_speed = 0.0f;
 
-    while(target_ticks > (abs(left_pos) +5) || target_ticks > (abs(right_pos) + 5)) {
+    unsigned long start_time = millis();
+    const int timeoutMs = 10000; // 10 second timeout
+    
+    while((target_ticks > (abs(left_pos) +5) || target_ticks > (abs(right_pos) + 5)) && 
+          (millis() - start_time < timeoutMs)) {
         man.motor(m_id_left).requestInfo([&](rb::Motor& info) {
              left_pos = info.position();
           });
@@ -821,6 +829,9 @@ void Motors::turn_on_spot_left(float angle, float speed) {
 
 
 
+
+
+
 void Motors::radius_right(float radius, float angle, float speed) {
     auto& man = rb::Manager::get();
     
@@ -850,10 +861,7 @@ void Motors::radius_right(float radius, float angle, float speed) {
     
     // P regulátor - konstanty
     const float Kp = 1.47f;  // Zkus začít s 0.5 a uprav podle potřeby
-    const float max_speed_adjust = 1.9f;  // Maximální úprava rychlosti
-    
-    man.motor(m_id_left).power(pctToSpeed(speed_left));
-    man.motor(m_id_right).power(pctToSpeed(speed_right));
+    const float max_speed_adjust = 5.9f;  // Maximální úprava rychlosti
 
     int timeoutMs = 10000;
     unsigned long start_time = millis();
@@ -873,6 +881,8 @@ void Motors::radius_right(float radius, float angle, float speed) {
         man.motor(m_id_right).requestInfo([&](rb::Motor& info) {
              right_pos = info.position();
           });
+
+        delay(10);
         
         // Výpočet progresu (0.0 - 1.0)
         float progress_left = (float)abs(left_pos) / abs(target_ticks_left);
@@ -910,18 +920,20 @@ void Motors::radius_right(float radius, float angle, float speed) {
             }
             
             // Aplikace upravených rychlostí
-            man.motor(m_id_left).power(pctToSpeed(adjusted_speed_left));
-            man.motor(m_id_right).power(pctToSpeed(adjusted_speed_right));
+            man.motor(m_id_left).speed(pctToSpeed(adjusted_speed_left));
+            man.motor(m_id_right).speed(pctToSpeed(adjusted_speed_right));
         }
         
         // Kontrola dokončení
         if (abs(left_pos)  >= abs(target_ticks_left) && !left_done) {
             left_done = true;
+            man.motor(m_id_left).speed(0);
             man.motor(m_id_left).power(0);
         }
         
         if (abs(right_pos) >= abs(target_ticks_right) && !right_done) {
             right_done = true;
+            man.motor(m_id_right).speed(0);
             man.motor(m_id_right).power(0);
         }
         
@@ -929,10 +941,11 @@ void Motors::radius_right(float radius, float angle, float speed) {
             break;
         }
         
-        delay(10);
     }
     
     // Zastavení motorů
+    man.motor(m_id_left).speed(0);
+    man.motor(m_id_right).speed(0);
     man.motor(m_id_left).power(0);
     man.motor(m_id_right).power(0);
     
@@ -969,9 +982,6 @@ void Motors::radius_left(float radius, float angle, float speed) {
     // P regulátor - konstanty (stejné jako pro right)
     const float Kp = 1.47f;
     const float max_speed_adjust = 1.9f;
-    
-    man.motor(m_id_left).power(pctToSpeed(speed_left));
-    man.motor(m_id_right).power(pctToSpeed(speed_right));
 
     int timeoutMs = 10000;
     unsigned long start_time = millis();
@@ -991,7 +1001,7 @@ void Motors::radius_left(float radius, float angle, float speed) {
         man.motor(m_id_right).requestInfo([&](rb::Motor& info) {
              right_pos = info.position();
           });
-        
+        delay(10);
         // Výpočet progresu (0.0 - 1.0)
         float progress_left = (float)abs(left_pos) / abs(target_ticks_left);
         float progress_right = (float)abs(right_pos) / abs(target_ticks_right);
@@ -1028,34 +1038,38 @@ void Motors::radius_left(float radius, float angle, float speed) {
             }
             
             // Aplikace upravených rychlostí
-            man.motor(m_id_left).power(pctToSpeed(adjusted_speed_left));
-            man.motor(m_id_right).power(pctToSpeed(adjusted_speed_right));
+            man.motor(m_id_left).speed(pctToSpeed(adjusted_speed_left));
+            man.motor(m_id_right).speed(pctToSpeed(adjusted_speed_right));
         }
         
         // Kontrola dokončení
         if (abs(left_pos) >= abs(target_ticks_left) && !left_done) {
             left_done = true;
+            man.motor(m_id_left).speed(0);
             man.motor(m_id_left).power(0);
         }
         
         if (abs(right_pos) >= abs(target_ticks_right) && !right_done) {
             right_done = true;
+            man.motor(m_id_right).speed(0);
             man.motor(m_id_right).power(0);
         }
         
         if (left_done && right_done) {
             break;
         }
-        
-        delay(10);
+        ;
     }
     
     // Zastavení motorů
+    man.motor(m_id_left).speed(0);
+    man.motor(m_id_right).speed(0);
     man.motor(m_id_left).power(0);
     man.motor(m_id_right).power(0);
     
     std::cout << "Radius left completed!" << std::endl;
 }
+
 
 // Pomocná funkce pro plynulé přiblížení k hodnotě
 float Motors::approachValue(float current, float target, float step) {
