@@ -731,6 +731,20 @@ static void processCommand(const String &cmd) {
         return;
     }
 
+    // MAX_RYCHLOST - max_rychlost()
+    if (cmd == "max_rychlost()") {
+        int16_t rychlost = max_rychlost();
+        Serial.printf("Max rychlost: %d\n", rychlost);
+        return;
+    }
+
+    // STOP - stop()
+    if (cmd == "stop()") {
+        rkMotorsSetPower(0, 0);
+        Serial.println("stop zavoláno");
+        return;
+    }
+
     // SMART SERVO INIT - rkSmartServoInit(id, low, high)
     if (cmd.startsWith("servo_init(")) {
         float params[3] = {0, 0, 240}; // id, low, high (default values)
@@ -868,6 +882,8 @@ void rkSerialTerminal() {
     Serial.println("radius_left(radius, angle, speed) - např. radius_left(200, 90, 40)");
     Serial.println("radius_right(radius, angle, speed)- např. radius_right(200, 90, 40)");
     Serial.println("back_buttons(speed)          - např. back_buttons(30)");
+    Serial.println("max_rychlost()               - změří maximální rychlost motorů");
+    Serial.println("stop()                       - okamžité zastavení motorů");
     Serial.println("=== SMART SERVA ===");
     Serial.println("servo_init(id, [low, high])  - např. servo_init(1) nebo servo_init(1, 0, 180)");
     Serial.println("servo_move(id, angle, [speed]) - např. servo_move(1, 90) nebo servo_move(1, 90, 300)");

@@ -1235,9 +1235,9 @@ void Motors::forward_acc(float mm, float speed) {
 
     byte step= 3;
     byte deaccelating = byte(250/abs(speed));
-    byte a;
+    byte a = 1;
 
-    byte b;
+    byte b = 1;
     byte accelerating = byte(300/abs(speed));
 
     // Reset pozic
@@ -1261,11 +1261,15 @@ void Motors::forward_acc(float mm, float speed) {
     float step_left = (base_speed_left > 0) ? step : -step;
     float step_right = (base_speed_right > 0) ? step : -step;
     // Proměnné pro akceleraci
-    float current_speed_left = 0;
-    float current_speed_right = 0;
+    float current_speed_left = (base_speed_left > 0) ? m_min_speed : -m_min_speed;
+    float current_speed_right = (base_speed_right > 0) ? m_min_speed : -m_min_speed;
     int o_kolik_drive_zpomalovat = int(60 * speed);    
     unsigned long start_time = millis();
-    int timeoutMs = 1.7 * timeout_ms(mm, speed);
+    int timeoutMs = 1.7 * timeout_ms(mm, speed * 0.8);
+
+    if(timeoutMs < 5000){
+        timeoutMs = 5000;
+    }
     
     while((target_ticks_left > abs(left_pos) || target_ticks_right > abs(right_pos)) && 
           (millis() - start_time < timeoutMs)) {
@@ -1390,9 +1394,9 @@ void Motors::backward_acc(float mm, float speed) {
 
     byte step= 3;
     byte deaccelating = byte(250/abs(speed));
-    byte a;
+    byte a = 1;
 
-    byte b;
+    byte b = 1;
     byte accelerating = byte(300/abs(speed));
 
     // Reset pozic
@@ -1415,12 +1419,17 @@ void Motors::backward_acc(float mm, float speed) {
     
     float step_left = (base_speed_left > 0) ? step : -step;
     float step_right = (base_speed_right > 0) ? step : -step;
+
+    float current_speed_left = (base_speed_left > 0) ? m_min_speed : -m_min_speed;
+    float current_speed_right = (base_speed_right > 0) ? m_min_speed : -m_min_speed;
     // Proměnné pro akceleraci
-    float current_speed_left = 0;
-    float current_speed_right = 0;
     int o_kolik_drive_zpomalovat = int(60 * speed);    
     unsigned long start_time = millis();
-    int timeoutMs = 1.7 * timeout_ms(mm, speed);
+    int timeoutMs = 1.7 * timeout_ms(mm, speed * 0.8);
+
+    if(timeoutMs < 5000){
+        timeoutMs = 5000;
+    }
     
     while((target_ticks_left > abs(left_pos) || target_ticks_right > abs(right_pos)) && 
           (millis() - start_time < timeoutMs)) {
@@ -1982,6 +1991,15 @@ void Motors::orient_to_wall_any_price(bool button_or_right, std::function<uint32
     distance_first = first_sensor();
     delay(80);
     distance_second = second_sensor();
+    std::cout<< "Distance first: " << distance_first << " , Distance second: " << distance_second <<std::endl;
+
+    if(distance_first > 800 && distance_second > 800){
+        std::cout<< "Jsme moc daleko, nebo nevim jak se mam srovnat"<<std::endl;
+    }
+    else if((distance_first +5 > distance_second) && (distance_first -5 < distance_second) && (distance_first < 1000) && (distance_second < 1000) && (distance_first > 0 && (distance_second > 0))){
+        std::cout<<"UZ jsem vyrovnanej, kaslu an to"<<std::endl;
+        return;
+    }
 
     man.motor(m_id_left).speed(pctToSpeed(speed)); // jeden je prehozene tak to vzdy nekam se otoci
     man.motor(m_id_right).speed(pctToSpeed(speed));
@@ -2121,7 +2139,6 @@ int32_t Motors::mmToTicks_right(float mm) const {
 }
 
 
-// WiFi inicializace
 // WiFi inicializace
 void Motors::initWifi(const char* ssid, const char* password) {
     std::cout << "Inicializace WiFi..." << std::endl;

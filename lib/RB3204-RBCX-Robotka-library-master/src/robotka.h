@@ -99,7 +99,7 @@ struct rkConfig {
     /**
      * \brief left_wheel_diameter - Průměr levého kola robota v mm.
      * 
-     * Výchozí hodnota je `62.1` mm.
+     * Výchozí hodnota je `62.2` mm.
      * 
      * Rozdíl mezi koly vyrovnáte nastavením této hodnoty.
      */
@@ -459,6 +459,27 @@ void rkMotorsSetPositionById(uint8_t id, float positionMm = 0.f);
 void rkMotorsJoystick(int32_t x, int32_t y);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**@}*/
+
+/******************************************************************************
+ * Komplexní funkce pro pohyb
+ *
+ * Toto jsou funkce které při správném nastavení v rkConfig() pojedou přesně a jsou
+ * zde tedy univerzální.
+ *
+ * Všechny funkce jsou blokující -> pokud si chcete udělat podobnou, ale dělat při
+ * ní ještě jednu věc (měřit barvu, ...), tak není nic jednoduššího:
+ * vykopírujte si ji z _librk_motors.cpp a upravte podle toho co potřebujete.
+ *
+ * (Viditelný nadpis v souboru; níže je zachován Doxygen \defgroup pro dokumentaci)
+ ******************************************************************************/
+
+/**
+ * \defgroup Komplexni_funkce_pro_pohyb Komplexní funkce pro pohyb
+ *
+ * @{
+ */
+
 
 /**
  * \brief Vrátí maximální rychlost robota, to co potom zadate na motor_max_ticks_per_second.
@@ -496,6 +517,8 @@ void backward(float mm, float speed);
  * 
  * Robot využívá P - regulátor.
  * 
+ * Robot během pohybu zrychlujeazpomaluje
+ * 
  * Timeout je nastavený na 10 sekund.
  */
 void turn_on_spot_left(float angle, float speed);
@@ -506,6 +529,8 @@ void turn_on_spot_left(float angle, float speed);
  * Úhel od 0 do 360, a doporučujeme rychlost do 60%
  * 
  * Robot využívá P - regulátor.
+ * 
+ * Robot během pohybu zrychluje a zpomaluje
  * 
  * Timeout je nastavený na 10 sekund.
  */
@@ -520,6 +545,8 @@ void turn_on_spot_right(float angle, float speed);
  * 
  * Robot využívá P - regulátor.
  * 
+ * Robot během pohybu zrychluje a zpomaluje
+ * 
  * Timeout je nastavený na 10 sekund.
  */
 void radius_right(float radius, float angle, float speed);
@@ -533,6 +560,8 @@ void radius_right(float radius, float angle, float speed);
  * 
  * Robot využívá P - regulátor.
  * 
+ * Robot během pohybu zrychluje a zpomaluje
+ * 
  * Timeout je nastavený na 10 sekund.
  */
 void radius_left(float radius, float angle, float speed);
@@ -540,7 +569,7 @@ void radius_left(float radius, float angle, float speed);
 /**
  * \brief Pohyb robota vpřed se zrychkením a zpomalením (robot s sebou necukne)
  * 
- * Provelmi malé vzdálenosti neefektivní
+ * Lze vyuzit i pro male vzdalenosti.
  * 
  * Robot využívá P - regulátor.
  * 
@@ -551,7 +580,7 @@ void forward_acc(float mm, float speed);
 /**
  * \brief Pohyb robota vzad se zrychkením a zpomalením (robot s sebou necukne)
  * 
- * Provelmi malé vzdálenosti neefektivní
+ * Lze vyuzit i pro male vzdalenosti.
  * 
  * Robot využívá P - regulátor.
  * 
@@ -564,7 +593,7 @@ void backward_acc(float mm, float speed);
  * 
  * Timeout je 10 000 ms == 10 sekund, pokud chcete zmenit tak v _librk_motors.cpp v teto funkci zmente int timeoutMs = 10000;
  * 
- * Pokud bylo stisknuto jedno tlacitko na druhe se bude cekat jen 2 sekundy.
+ * Pokud bylo stisknuto jedno tlacitko na druhe se bude cekat jen 3 sekundy.
  * 
  * Při couváni jede robut s P - regulátorem.
  */
@@ -593,6 +622,8 @@ void wall_following(float distance_to_drive, float speed, float distance_of_wall
  * 
  * Timeout je 5 000 ms == 5 sekund, pokud chcete zmenit tak v _librk_motors.cpp v teto funkci zmente int timeut_ms = 5000;
  * 
+ * Důležité je jaký senzor je first ---> First je prvni ve predni casti robota , pokud je na boku. First je na prave strane, pokud je v zadu nebo ve predu robota.
+ * 
  * Důležité je aby jste spravne nastavily button_or_right ---> pokud je zed od robota na prave stranenebo vzadu tak nastavte true, pokud je zed na leve strane nebo ve predu tak nastavte false
  * 
  * Pokud je robot vyrovnanej na zactku tak se nic nestane.
@@ -606,11 +637,30 @@ void wall_following(float distance_to_drive, float speed, float distance_of_wall
 void orient_to_wall(bool button_or_right, std::function<uint32_t()> first_sensor, 
                    std::function<uint32_t()> second_sensor, float speed = 10);
 
+/**
+ * \brief Srovnání robota podle nejbližší zdi pomocí dvou senzorů vzdálenosti
+ * 
+ * Timeout je 8 000 ms == 8 sekund, pokud chcete zmenit tak v _librk_motors.cpp v teto funkci zmente int timeut_ms = 8000;
+ * 
+ * Důležité je jaký senzor je first ---> First je prvni ve predni casti robota , pokud je na boku. First je na prave strane, pokud je v zadu nebo ve predu robota.
+ * 
+ * Důležité je aby jste spravne nastavily button_or_right ---> pokud je zed od robota na prave stranenebo vzadu tak nastavte true, pokud je zed na leve strane nebo ve predu tak nastavte false
+ * 
+ * Pokud je robot vyrovnanej na zactku tak se nic nestane.
+ * 
+ * Volte spise nizsi rychlosti do 30 % --- 10% je defaultni hodnota
+ * 
+ * Funkce udela to ze se robot otoci o 360 stupnu a zjisti, kde nejblize je zed a k ni se vyrovna
+ * 
+ * Funkce first_sensor a second_sensor vrací hodnoty v mm ze senzorů vzdálenosti --- ultrazvuky nebo laserový s.
+ */
+
 void orient_to_wall_any_price(bool button_or_right, std::function<uint32_t()> first_sensor, 
                    std::function<uint32_t()> second_sensor, float speed = 20);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**@}*/
+
 /**
  * \defgroup battery Baterie
  *
