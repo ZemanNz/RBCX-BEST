@@ -47,6 +47,9 @@ void Context::setup(const rkConfig& cfg) {
     m_ir_left = cfg.pins.ir_adc_chan_left;
     m_ir_right = cfg.pins.ir_adc_chan_right;
 
+    pinMode(cfg.Button1,INPUT_PULLUP);
+    pinMode(cfg.Button2,INPUT_PULLUP);
+
     m_stupid_servo_min = cfg.stupid_servo_min;
     m_stupid_servo_max = cfg.stupid_servo_max;
     if(cfg.pocet_chytrych_serv > 0){
