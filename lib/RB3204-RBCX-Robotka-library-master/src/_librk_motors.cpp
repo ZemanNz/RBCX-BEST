@@ -1550,7 +1550,7 @@ void Motors::back_buttons(float speed) {
     
     float m_kp = 0.23f; // Proporcionální konstanta
     float m_min_speed = 15.0f; // Minimální rychlost motorů
-    float m_max_correction = 10.0f; // Maximální korekce rychlosti
+    float m_max_correction = 5.0f; // Maximální korekce rychlosti
 
     bool left_done = false;
     bool right_done = false;
@@ -1570,8 +1570,8 @@ void Motors::back_buttons(float speed) {
     float step_left = (base_speed_left > 0) ? step : -step;
     float step_right = (base_speed_right > 0) ? step : -step;
 
-    float current_speed_left = 0;
-    float current_speed_right = 0;
+    float current_speed_left = (base_speed_left > 0) ? m_min_speed : - m_min_speed;
+    float current_speed_right = (base_speed_right > 0) ? m_min_speed : - m_min_speed;
 
     byte a = 0;
     
@@ -1593,13 +1593,13 @@ void Motors::back_buttons(float speed) {
         std::cout << "Left pos: " << left_pos << ", Right pos: " << right_pos << std::endl;
         
         //Zrychlování
-        if((abs(current_speed_left) < abs(speed)) && (abs(current_speed_right) < abs(speed)) && (a % 5 ==0)){
+        if((abs(current_speed_left) < abs(speed)) && (abs(current_speed_right) < abs(speed)) && (a % 9 ==0)){
             current_speed_left += step_left;
             current_speed_right += step_right;
-            a=0;;
+            a=0;
         }
         a++;
-
+        std::cout<<"current_speed_left : "<< current_speed_left<<std::endl;
         // P regulátor - pracuje s absolutními hodnotami pozic
         int error = abs(left_pos)  - abs(right_pos);
 
@@ -1607,8 +1607,8 @@ void Motors::back_buttons(float speed) {
         correction = std::max(-m_max_correction, std::min(correction, m_max_correction));
         
         // Výpočet korigovaných rychlostí
-        float speed_left = base_speed_left;
-        float speed_right = base_speed_right;
+        float speed_left = current_speed_left;
+        float speed_right = current_speed_right;
         
         // Aplikace korekce podle polarity
         if (error > 0) {
@@ -1628,11 +1628,11 @@ void Motors::back_buttons(float speed) {
         }
         
         // Zajištění minimální rychlosti
-        if (abs(speed_left) < m_min_speed && abs(speed_left) > 0) {
-            speed_left = (speed_left > 0) ? -m_min_speed : +m_min_speed;
+        if (abs(speed_left) < m_min_speed) {
+            speed_left = (speed_left > 0) ? m_min_speed : -m_min_speed;
         }
-        if (abs(speed_right) < m_min_speed && abs(speed_right) > 0) {
-            speed_right = (speed_right > 0) ? -m_min_speed : +m_min_speed;
+        if (abs(speed_right) < m_min_speed) {
+            speed_right = (speed_right > 0) ? m_min_speed : -m_min_speed;
         }
         
         // Nastavení výkonu motorů
@@ -1640,29 +1640,31 @@ void Motors::back_buttons(float speed) {
         man.motor(m_id_right).speed(pctToSpeed(speed_right));
         std::cout << "Speed left: " << speed_left << ", Speed right: " << speed_right << std::endl;
 
-        if(digitalRead(Button1) == LOW ) {
+        if((digitalRead(Button1) == LOW) && !left_done) {
             std::cout << "TLACITKO 1 STISKNUTO" << std::endl;
             start_time = millis();
-            timeoutMs = 2000;
+            timeoutMs = 3000;
             left_done = true;
         }
-        if(digitalRead(Button2) == LOW ) {
+        if((digitalRead(Button2) == LOW) && !right_done) {
             std::cout << "TLACITKO 2 STISKNUTO" << std::endl;
             start_time = millis();
-            timeoutMs = 2000;
+            timeoutMs = 3000;
             right_done = true;
         }
+        if(left_done && right_done ) {
+            std::cout << "OBE TLACITKA Stisknuta" << std::endl;
+            delay(50);
+            break;
+        }
     }
-    if(left_done && right_done ) {
-        std::cout << "OBE TLACITKA Stisknuta" << std::endl;
-    }
+    
     // Zastavení motorů
     man.motor(m_id_left).speed(0);
     man.motor(m_id_left).speed(0);
     man.motor(m_id_left).power(0);
     man.motor(m_id_right).power(0);
 }
-
 
 
 

@@ -6,6 +6,15 @@ void setup() {
     //cfg.motor_max_power_pct = 50;
     rkSetup(cfg);
     printf("Robotka started!\n");
+
+    pinMode(cfg.Button1,INPUT_PULLUP);
+    pinMode(cfg.Button2,INPUT_PULLUP);
+    delay(100);
+    for(int i= 0; i < 50; i++){
+        std::cout<<"Tlacitko 1 : " << digitalRead(cfg.Button1) << std::endl;
+        std::cout<<"Tlacitko 2 : " << digitalRead(cfg.Button2) << std::endl;
+        delay(50);
+    }
     
     rkLedRed(true); // Turn on red LED
     rkLedBlue(true); // Turn on blue LED
@@ -21,6 +30,7 @@ void loop() {
     // printf("Přední Ultrasonic: %d mm\n", rkUltraMeasure(2));
     // printf_wifi("Zadní Ultrasonic: %d mm", rkUltraMeasure(1));
     // printf_wifi("Přední Ultrasonic: %d mm", rkUltraMeasure(2));
+    
     delay(50);
     if(rkButtonIsPressed(BTN_UP)){
         rkLedGreen(true); // Turn on green LED
