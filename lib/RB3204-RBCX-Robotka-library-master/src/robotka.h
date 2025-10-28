@@ -57,8 +57,6 @@ struct rkPinsConfig {
 struct rkConfig {
     rkConfig()
         : prevod_motoru(1979.3f) // pro 12v ==  41.62486f * 48.f, pro 6v == 1981.3f
-        , rozdil_v_kolech_levy(0.996f)// Korekční faktor pro levé kolo treba vetsi pneu   rozdil_v_kolech_levy(0.996f)
-        , rozdil_v_kolech_pravy(1.0f)// Korekční faktor pro pravé kolo napr. mensi pneu
         , left_wheel_diameter(62.2) // v mm
         , right_wheel_diameter(62) // v mm
         , roztec_kol(135.0) // v mm
@@ -98,22 +96,6 @@ struct rkConfig {
      */
     float prevod_motoru;
 
-    /**
-     * \brief Korekční faktor pro levé kolo, použito na vyrovnání rozdílných kol.
-     * 
-     * Výchozí hodnota je `0.996` (pro 6V motory
-     * může být potřeba menší hodnota, např. 0.95).
-     */
-    float rozdil_v_kolech_levy;
-
-    /**
-     * \brief Korekční faktor pro pravé kolo, použito na vyrovnání rozdílných kol.
-     * 
-     * Výchozí hodnota je `1.0` (pro 6V motory
-     * může být potřeba JINÁ hodnota, např. 9.998).
-     */
-    float rozdil_v_kolech_pravy ; //!< Korekční faktor pro pravé kolo, použito na vyrovnání rozdílných kol. Výchozí: `1.0`
-    
     /**
      * \brief left_wheel_diameter - Průměr levého kola robota v mm.
      * 

@@ -31,7 +31,7 @@ void loop() {
     if(rkButtonIsPressed(BTN_DOWN)){
         rkLedGreen(true); // Turn on green LED
         delay(1500);
-        forward_acc(1500,50);
+        back_buttons(60);
 
         rkLedGreen(false); // Turn off green LED
     }

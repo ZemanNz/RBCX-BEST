@@ -76,11 +76,8 @@ private:
     int32_t mmToTicks_left(float mm) const;
     int32_t mmToTicks_right(float mm) const;
     float ticksToMm(int32_t ticks) const;
-    float approachValue(float current, float target, float step);
     float prevod_motoru; 
     float roztec_kol; // v mm
-    float rozdil_v_kolech_levy; // Korekční faktor pro levé kolo
-    float rozdil_v_kolech_pravy; // Korekční faktor pro pravé kolo
     float left_wheel_diameter;
     float right_wheel_diameter;
     float konstanta_radius_vnejsi_kolo; // Korekční faktor pro vnější kolo při zatáčení
