@@ -1658,10 +1658,6 @@ void Motors::back_buttons(float speed) {
     man.motor(m_id_right).power(0);
 }
 
-
-
-
-
 void Motors::wall_following(float distance_to_drive, float speed, float distance_of_wall, bool is_wall_on_right,
                    std::function<int()> first_sensor, 
                    std::function<int()> second_sensor) {
@@ -1670,7 +1666,7 @@ void Motors::wall_following(float distance_to_drive, float speed, float distance
     
     float m_kp = 0.28f; // Proporcionální konstanta
     float m_min_speed = 20.0f; // Minimální rychlost motorů
-    float m_max_correction = 8.0f; // Maximální korekce rychlosti
+    float m_max_correction = 6.0f; // Maximální korekce rychlosti
     
     float pocet_mereni=0.0f;
     float soucet_error=0.0f;
@@ -1718,7 +1714,7 @@ void Motors::wall_following(float distance_to_drive, float speed, float distance
         celkovy_error = (front_distance_senzor + back_distance_senzor)/2 - distance_of_wall;
         float error = 0;
         if(abs(celkovy_error) > 40){
-            error = celkovy_error * 0.9f;
+            error = celkovy_error * 0.8f;
             std::cout << "Velká chyba: " << error << std::endl;
         }
         else{
@@ -1853,160 +1849,6 @@ void Motors::wall_following(float distance_to_drive, float speed, float distance
     
 }
 
-
-
-
-
-
-
-
-
-
-void Motors::wall_following(float distance_to_drive, float speed, float distance_of_wall, bool is_wall_on_right,
-                   std::function<int()> first_sensor, 
-                   std::function<int()> second_sensor) {
-
-    auto& man = rb::Manager::get();
-    
-    float m_kp = 0.28f; // Proporcionální konstanta
-    float m_min_speed = 20.0f; // Minimální rychlost motorů
-    float m_max_correction = 8.0f; // Maximální korekce rychlosti
-    
-    float pocet_mereni=0.0f;
-    float soucet_error=0.0f;
-    float integral=0.0f;
-    
-    // Reset pozic
-    man.motor(m_id_left).setCurrentPosition(0);
-    man.motor(m_id_right).setCurrentPosition(0);
-    
-    int left_pos = 0;
-    int right_pos = 0;
-
-    float speed_left = 0;
-    float speed_right = 0;
-    // Základní rychlosti s přihlédnutím k polaritě
-    float base_speed_left = m_polarity_switch_left ? -speed : speed;
-    float base_speed_right = m_polarity_switch_right ? -speed : speed;
-    
-    unsigned long start_time = millis();
-    int timeoutMs = timeout_ms(distance_to_drive, speed);
-    int target_ticks = mmToTicks(distance_to_drive);
-    float celkovy_error = 0;
-
-    while((abs(target_ticks) > abs(left_pos) || abs(target_ticks) > abs(right_pos)) && 
-          (millis() - start_time < timeoutMs)) {
-        
-        man.motor(m_id_left).requestInfo([&](rb::Motor& info) {
-             left_pos = info.position();
-          });
-        man.motor(m_id_right).requestInfo([&](rb::Motor& info) {
-             right_pos = info.position();
-          });
-
-        int front_distance_senzor = first_sensor();
-        int back_distance_senzor = second_sensor();
-
-        if(front_distance_senzor <= 0 || front_distance_senzor > 300 || back_distance_senzor <= 0 || back_distance_senzor > 300){
-            std::cout << "Chyba senzoru vzdálenosti!" << std::endl;
-            front_distance_senzor = distance_of_wall;
-            back_distance_senzor = distance_of_wall;
-        }
-
-        celkovy_error = (front_distance_senzor + back_distance_senzor)/2 - distance_of_wall;
-        float error = 0;
-        if(abs(celkovy_error) > 40){
-            error = celkovy_error * 0.9f;
-            std::cout << "Velká chyba: " << error << std::endl;
-        }
-        else{
-            error =  (front_distance_senzor - back_distance_senzor) * 1.8 + celkovy_error * 0.5f;
-            std::cout << "Malá chyba: " << error << std::endl;
-        }
-
-        float correction = error * m_kp;
-        correction = abs(std::max(-m_max_correction, std::min(correction, m_max_correction)));
-        speed_left = base_speed_left;
-        speed_right = base_speed_right;
-
-        // Aplikace korekce podle polarity
-        if(is_wall_on_right){
-            if (error > 0) {
-                if (m_polarity_switch_left) {
-                    speed_left -= correction;
-                    speed_right -= correction;
-                } else {
-                    speed_left += correction;
-                    speed_right += correction;
-                }
-            } else if (error < 0) {
-                if (m_polarity_switch_right) {
-                    speed_right -= correction;
-                    speed_left -= correction;
-                } else {
-                    speed_right += correction;
-                    speed_left += correction;
-                }
-            }
-        }
-        else{
-            if (error > 0) {
-                if (m_polarity_switch_left) {
-                    speed_left += correction;
-                    speed_right += correction;//ok
-                } else {
-                    speed_left -= correction;
-                    speed_right -= correction;//ok
-                }
-            } else if (error < 0) {
-                if (m_polarity_switch_right) {
-                    speed_right += correction;
-                    speed_left += correction;//ok
-                } else {
-                    speed_right -= correction;
-                    speed_left -= correction;//ok
-                }
-            }
-        }
-        // Zajištění minimální rychlosti
-        if (abs(speed_left) < m_min_speed && abs(speed_left) > 0) {
-            speed_left = (speed_left > 0) ? m_min_speed : -m_min_speed;
-        }
-        if (abs(speed_right) < m_min_speed && abs(speed_right) > 0) {
-            speed_right = (speed_right > 0) ? m_min_speed : -m_min_speed;
-        }
-
-        // Nastavení výkonu motorů
-        man.motor(m_id_left).power(pctToSpeed(speed_left));
-        man.motor(m_id_right).power(pctToSpeed(speed_right));
-        
-        // Výpis informací pro ladění (volitelné)
-        std::cout << "----------------------------------------" << std::endl;
-        std::cout << "celkovy_error: " << celkovy_error << std::endl;
-        std::cout << "Error: " << error << std::endl;
-        std::cout << "Correction: " << correction << std::endl;
-        std::cout << "Speed left: " << speed_left << ", Speed right: " << speed_right << std::endl;
-        std::cout << "Front sensor: " << front_distance_senzor << ", Back sensor: " << back_distance_senzor << std::endl;
-        std::cout << "----------------------------------------" << std::endl;
-        // printf_wifi("celkovy error:  %.1f", celkovy_error);
-        // printf_wifi("Error:  %.1f", error);
-        // printf_wifi("Correction:  %.1f", correction);
-        // printf_wifi("Speed left:  %.1f", speed_left);
-        // printf_wifi("Speed right:  %.1f", speed_right);
-        // printf_wifi("Front sensor:  %d", front_distance_senzor);
-        // printf_wifi("Back sensor:  %d", back_distance_senzor);
-        // printf_wifi("-----------------------------");
-        // handleWebClients();
-        // Krátké zpoždění pro stabilizaci
-        delay(50);
-        }
-    
-    // Zastavení motorů po ukončení
-    man.motor(m_id_left).power(0);
-    man.motor(m_id_right).power(0);
-    
-}
-
 void Motors::orient_to_wall(bool button_or_right, std::function<int()> first_sensor, //first senzor se musi vzdy davat do prava, nebo do predu!!!
                                    std::function<int()> second_sensor, float speed) { 
     int distance_first = 0;
@@ -2016,6 +1858,7 @@ void Motors::orient_to_wall(bool button_or_right, std::function<int()> first_sen
 
     float speed_left = speed;
     float speed_right = speed;
+
 
     for(byte i = 0; i < 3; i++){
         distance_first = first_sensor();
@@ -2092,24 +1935,154 @@ void Motors::orient_to_wall(bool button_or_right, std::function<int()> first_sen
         }
 
         if((start_error > 0) && (error > 0)){ //porad stejne
-            man.motor(m_id_left).power(pctToSpeed(speed_left));
-            man.motor(m_id_right).power(pctToSpeed(speed_right));
+            man.motor(m_id_left).speed(pctToSpeed(speed_left));
+            man.motor(m_id_right).speed(pctToSpeed(speed_right));
         }
         else if((start_error < 0) && (error < 0)){ //porad stejne
-            man.motor(m_id_left).power(pctToSpeed(speed_left));
-            man.motor(m_id_right).power(pctToSpeed(speed_right));
+            man.motor(m_id_left).speed(pctToSpeed(speed_left));
+            man.motor(m_id_right).speed(pctToSpeed(speed_right));
         }
         else{
-            man.motor(m_id_left).power(pctToSpeed(-speed_left)); // prejel to a musi jet zpet
-            man.motor(m_id_right).power(pctToSpeed(-speed_right));
+            man.motor(m_id_left).speed(pctToSpeed(-speed_left)); // prejel to a musi jet zpet
+            man.motor(m_id_right).speed(pctToSpeed(-speed_right));
         }
 
         delay(30);
     }
-
+    man.motor(m_id_left).speed(0);
+    man.motor(m_id_right).speed(0);
     man.motor(m_id_left).power(0);
     man.motor(m_id_right).power(0);
 
+}
+
+void Motors::orient_to_wall_any_price(bool button_or_right, std::function<uint32_t()> first_sensor, 
+                   std::function<uint32_t()> second_sensor, float speed){
+
+    int distance_first = 0;
+    int distance_second = 0;
+
+    int target_ticks = 1.1 * mmToTicks((M_PI * roztec_kol));
+
+    auto& man = rb::Manager::get();
+
+    float speed_left = speed;
+    float speed_right = speed;
+
+    // Reset pozic
+    man.motor(m_id_left).setCurrentPosition(0);
+    man.motor(m_id_right).setCurrentPosition(0);
+
+    for(byte i = 0; i < 3; i++){
+        distance_first = first_sensor();
+        distance_second = second_sensor();
+        delay(60);
+    }
+
+    distance_first = first_sensor();
+    delay(80);
+    distance_second = second_sensor();
+
+    man.motor(m_id_left).speed(pctToSpeed(speed)); // jeden je prehozene tak to vzdy nekam se otoci
+    man.motor(m_id_right).speed(pctToSpeed(speed));
+
+    int dobra_pos_right = 0;
+    int dobra_pos_left = 0;
+
+    int left_pos = 0;
+    int right_pos = 0;
+    int vzdalenost_left;
+    int vzdalenost_right;
+
+    float avg_vzdalenost;
+    float nejmensi_avg_vzdalenost = 10000;
+
+    unsigned long start_time = millis();
+    int timeut_ms = 8000;
+
+    while(timeut_ms > millis() - start_time){
+
+        man.motor(m_id_left).requestInfo([&](rb::Motor& info) {
+             left_pos = info.position();
+          });
+        man.motor(m_id_right).requestInfo([&](rb::Motor& info) {
+             right_pos = info.position();
+          });
+
+        delay(50);
+
+        vzdalenost_left = first_sensor();
+        vzdalenost_right = second_sensor();
+
+        if(vzdalenost_left == 0 || vzdalenost_right == 0){
+            avg_vzdalenost == 1000;
+        }
+        else{
+            avg_vzdalenost = float(vzdalenost_left + vzdalenost_right) / 2;
+        }
+
+        if(avg_vzdalenost < nejmensi_avg_vzdalenost){
+            nejmensi_avg_vzdalenost = avg_vzdalenost;
+            dobra_pos_left = left_pos;
+            dobra_pos_right = right_pos;
+        }
+
+        if(abs(left_pos) > target_ticks && abs(right_pos) > target_ticks){
+            break;
+        }
+    }
+    man.motor(m_id_left).speed(0);
+    man.motor(m_id_right).speed(0);
+    man.motor(m_id_left).power(0);
+    man.motor(m_id_right).power(0);
+
+    std::cout<<"Uz to mam objety"<<std::endl;
+
+    std::cout<<"nejmensi_avg_vzdalenost"<< nejmensi_avg_vzdalenost << std::endl;
+
+    std::cout<<"dobra pozice eft"<< dobra_pos_left << std::endl;
+
+    std::cout<<"aktualnipozice left"<< left_pos << std::endl;
+
+    delay(300);
+
+    man.motor(m_id_left).speed(pctToSpeed(-speed));
+    man.motor(m_id_right).speed(pctToSpeed(-speed));
+
+    start_time = millis();
+
+    while(timeut_ms > millis() - start_time){
+        man.motor(m_id_left).requestInfo([&](rb::Motor& info) {
+             left_pos = info.position();
+          });
+        man.motor(m_id_right).requestInfo([&](rb::Motor& info) {
+             right_pos = info.position();
+          });
+
+        delay(10);
+
+        if(left_pos > 0){
+            if(left_pos < dobra_pos_left- 50){
+                break;
+            }
+        }
+        else{
+            if(left_pos > dobra_pos_left + 50){
+                break;
+            }
+        }
+    }
+
+    std::cout<<"Uz jsem tam"<<std::endl;
+
+    man.motor(m_id_left).speed(0);
+    man.motor(m_id_right).speed(0);
+    man.motor(m_id_left).power(0);
+    man.motor(m_id_right).power(0);
+
+    delay(300);
+
+    orient_to_wall(button_or_right, first_sensor, second_sensor, 10);    
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2121,7 +2094,6 @@ int32_t Motors::scale(int32_t val) {
 int16_t Motors::pctToPower(int8_t pct) {
     return rb::clamp(pct * -INT16_MIN / 100, INT16_MIN, INT16_MAX);
 }
-
 
 int16_t Motors::pctToSpeed(float pct) {
     // Omezení vstupu
@@ -2137,12 +2109,7 @@ int16_t Motors::pctToSpeed(float pct) {
 int32_t Motors::mmToTicks(float mm) const {
     return (mm / m_wheel_circumference) * prevod_motoru;
 }
-// int32_t Motors::mmToTicks_left(float mm) const {
-//     return (mm / m_wheel_circumference) * prevod_motoru * rozdil_v_kolech_levy;
-// }
-// int32_t Motors::mmToTicks_right(float mm) const {
-//     return (mm / m_wheel_circumference) * prevod_motoru * rozdil_v_kolech_pravy;
-// }
+
 float Motors::ticksToMm(int32_t ticks) const {
     return float(ticks) / prevod_motoru * m_wheel_circumference;
 }
@@ -2375,3 +2342,4 @@ void Motors::handleWebClient() {
 }
 
 }; // namespacer rk
+//jen aby to bylo 2345 :)

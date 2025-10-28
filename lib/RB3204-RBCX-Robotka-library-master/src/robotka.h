@@ -577,6 +577,10 @@ void back_buttons(float speed);
  * 
  * Při pohybu jede robut s P - regulátorem.
  * 
+ * Pokud je speed záporné ---> robit pojede do zadu. V takovem pripade je potreba zadat prvni senzor ten v zadu robota.
+ * 
+ * First senzor je ten, kterej je prvni ve smeru jizdy robota.
+ * 
  * Nejspise je potreba donastavovat podle aktualniho robota.
  */
 void wall_following(float distance_to_drive, float speed, float distance_of_wall, bool is_wall_on_right,
@@ -593,12 +597,17 @@ void wall_following(float distance_to_drive, float speed, float distance_of_wall
  * 
  * Pokud je robot vyrovnanej na zactku tak se nic nestane.
  * 
- * Volte spise nizsi rychlosti do 30 % --- 25% je defaultni hodnota
+ * Volte spise nizsi rychlosti do 30 % --- 10% je defaultni hodnota
+ * 
+ * Funkce nezvládne větší úhly ---- > pokud kolem neni zadna jina stena pouzit orient_to_wall_any_price() !!!!
  * 
  * Funkce first_sensor a second_sensor vrací hodnoty v mm ze senzorů vzdálenosti --- ultrazvuky nebo laserový s.
  */
 void orient_to_wall(bool button_or_right, std::function<uint32_t()> first_sensor, 
-                   std::function<uint32_t()> second_sensor, float speed = 25);
+                   std::function<uint32_t()> second_sensor, float speed = 10);
+
+void orient_to_wall_any_price(bool button_or_right, std::function<uint32_t()> first_sensor, 
+                   std::function<uint32_t()> second_sensor, float speed = 20);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**@}*/
