@@ -25,27 +25,26 @@ void loop() {
     if(rkButtonIsPressed(BTN_UP)){
         rkLedGreen(true); // Turn on green LED
         delay(1500);
-        radius_left(200,360,40);
+        forward_acc(1500,80);
         rkLedGreen(false); // Turn off green LED
     }
     if(rkButtonIsPressed(BTN_DOWN)){
         rkLedGreen(true); // Turn on green LED
         delay(1500);
-        radius_right(200,360,40);
+        forward_acc(1500,50);
 
         rkLedGreen(false); // Turn off green LED
     }
     if(rkButtonIsPressed(BTN_LEFT)){
         rkLedGreen(true); // Turn on green LED
         delay(2000);
-        radius_left(100,180,60);
+        backward_acc(1500,50);
         rkLedGreen(false); // Turn off green LED
     }
     if(rkButtonIsPressed(BTN_RIGHT)){
         rkLedGreen(true); // Turn on green LED
         delay(2000);
-        radius_right(100,180,60);
-        
+        backward_acc(1500,80);          
         rkLedGreen(false); // Turn off green LED
     }
 }
