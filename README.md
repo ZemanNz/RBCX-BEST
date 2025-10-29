@@ -1,23 +1,18 @@
-# RBCX-UPGRADE 🤖
+# RBCX-BEST 🤖
 
 ## 🚀 Účel projektu
 
-Cílem projektu **RBCX-UPGRADE** je vylepšit funkčnost knihovny Robotka. Projekt přináší nové funkce a optimalizace, které zlepšují použitelnost a efektivitu knihovny, ale převážně je osekaný a odlehčený.
+Cílem projektu **RBCX-BEST** je vylepšit funkčnost knihovny Robotka. Projekt přináší nové funkce a optimalizace, které zlepšují použitelnost a efektivitu knihovny.
 
 ![RBCX Front View](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/rbcx-front.png)
 
 ### Klíčové vlastnosti:
 
-- **Uvolnění paměti:** Optimalizace knihovny snížila využití paměti z přibližně 60 % na 14 %, což zvyšuje efektivitu a dává nám prostor.
+- **Uvolnění paměti:** Optimalizace knihovny snížila využití paměti z přibližně 60 % na 27 %, což zvyšuje efektivitu a dává nám prostor.
 - **Desetinné řízení rychlosti:** Přidána možnost nastavit rychlost s desetinnou hodnotou, např. 50.5 místo pouze celých čísel (50 nebo 51). Díky tomu můžeme přesněji nastavovat přímý pohyb.
 - **Integrace senzorů:** Nové funkce pro inicializaci a měření pomocí barevných a laserových senzorů. Podpora až dvou laserových senzorů (vyřešené měnění adresy).
 - **Bezpečnost motorů:** Zaveden mechanismus, který zabraňuje zaseknutí programu při nedosažení cílové pozice. Nastaven timeout pro případ, že motor nedojede.
-
----
-
-## 📝 Shrnutí
-
-Projekt **RBCX-UPGRADE** zlepšuje práci s knihovnou RBCX-Robotka-library přidáním funkcí, jako je podpora barevných a laserových senzorů, optimalizace paměti a zavedení bezpečnostních mechanismů pro motory. Tyto upgrady zvyšují spolehlivost a efektivitu knihovny, zejména v robotických aplikacích. Všechny změny jsou provedeny pouze v RBCX-Robotka-library, žádná jiná knihovna nebyla upravena.
+- **Přidání pohybových funkcí:** Funkce jako forward() nebo wall_following jsou vyzkousené a mají timeout. Reagují na zmeny nastavení robota v rkConfig() -- nap. polarita motorů, roztec kol, prevod motoru.
 
 ---
 
@@ -27,8 +22,8 @@ Projekt **RBCX-UPGRADE** zlepšuje práci s knihovnou RBCX-Robotka-library přid
 
 - 📂 `.pio/`           – Výstup sestavení PlatformIO (lze kdykoliv smazat, při kompilaci se znovu vytvoří)
 - 📂 `.vscode/`        – Nastavení VS Code  
-- 📂 `examples/`       – Ukázkové příklady použití  
-- 📂 `include/`        – Vlastní hlavičkové soubory (např. `motor_commands.h`)  
+- 📂 `examples/`       – Ukázkové příklady použití (Je jich tam opravdu dost --- > vsechny ozkousené)
+- 📂 `include/`        – Vlastní hlavičkové soubory (např. `I2C`) -- ale o vetsinu se postara knihovna
 - 📂 `lib/`            – Knihovny projektu (např. `RB3204-RBCX-Robotka-library-master/`)  
 - 📂 `src/`            – Hlavní kód projektu (např. `main.cpp`)  
 - 📂 `test/`           – Testovací skripty a jednotkové testy  
@@ -68,13 +63,70 @@ Projekt **RBCX-UPGRADE** zlepšuje práci s knihovnou RBCX-Robotka-library přid
 ![" "](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/SharedScreenshot.jpg)
 ---
 
+## ⚙️ Příkazy pro GitHub
+
+Zde je několik užitečných příkazů pro správu repozitáře GitHub:
+
+```bash
+git init                 # Inicializace nového git repozitáře
+git clone <url>          # Klonování existujícího repozitáře
+git add .                # Přidání změn ke commitnutí
+git commit -m "zpráva"  # Commit změn
+git push                 # Odeslání na vzdálený repozitář
+git pull                 # Stažení posledních změn z repozitáře
+```
+## ⚙️ Konfigurace (`rkConfig()`)
+
+`rkConfig()` je součást knihovny Robotka a najdeš ji v souboru `robotka.h`. Umožňuje nakonfigurovat různé parametry hardware, například nastavení pinů pro motory, polaritu motorů, zrychlení motorů, maximální rychlost motorů a podobně.
+
+### Ukázková konfigurace:
+
+```cpp
+rkConfig()
+        : prevod_motoru(1979.3f) // pro 12v ==  41.62486f * 48.f, pro 6v == 1981.3f
+        , left_wheel_diameter(62.2) // v mm
+        , right_wheel_diameter(62) // v mm
+        , roztec_kol(135.0) // v mm
+        , konstanta_radius_vnejsi_kolo(1.064) // Korekční faktor pro vnější kolo při zatáčení
+        , konstanta_radius_vnitrni_kolo(1.017f) // Korekční faktor pro vnitřní kolo při zatáčení
+        , korekce_nedotacivosti_left(1.12f)// Korekce nedotáčivosti při otaceni na miste do leva
+        , korekce_nedotacivosti_right(1.12f)// Korekce nedotáčivosti při otaceni na miste do prava
+        , Button1(14)
+        , Button2(35)
+        , motor_id_left(1)
+        , motor_id_right(4)
+        , motor_max_power_pct(100)
+        , motor_polarity_switch_left(false)
+        , motor_polarity_switch_right(true)
+        , motor_enable_failsafe(false)
+        , motor_wheel_diameter(62)
+        , motor_max_ticks_per_second(5200) // vyzkousite tak ze spustite funkci max_rychlost() a podle toho nastavite
+        , motor_max_acceleration(50000)
+        , stupid_servo_min(-1.65f)
+        , stupid_servo_max(1.65f)
+        , pocet_chytrych_serv(0)
+        , enable_wifi_log(false)
+        , enable_wifi_control_wasd(false)
+        , enable_wifi_terminal(false)
+        , wifi_ssid("robot1234")        // pro wasd a wifi_terminal je to jmeno wifi ktere robot vytvori!!! , pro logovani je to wifi ke ktere se pripoji ----> bacha to jmeno musi byt nejak dlouhy, jinak vam to nepujde prejmenovat
+        , wifi_password("1234robot") {       // pro wasd a wifi_terminal je to heslo wifi ktere robot vytvori!!! , pro logovani je to wifi ke ktere se pripoji ----> bacha to heslo musi byt nejak dlouhy, jinak vam to nepujde prejmenovat
+    }
+```
+**Varování**
+- Vše je potrěba správně nastavit. Při špatném nastavení se robot může zaseknout, nebude reagovat. Např. pokud nemáte připojené ani jeno ch. servo
+, ale máte nastavený pocet_chytrych_serv(2) --- na 2, tak se program bude snazit tyto serva inicializovat a nepustí vás dál.
+
 ## 🔧 Ovládání tlačítek a LED
 
 **Tlačítka na desce:**  
 - Button1, Button2, Button3, Button4 (Směry: Nahoru, Vlevo, Vpravo, Dolů)
 - On, Off, Reset
 
-Tato tlačítka lze také připojit externě k určeným pinům na desce.
+Tato tlačítka lze také připojit externě k určeným pinům na desce (podle popisků na desce).
+
+```cpp
+if (rkButtonIsPressed(BTN_LEFT)) // pokud je tlačítko stisknuto
+```
 
 **LED indikátory:**  
 Na desce jsou čtyři LED diody: Červená, Zelená, Modrá, Žlutá.  
@@ -96,15 +148,29 @@ rkLedBlue(false);  // Vypnutí modré LED
 - **Serva:**
   - 4 konektory pro připojení serv.
 
+!["Tabulka pinů - pinout"](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/Tabulka_s_piny.png)
+
+- podle tabulky si muzete zjistit, jake piny muzete vyuzit, jaké mají číslo a jak se jmenují na desce.
+
+!["Ukázka DPS v kicadu"](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/Sn%C3%ADmek%20obrazovky%20z%202025-10-24%2021-50-48.png)
+
+- pokud by vám nestacila tabulka můžete si stáhnout návrh DPS a tam zjistit vse co potrebujete.
+- zde je znázorněna část, která ukazuje GPIO piny a UART -- pozor na deskách jsoou španné popisky --- TX a RX jsou správně tady v ukázce.
+
 - **Tlačítka:**
  - Tlačítka lze připojit na IN1 a IN2 (analogové hodnoty, ale mohou se použít i jako digitální) 
  - Piny: IN1 = 36, IN2 = 39;, IN3 = 34 a IN4 = 35.
+ - Piny GPIO27 a GPIO14.
 
-- **GPIO piny:**
-  - GPIO27: Pin vzdálenější od středu desky.
-  - GPIO14: Pin blíže ke středu desky.
-![" "](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/SENZORY-15-edit.jpg)
-![" "](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/SENZORY-25-edit.jpg)
+- **GPIO piny -- Viz obrázky :**
+  - GPIO27: Pin vzdálenější od středu desky. Viz obrázky.
+  - GPIO14: Pin blíže ke středu desky. Viz obrázky.
+  - GPIO25: Viz obrázky.
+  - GPIO26: Viz obrázky.
+  
+!["GPIO piny - GPIO27, GPIO14"](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/SENZORY-15-edit.jpg)
+!["IN1 a IN2"](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/SENZORY-25-edit.jpg)
+
 - **Doporučení:**
   - Při připojování periférií dbejte na správné napájecí napětí (3.3V nebo 5V podle specifikace).
   - Pro další piny a podrobnosti konzultujte dokumentaci desky.
@@ -127,40 +193,7 @@ Deska poskytuje několik digitálních pinů, které lze využít pro různá za
 
 Dbejte na to, aby na každý pin nebyl připojen nepřiměřený počet zařízení a bylo dodrženo napájecí napětí.
 
-## ⚙️ Příkazy pro GitHub
 
-Zde je několik užitečných příkazů pro správu repozitáře GitHub:
-
-```bash
-git init                 # Inicializace nového git repozitáře
-git clone <url>          # Klonování existujícího repozitáře
-git add .                # Přidání změn ke commitnutí
-git commit -m "zpráva"  # Commit změn
-git push                 # Odeslání na vzdálený repozitář
-git pull                 # Stažení posledních změn z repozitáře
-```
-
-## ⚙️ Konfigurace (`rkConfig()`)
-
-`rkConfig()` je součást knihovny Robotka a najdeš ji v souboru `robotka.h`. Umožňuje nakonfigurovat různé parametry hardware, například nastavení pinů pro motory, polaritu motorů, zrychlení motorů, maximální rychlost motorů a podobně.
-
-### Ukázková konfigurace:
-
-```cpp
-rkConfig()
-        :  motor_id_left(1)
-        , motor_id_right(2)
-        , motor_max_power_pct(100)
-        , motor_polarity_switch_left(false)
-        , motor_polarity_switch_right(true)
-        , motor_enable_failsafe(false)
-        , motor_wheel_diameter(67)
-        , motor_max_ticks_per_second(5800)
-        , motor_max_acceleration(18000)
-        , stupid_servo_min(-1.65f)
-        , stupid_servo_max(1.65f) {
-    }
-```
 ## Práce s I2C
 
 - RBCX deska podporuje 2 I2C sběrnice.

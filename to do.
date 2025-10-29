@@ -1,22 +1,10 @@
-# co je hned potreba udelat: 
-
-* vymyslet tu presnost ----> bud na kazdou funkci dat do robotky konstanty, nebo to nejak vymyslet..... ---> mozna na to ted strat a udelat to s tim wifi vypisem...
-
-* presnost zkusit udelat tak ze budeme nastavovat podle polomeru kol ---> kazdy kolo bude muset ujet jinej pocet tiku ---> a pid bude dorovnavat do jejich pomeru-----
-----> treba jeden ma ujet 100 a druhej 50 ---> zatim co prvni mel ujet 50 tak t´druhej 25, ale ujel 23 tak mu pridam ---> zatim u funkce forward, ale jeste potreba doladit, byl by dobrej podle vystupu z wifi ---> takze to drive
-
-* potom tu presnost dale neresit.....  mozna to nechat na vyslednyho robota...
-
-
 # Zitra 29.10: 
 
 * udelat dokumentaci knihiovny....  -----> readme   --- ano udelat 
 
 * zdokumentovat ten uart zkrz novy fotky v osekana robotka
 
-* vyresit varovani
 
-* zacommitovat ty pohyby
 
 
 
@@ -48,3 +36,14 @@ udelat funkce pro ovladani na dalku (s,w,a,d), (<>)
 * vyzkouset wall_following a poupravit, potom pridat do examplu na jizdu....... 
 *power ---> speed
 * udelat nejako final verzi tech pohybu...   ----> radius --> zrychlovani a presnost , acc a back_buttons a wall_following -----------------
+* zacommitovat ty pohyby
+* vyresit varovani
+# co je hned potreba udelat: 
+
+* vymyslet tu presnost ----> bud na kazdou funkci dat do robotky konstanty, nebo to nejak vymyslet..... ---> mozna na to ted strat a udelat to s tim wifi vypisem...
+
+* presnost zkusit udelat tak ze budeme nastavovat podle polomeru kol ---> kazdy kolo bude muset ujet jinej pocet tiku ---> a pid bude dorovnavat do jejich pomeru-----
+----> treba jeden ma ujet 100 a druhej 50 ---> zatim co prvni mel ujet 50 tak t´druhej 25, ale ujel 23 tak mu pridam ---> zatim u funkce forward, ale jeste potreba doladit, byl by dobrej podle vystupu z wifi ---> takze to drive
+
+* potom tu presnost dale neresit.....  mozna to nechat na vyslednyho robota...
+
