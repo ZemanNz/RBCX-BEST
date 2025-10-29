@@ -1677,10 +1677,6 @@ void Motors::wall_following(float distance_to_drive, float speed, float distance
     float m_min_speed = 20.0f; // Minimální rychlost motorů
     float m_max_correction = 6.0f; // Maximální korekce rychlosti
     
-    float pocet_mereni=0.0f;
-    float soucet_error=0.0f;
-    float integral=0.0f;
-    
     // Reset pozic
     man.motor(m_id_left).setCurrentPosition(0);
     man.motor(m_id_right).setCurrentPosition(0);
@@ -1975,8 +1971,6 @@ void Motors::orient_to_wall_any_price(bool button_or_right, std::function<uint32
 
     auto& man = rb::Manager::get();
 
-    float speed_left = speed;
-    float speed_right = speed;
 
     // Reset pozic
     man.motor(m_id_left).setCurrentPosition(0);
@@ -2004,7 +1998,6 @@ void Motors::orient_to_wall_any_price(bool button_or_right, std::function<uint32
     man.motor(m_id_left).speed(pctToSpeed(speed)); // jeden je prehozene tak to vzdy nekam se otoci
     man.motor(m_id_right).speed(pctToSpeed(speed));
 
-    int dobra_pos_right = 0;
     int dobra_pos_left = 0;
 
     int left_pos = 0;
@@ -2012,8 +2005,8 @@ void Motors::orient_to_wall_any_price(bool button_or_right, std::function<uint32
     int vzdalenost_left;
     int vzdalenost_right;
 
-    float avg_vzdalenost;
-    float nejmensi_avg_vzdalenost = 10000;
+    float avg_vzdalenost = 1000.0f;
+    float nejmensi_avg_vzdalenost = 10000.0f;
 
     unsigned long start_time = millis();
     int timeut_ms = 8000;
@@ -2033,7 +2026,7 @@ void Motors::orient_to_wall_any_price(bool button_or_right, std::function<uint32
         vzdalenost_right = second_sensor();
 
         if(vzdalenost_left == 0 || vzdalenost_right == 0){
-            avg_vzdalenost == 1000;
+            avg_vzdalenost = 1000.0f;
         }
         else{
             avg_vzdalenost = float(vzdalenost_left + vzdalenost_right) / 2;
@@ -2042,7 +2035,6 @@ void Motors::orient_to_wall_any_price(bool button_or_right, std::function<uint32
         if(avg_vzdalenost < nejmensi_avg_vzdalenost){
             nejmensi_avg_vzdalenost = avg_vzdalenost;
             dobra_pos_left = left_pos;
-            dobra_pos_right = right_pos;
         }
 
         if(abs(left_pos) > target_ticks && abs(right_pos) > target_ticks){

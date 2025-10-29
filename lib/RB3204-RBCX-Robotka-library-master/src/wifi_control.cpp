@@ -137,8 +137,8 @@ void Wifi::handleWebClients_terminal() {
         printf("Received command: %s\n", incomingPacket);
 
         int param1 = 0, param2 = 0, param3 = 0, param4 = 0;
-        float fparam1 = 0, fparam2 = 0, fparam3 = 0;
-        char strParam[50], strParam2[50];
+        float fparam1 = 0;
+        char strParam[50];
 
         // Příkazy pro motory
         if (sscanf(incomingPacket, "forward(%d,%d)", &param1, &param2) == 2) {

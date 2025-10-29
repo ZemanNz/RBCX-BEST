@@ -468,10 +468,12 @@ void rkMotorsJoystick(int32_t x, int32_t y);
  * zde tedy univerzální.
  *
  * Všechny funkce jsou blokující -> pokud si chcete udělat podobnou, ale dělat při
- * ní ještě jednu věc (měřit barvu, ...), tak není nic jednoduššího:
+ * do ní ještě jednu věc (měřit barvu, ...), tak není nic jednoduššího:
  * vykopírujte si ji z _librk_motors.cpp a upravte podle toho co potřebujete.
  *
- * (Viditelný nadpis v souboru; níže je zachován Doxygen \defgroup pro dokumentaci)
+ * Všechny funkce mají výpisi printf(), nebo std::cout<< ------> nyní zakomentované 
+ * ----> pokud chcete upravovat/ vylepsovat / zjišťovat procto nejede ----> tak by jste to meli odkomentovat !!!!!!!
+
  ******************************************************************************/
 
 /**
