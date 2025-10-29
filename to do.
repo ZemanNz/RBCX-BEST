@@ -1,8 +1,6 @@
-# Zitra 29.10: 
+# TO DO:
 
-* udelat dokumentaci knihiovny....  -----> readme   --- ano udelat 
-
-* zdokumentovat ten uart zkrz novy fotky v osekana robotka
+* Už asi nic....... Jen kdyby se naskytla nejaka chybka.......
 
 
 
@@ -46,4 +44,5 @@ udelat funkce pro ovladani na dalku (s,w,a,d), (<>)
 ----> treba jeden ma ujet 100 a druhej 50 ---> zatim co prvni mel ujet 50 tak t´druhej 25, ale ujel 23 tak mu pridam ---> zatim u funkce forward, ale jeste potreba doladit, byl by dobrej podle vystupu z wifi ---> takze to drive
 
 * potom tu presnost dale neresit.....  mozna to nechat na vyslednyho robota...
-
+* zdokumentovat ten uart zkrz novy fotky v osekana robotka
+* udelat dokumentaci knihiovny....  -----> readme   --- ano udelat 

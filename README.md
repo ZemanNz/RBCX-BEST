@@ -33,6 +33,7 @@ Cílem projektu **RBCX-BEST** je vylepšit funkčnost knihovny Robotka. Projekt 
 - 📜 `partitions.csv`  – Konfigurace paměťových oddílů  
 - 📜 `platformio.ini`  – Konfigurační soubor PlatformIO  
 - 📜 `README.md`       – Dokumentace projektu  
+- 📜 `to do.`          – To do list ---> opravdu se vyplatí
 
 ---
 
@@ -384,8 +385,8 @@ WiFi funkce se konfigurují v `rkConfig()` struktuře:
 
 ```cpp
 rkConfig cfg;
-cfg.enable_wifi_log = true;        // Povolení WiFi logování
-cfg.enable_wifi_control_wasd = true; // Povolení WASD ovládání  
+cfg.enable_wifi_log = false;        // Povolení WiFi logování
+cfg.enable_wifi_control_wasd = false; // Povolení WASD ovládání  
 cfg.enable_wifi_terminal = true;   // Povolení WiFi terminálu
 cfg.wifi_ssid = "robotka1234";     // SSID WiFi sítě
 cfg.wifi_password = "1234robotka"; // Heslo WiFi sítě
@@ -394,6 +395,10 @@ rkSetup(cfg);
 ```
 
 ### 📊 WiFi Logování
+- priklady najdete v _librk_motors.cpp u pohybových funkcí
+- robot musí být připojen na wifi
+- po připojení se vypise ip adresa do s.m.
+
 ```cpp
 void setup() {
     rkConfig cfg;
@@ -413,6 +418,12 @@ void loop() {
 ```
 
 ### 🎮 WASD Ovládání
+- priklad je v examples
+- robot si vytvori vlastni wifi, na kterouse musite pripojit
+- v tomto projektu naleznete slozku RBCX-controller ---> to je projektktery si spustite na svem zarizeni ---> musite zmenit ip adresu--- ta se zase vypise
+- funkci muzeme na dalku ukoncit stisknutim P
+- pokud je cfg.enable_wifi_control_wasd = true tak se wifi inicializuje sama
+
 ```cpp
 void setup() {
     rkConfig cfg;
@@ -421,11 +432,17 @@ void setup() {
 }
 
 void loop() {
-    wifi_control_wasd(); // Blokující funkce
+    wifi_control_wasd(); // Blokující funkce ---> jde ukoncit pismenem P
 }
 ```
 
 ### 💻 WiFi Terminál
+- priklad je v examples
+- robot si vytvori vlastni wifi, na kterouse musite pripojit
+- v tomto projektu naleznete slozku RBCX-controller ---> to je projektktery si spustite na svem zarizeni ---> musite zmenit ip adresu--- ta se zase vypise
+- pokud je cfg.enable_wifi_terminal = true tak se wifi inicializuje sama
+- z funkce nelze vyjit --> je potreba restart robota
+
 ```cpp
 void setup() {
     rkConfig cfg;
@@ -463,10 +480,7 @@ Chcete-li přidat vlastní funkce pro tlačítka L, K, J, H, G, M, N, B, upravte
 Díky WiFi funkcím můžeš ovládat robota na dálku, sledovat jeho logy a testovat chování bez nutnosti fyzického připojení kabelem!
 
 
-
-
-
-- **Autor:** (NZ)
+## Autor: (NZ)
 
 - **Další projekt s RBCX:** 
 - https://github.com/ZemanNz/RBCX-ROBOT-BRNO-2025.git

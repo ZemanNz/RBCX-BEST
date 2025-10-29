@@ -50,21 +50,21 @@ bool Wifi::handleWebClients() {
 
         if (strcmp(incomingPacket, "OFF") == 0) {
             // VYPNI MOTORY - přidej svůj kód  
-            rkMotorsSetPower(0, 0);
+            rkMotorsSetSpeed(0, 0);
             printf("Konec wasd\n");
             return false;
             
         } else if (strcmp(incomingPacket, "FORWARD") == 0) {
-            rkMotorsSetPower(60, 60);
+            rkMotorsSetSpeed(60, 60);
             
         } else if (strcmp(incomingPacket, "BACKWARD") == 0) {
-            rkMotorsSetPower(-60, -60);
+            rkMotorsSetSpeed(-60, -60);
             
         } else if (strcmp(incomingPacket, "LEFT") == 0) {
-            rkMotorsSetPower(-20, 20);
+            rkMotorsSetSpeed(-20, 20);
             
         } else if (strcmp(incomingPacket, "RIGHT") == 0) {
-            rkMotorsSetPower(20, -20);
+            rkMotorsSetSpeed(20, -20);
 
         }else if(strcmp(incomingPacket, "FUNC1")){
             printf("Function 1 executed!\n");
