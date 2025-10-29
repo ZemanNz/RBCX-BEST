@@ -10,7 +10,7 @@ void setup() {
     rkLedBlue(true); // Turn on blue LED
 
 
-    wifi_terminal(); // pozor at jsme pripojeni na stejnou wifi, v robotka.h mit povoleny enable_wifi_terminal=true a ve vysilaci spravnou ip adresu
+    wifi_control_terminal(); // pozor at jsme pripojeni na stejnou wifi, v robotka.h mit povoleny enable_wifi_terminal=true a ve vysilaci spravnou ip adresu
     
 }
 void loop() {

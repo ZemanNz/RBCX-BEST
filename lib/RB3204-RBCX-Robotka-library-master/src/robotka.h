@@ -1197,7 +1197,7 @@ void wifi_control_terminal();
 
 //////////////////////////////////////////////////////
 /**
- * \brief Spustí serialový terminál pro příkazy motorů
+ * \brief Spustí serialový terminál pro příkazy
  * 
  * Tato funkce běží nekonečně a čeká na příkazy ze sériového portu.
  * POZOR: Serial musí být inicializován v main.cpp (Serial.begin(115200))
@@ -1212,6 +1212,7 @@ void wifi_control_terminal();
  * - radius_left(radius, angle, speed)
  * - radius_right(radius, angle, speed)
  * - back_buttons(speed)
+ * - servo_soft_move(1, 90, 150) ....... 
  * 
  * Pokud si chcete doplnit prikazy tak v lib/RB3204-RBCX-Robotka-library-master/src/robotka.cpp/processCommand()
  */

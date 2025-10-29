@@ -116,6 +116,36 @@ rkConfig()
 - Vše je potrěba správně nastavit. Při špatném nastavení se robot může zaseknout, nebude reagovat. Např. pokud nemáte připojené ani jeno ch. servo
 , ale máte nastavený pocet_chytrych_serv(2) --- na 2, tak se program bude snazit tyto serva inicializovat a nepustí vás dál.
 
+## 🔧 Konfigurace PlatformIO (`platformio.ini`)
+
+Soubor `platformio.ini` definuje prostředí a nastavení projektu. Obsahuje například:
+
+- Verzi platformy (`platform = espressif32@~1.12.4`)
+- Definici desky (`board = esp32dev`)
+- Další volby jako `monitor_speed` a `upload_port`
+- Knihovny uvedené pod klíčem `lib_deps` (sem se dávají knihovny, které chci, aby se při kompilaci stáhly) ---- mohu to nechat prázdné a knihovny přidat ručně do složky lib
+- Pokud nepoužívám laserové senzory, mohu ("-DUSE_VL53L0X") odstranit, a uvolnit místo
+
+```ini
+; PlatformIO Project Configuration File
+[env:esp32dev]
+platform = espressif32@~1.12.4
+board = esp32dev
+framework = arduino
+monitor_speed = 115200
+upload_speed = 921600
+board_build.partitions = partitions.csv
+build_flags = -std=c++14 -DUSE_PRECOMPILED_LIBRARIES -DCCACHE -DUSE_VL53L0X
+build_unflags = -std=gnu++11
+monitor_filters = esp32_exception_decoder
+extra_scripts = pre:ccache.py
+lib_deps = 
+        https://github.com/adafruit/Adafruit_TCS34725/archive/refs/tags/1.3.6.tar.gz
+        SPI
+        adafruit/Adafruit_VL53L0X @ ^1.2.4
+
+```
+
 ## 🔧 Ovládání tlačítek a LED
 
 **Tlačítka na desce:**  
@@ -163,7 +193,7 @@ rkLedBlue(false);  // Vypnutí modré LED
 - zde je znázorněna část, která ukazuje GPIO piny a UART -- pozor na deskách jsoou španné popisky --- TX a RX jsou správně tady v ukázce.
 - pokud mate kicad. tak s muzete projekt stahnout zde : https://github.com/RoboticsBrno/RB3204-RBCX/blob/master/hw/RBCX.brd a https://github.com/RoboticsBrno/RB3204-RBCX/blob/master/hw/RBCX.sch ------ nasledne tyto dva soubory musite dat do slosky ktera se vam vygeneruje ---> /Stažené/RBCX
 
-- **Tlačítka:**
+### Tlačítka:
  - Tlačítka lze připojit na IN1 a IN2 (analogové hodnoty, ale mohou se použít i jako digitální) 
  - Piny: IN1 = 36, IN2 = 39;, IN3 = 34 a IN4 = 35.
  - Piny GPIO27 a GPIO14.
@@ -236,38 +266,67 @@ UART (Universal Asynchronous Receiver/Transmitter) je jednoduché rozhraní pro 
 
 ### 📚 Knihovna pro příjem struktury přes UART
 
-V projektu je připravena jednoduchá knihovna (viz `include/uart_commands.h`), která umožňuje:
-
 - **Inicializaci UART:**  
-  Funkce `uartInit()` nastaví UART2 na rychlost 115200 baudů a vypíše stav na Serial monitor.
+  Příklad použití je v examples/UART ---> je tu main.cpp pro rbcx a projekt pro esp32.
+
+  Funkce `rkUartInit();` nastaví UART2 na rychlost 115200 baudů.
 
 - **Příjem struktury:**  
-  Funkce `uartReceiveStruct()` umožňuje přijímat libovolnou strukturu (například příkaz pro servo nebo motor) s jednoduchým framingem (každá zpráva začíná bajty 0xAA 0x55).  
-  Funkci předáš prázdnou (neinicializovanou) strukturu, kterou tato funkce při úspěšném příjmu automaticky naplní přijatými daty.  
+  Funkce `rkUartReceive()` umožňuje přijímat libovolnou strukturu (například příkaz pro servo nebo motor) s jednoduchým framingem (každá zpráva začíná bajty 0xAA 0x55).  
+  Funkci předáš odkaz na strukturu, kterou tato funkce při úspěšném příjmu automaticky naplní přijatými daty.  
   Funkce čeká na přijetí celé struktury, vypíše přijaté bajty na Serial monitor a vrátí `true`, pokud byla struktura úspěšně přijata.  
   Díky tomu můžeš s naplněnou strukturou dále pracovat ve svém kódu.
+
+- **Odeslání struktury:**
+  Funkce `rkUartSend()` umožňuje odesilat odesilat data pomoci odkazu na strukturu, kterou má poslat.
+
+- **__attribute__((packed))**
+  Toto umozňuje poslat co nejmene dat, jinak by se doplnilo do celyho byte.
 
 #### Ukázka použití v kódu
 
 ```cpp
-#include "uart_commands.h"
+#include <Arduino.h>
+#include "robotka.h"
 
-struct MyStruct {
-    uint8_t id;
-    int16_t value;
-};
+// Nejjednodušší struktura
+typedef struct __attribute__((packed)) {
+    uint8_t servo_id;
+    uint8_t position; // 0-255
+} SimpleCommand;
+
+SimpleCommand cmd = {1, 128}; // Servo ID 1, střední pozice
 
 void setup() {
-    Serial.begin(115200);
-    while (!Serial);
-    uartInit(); // Inicializace UART2
-}
+    rkConfig cfg;
+    rkSetup(cfg);
+    printf("Robotka started!\n");
+    
+    rkLedRed(true); // Turn on red LED
+    rkLedBlue(true); // Turn on blue LED
 
+    delay(2000); // Wait for 2 seconds
+    rkUartInit();
+
+    delay(100); // Short delay to ensure UART is initialized
+    printf("posilam data...\n");
+    rkUartSend(&cmd, sizeof(cmd));
+    
+}
+int start_mil = millis();
 void loop() {
-    MyStruct data;
-    if (uartReceiveStruct(data)) {
-        Serial.print("ID: "); Serial.print(data.id);
-        Serial.print(", Value: "); Serial.println(data.value);
+    
+    if(millis() - start_mil > 3000) {
+        start_mil = millis();
+        printf("posilam data...\n");
+        rkUartSend(&cmd, sizeof(cmd));
+    }
+    if(rkUartReceive(&cmd, sizeof(cmd))) {
+        // TADY PRACUJEME S PŘIJATÝMI DATY:
+        
+        // 1. Výpis na serial
+        printf("Servo %d -> Position %d\n", cmd.servo_id, cmd.position);
+
     }
 }
 ```
@@ -281,83 +340,33 @@ void loop() {
 
 Tato knihovna umožňuje ovládat serva a motory přímo přes Serial monitor. Můžeš zadávat příkazy ve formě textových řetězců, které se následně zpracují a provedou odpovídající akce na robotu.
 
-### ✨ Ovládání serv (příklad: `examples/ovladani_serial_monitor/ovladani_s_s.cpp`)
+### ✨ Ovládání přes serial_monitor(příklad: `examples/ovladani_serial_monitor/ovladanii_pres_serial_monitor.cpp`)
 
-- **Příkazy pro serva:**
-  - `s_s_init(id, min, max)` – Inicializace serva s daným ID a limity.
-  - `s_s_move(id, pozice)` – Okamžitý pohyb serva na zadanou pozici.
-  - `s_s_soft_move(id, pozice, rychlost)` – Plynulý pohyb serva na pozici s danou rychlostí.
-
-**Ukázka zadání v Serial monitoru:**
-```
-s_s_init(1, 0, 160)
-s_s_move(1, 90)
-s_s_soft_move(1, 150, 150)
-```
-
-### ✨ Ovládání motorů (příklad: `examples/ovladani_serial_monitor/ovladani_motoru.cpp`)
-
-- **Příkazy pro motory:**
-  - `encodery()` – Vypíše hodnoty enkodérů.
-  - `forward(rychlost, čas)` – Jede rovně danou rychlostí po zadaný čas.
-  - `radius_r(uhel, rychlost, polomer)` – Zatáčí doprava po kružnici.
-  - `radius_l(uhel, rychlost, polomer)` – Zatáčí doleva po kružnici.
-  - `turn_on_spot(uhel)` – Otočí se na místě o zadaný úhel.
-  - `back_buttons(cas)` – Couvne po stisknutí tlačítka.
-
-**Ukázka zadání v Serial monitoru:**
-```
-encodery()
-forward(100, 50)
-radius_r(90, 100, 40)
-turn_on_spot(180)
-```
+Dostupné příkazy:
+ * - forward(mm, speed)
+ * - forward_acc(mm, speed)
+ * - backward(mm, speed) 
+ * - backward_acc(mm, speed)
+ * - turn_on_spot_left(angle, speed)
+ * - turn_on_spot_right(angle, speed)
+ * - radius_left(radius, angle, speed)
+ * - radius_right(radius, angle, speed)
+ * - back_buttons(speed)
+ * - servo_soft_move(1, 90, 150) ....... 
 
 ### 📝 Jak to funguje?
 
-- Zadáš příkaz do Serial monitoru (např. `s_s_move(1, 90)`).
+- Zadáš příkaz do Serial monitoru (např. `forward(1000,50)`).
 - Program příkaz rozparsuje, zkontroluje parametry a zavolá odpovídající funkci.
 - Výsledek (nebo případná chyba) se vypíše zpět do Serial monitoru.
 
 ---
-
 **Díky této knihovně můžeš jednoduše testovat a ovládat robota bez nutnosti měnit kód – stačí zadávat příkazy přes Serial monitor!**
 
-## 🔧 Konfigurace PlatformIO (`platformio.ini`)
-
-Soubor `platformio.ini` definuje prostředí a nastavení projektu. Obsahuje například:
-
-- Verzi platformy (`platform = espressif32@~1.12.4`)
-- Definici desky (`board = esp32dev`)
-- Další volby jako `monitor_speed` a `upload_port`
-- Knihovny uvedené pod klíčem `lib_deps` (sem se dávají knihovny, které chci, aby se při kompilaci stáhly) ---- mohu to nechat prázdné a knihovny přidat ručně do složky lib
-- Pokud nepoužívám laserové senzory, mohu ("-DUSE_VL53L0X") odstranit, a uvolnit místo
-
-```ini
-; PlatformIO Project Configuration File
-[env:esp32dev]
-platform = espressif32@~1.12.4
-board = esp32dev
-framework = arduino
-monitor_speed = 115200
-upload_speed = 921600
-board_build.partitions = partitions.csv
-build_flags = -std=c++14 -DUSE_PRECOMPILED_LIBRARIES -DCCACHE -DUSE_VL53L0X
-build_unflags = -std=gnu++11
-monitor_filters = esp32_exception_decoder
-extra_scripts = pre:ccache.py
-lib_deps = 
-        https://github.com/adafruit/Adafruit_TCS34725/archive/refs/tags/1.3.6.tar.gz
-        SPI
-        adafruit/Adafruit_VL53L0X @ ^1.2.4
-
-```
 - **Autor:** (NZ)
-- **Díky:**
-   - Marek Bajer
-   - Pan učitel Burda
 
 - **Další projekt s RBCX:** 
 - https://github.com/ZemanNz/RBCX-ROBOT-BRNO-2025.git
-
+- https://github.com/ZemanNz/PUKY_2025.git
+- https://github.com/ZemanNz/RBCX-BEARRESCUE-2025.git
 
