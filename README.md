@@ -343,6 +343,7 @@ Tato knihovna umožňuje ovládat serva a motory přímo přes Serial monitor. M
 ### ✨ Ovládání přes serial_monitor(příklad: `examples/ovladani_serial_monitor/ovladanii_pres_serial_monitor.cpp`)
 
 * Dostupné příkazy:
+
 === POHYB ROBOTA ===
 - forward(mm, speed)           - pohyb vpřed o zadanou vzdálenost (mm) a rychlost (%)
 - forward_acc(mm, speed)       - pohyb vpřed s plynulým zrychlením a zpomalením
@@ -374,7 +375,96 @@ Tato knihovna umožňuje ovládat serva a motory přímo přes Serial monitor. M
 **Díky této knihovně můžeš jednoduše testovat a ovládat robota bez nutnosti měnit kód – stačí zadávat příkazy přes Serial monitor!**
 
 
-## Práce s WIFI
+
+## 📡 Práce s WiFi
+Knihovna Robotka nabízí několik možností pro komunikaci přes WiFi, včetně vzdáleného logování, ovládání pomocí WASD kláves a terminálu.
+
+### 🔧 Konfigurace WiFi
+WiFi funkce se konfigurují v `rkConfig()` struktuře:
+
+```cpp
+rkConfig cfg;
+cfg.enable_wifi_log = true;        // Povolení WiFi logování
+cfg.enable_wifi_control_wasd = true; // Povolení WASD ovládání  
+cfg.enable_wifi_terminal = true;   // Povolení WiFi terminálu
+cfg.wifi_ssid = "robotka1234";     // SSID WiFi sítě
+cfg.wifi_password = "1234robotka"; // Heslo WiFi sítě
+
+rkSetup(cfg);
+```
+
+### 📊 WiFi Logování
+```cpp
+void setup() {
+    rkConfig cfg;
+    cfg.enable_wifi_log = true;
+    cfg.wifi_ssid = "moje_wifi";
+    cfg.wifi_password = "moje_heslo";
+    rkSetup(cfg);
+}
+
+void loop() {
+    printf_wifi("Robot ujel: %.1f mm", 123.5);
+    printf_wifi("Stav baterie: %d%%", rkBatteryPercent());
+    
+    handleWebClients(); // Nutné volat pravidelně
+    delay(100);
+}
+```
+
+### 🎮 WASD Ovládání
+```cpp
+void setup() {
+    rkConfig cfg;
+    cfg.enable_wifi_control_wasd = true;
+    rkSetup(cfg);
+}
+
+void loop() {
+    wifi_control_wasd(); // Blokující funkce
+}
+```
+
+### 💻 WiFi Terminál
+```cpp
+void setup() {
+    rkConfig cfg;
+    cfg.enable_wifi_terminal = true;
+    rkSetup(cfg);
+}
+
+void loop() {
+    wifi_control_terminal(); // Blokující funkce
+}
+```
+
+### 📝 Jak to funguje?
+- **WASD ovládání:** Robot vytvoří WiFi síť, připojíte se a ovládáte pomocí kláves WASD/šipky  
+- **WiFi terminál:** Připojíte se k robotovi a zadáváte textové příkazy jako v Serial monitoru  
+- **WiFi logování:** Robot se připojí k vaší WiFi a logy můžete číst v prohlížeči na IP adrese
+
+### Klávesy WASD ovládání:
+- **W/↑** – pohyb vpřed (60% rychlost)  
+- **S/↓** – pohyb vzad (60% rychlost)  
+- **A/←** – otáčení doleva (20% rychlost)  
+- **D/→** – otáčení doprava (20% rychlost)  
+- **P** – ukončení ovládání  
+- **L, K, J, H, G, M, N, B** – spuštění vlastních funkcí
+
+### ⚠️ Důležité upozornění
+- **Nelze kombinovat režimy:** Nelze současně používat WASD ovládání, WiFi terminál a WiFi logování – každý má jiný typ inicializace WiFi.  
+- **Blokující funkce:** `wifi_control_wasd()` a `wifi_control_terminal()` jsou blokující – robot čeká na připojení.  
+- **Pravidelné volání:** Pro WiFi logování musíte volat `handleWebClients()` v loopu.  
+- **Vlastní funkce v WASD:** Chcete-li přidat vlastní funkce pro tlačítka `L, K, J, ...`, upravte soubor `lib/RB3204-RBCX-Robotka-library-master/src/wifi_control.cpp` v metodě `Wifi::handleWebClients()`.
+
+### 🔧 Přizpůsobení WASD ovládání
+Chcete-li přidat vlastní funkce pro tlačítka L, K, J, H, G, M, N, B, upravte v souboru `wifi_control.cpp`:
+
+Díky WiFi funkcím můžeš ovládat robota na dálku, sledovat jeho logy a testovat chování bez nutnosti fyzického připojení kabelem!
+
+
+
+
 
 - **Autor:** (NZ)
 
@@ -382,4 +472,3 @@ Tato knihovna umožňuje ovládat serva a motory přímo přes Serial monitor. M
 - https://github.com/ZemanNz/RBCX-ROBOT-BRNO-2025.git
 - https://github.com/ZemanNz/PUKY_2025.git
 - https://github.com/ZemanNz/RBCX-BEARRESCUE-2025.git
-
