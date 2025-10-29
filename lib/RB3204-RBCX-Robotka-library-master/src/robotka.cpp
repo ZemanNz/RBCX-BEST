@@ -557,7 +557,6 @@ static bool parseParams(const String& params, float* out, int count) {
     }
     return true;
 }
-
 // Funkce pro zpracování příkazů
 static void processCommand(const String &cmd) {
     // FORWARD - forward(mm, speed)
@@ -745,6 +744,44 @@ static void processCommand(const String &cmd) {
         return;
     }
 
+    // SET_SPEED - set_speed(left, right)
+    if (cmd.startsWith("set_speed(")) {
+        float params[2];
+        int start = cmd.indexOf('(') + 1;
+        int end = cmd.indexOf(')');
+        if (start < 1 || end < 0) {
+            Serial.println("Chybný formát set_speed");
+            return;
+        }
+        String paramStr = cmd.substring(start, end);
+        if (!parseParams(paramStr, params, 2)) {
+            Serial.println("Chyba v parametrech set_speed");
+            return;
+        }
+        rkMotorsSetSpeed(params[0], params[1]);
+        Serial.println("set_speed zavoláno");
+        return;
+    }
+
+    // SET_POWER - set_power(left, right)
+    if (cmd.startsWith("set_power(")) {
+        float params[2];
+        int start = cmd.indexOf('(') + 1;
+        int end = cmd.indexOf(')');
+        if (start < 1 || end < 0) {
+            Serial.println("Chybný formát set_power");
+            return;
+        }
+        String paramStr = cmd.substring(start, end);
+        if (!parseParams(paramStr, params, 2)) {
+            Serial.println("Chyba v parametrech set_power");
+            return;
+        }
+        rkMotorsSetPower(params[0], params[1]);
+        Serial.println("set_power zavoláno");
+        return;
+    }
+
     // SMART SERVO INIT - rkSmartServoInit(id, low, high)
     if (cmd.startsWith("servo_init(")) {
         float params[3] = {0, 0, 240}; // id, low, high (default values)
@@ -884,6 +921,8 @@ void rkSerialTerminal() {
     Serial.println("back_buttons(speed)          - např. back_buttons(30)");
     Serial.println("max_rychlost()               - změří maximální rychlost motorů");
     Serial.println("stop()                       - okamžité zastavení motorů");
+    Serial.println("set_speed(left, right)       - nastaví rychlost motorů v % (-100 až 100)");
+    Serial.println("set_power(left, right)       - nastaví výkon motorů v % (-100 až 100)");
     Serial.println("=== SMART SERVA ===");
     Serial.println("servo_init(id, [low, high])  - např. servo_init(1) nebo servo_init(1, 0, 180)");
     Serial.println("servo_move(id, angle, [speed]) - např. servo_move(1, 90) nebo servo_move(1, 90, 300)");

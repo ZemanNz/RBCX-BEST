@@ -342,17 +342,27 @@ Tato knihovna umožňuje ovládat serva a motory přímo přes Serial monitor. M
 
 ### ✨ Ovládání přes serial_monitor(příklad: `examples/ovladani_serial_monitor/ovladanii_pres_serial_monitor.cpp`)
 
-Dostupné příkazy:
- * - forward(mm, speed)
- * - forward_acc(mm, speed)
- * - backward(mm, speed) 
- * - backward_acc(mm, speed)
- * - turn_on_spot_left(angle, speed)
- * - turn_on_spot_right(angle, speed)
- * - radius_left(radius, angle, speed)
- * - radius_right(radius, angle, speed)
- * - back_buttons(speed)
- * - servo_soft_move(1, 90, 150) ....... 
+* Dostupné příkazy:
+=== POHYB ROBOTA ===
+- forward(mm, speed)           - pohyb vpřed o zadanou vzdálenost (mm) a rychlost (%)
+- forward_acc(mm, speed)       - pohyb vpřed s plynulým zrychlením a zpomalením
+- backward(mm, speed)          - pohyb vzad o zadanou vzdálenost (mm) a rychlost (%)
+- backward_acc(mm, speed)      - pohyb vzad s plynulým zrychlením a zpomalením
+- turn_on_spot_left(angle, speed) - otočení na místě doleva o úhel (stupně) a rychlost (%)
+- turn_on_spot_right(angle, speed) - otočení na místě doprava o úhel (stupně) a rychlost (%)
+- radius_left(radius, angle, speed) - zatáčka doleva s poloměrem (mm), úhlem (stupně) a rychlost (%)
+- radius_right(radius, angle, speed) - zatáčka doprava s poloměrem (mm), úhlem (stupně) a rychlost (%)
+- back_buttons(speed)          - couvání, dokud nenarazí oběma tlačítky na zeď
+- max_rychlost()               - změří maximální rychlost motorů (ticks za sekundu)
+- stop()                       - okamžité zastavení motorů
+- set_speed(left, right)       - nastaví rychlost motorů v % (-100 až 100)
+- set_power(left, right)       - nastaví výkon motorů v % (-100 až 100)
+ 
+=== SMART SERVA ===
+- servo_init(id, [low, high])  - inicializace smart serva s ID, volitelně limity úhlu (low, high)
+- servo_move(id, angle, [speed]) - rychlý pohyb serva na úhel (0-240°) s volitelnou rychlostí
+- servo_soft_move(id, angle, [speed]) - plynulý pohyb serva s ochranou proti zaseknutí
+- servo_position(id)           - přečte aktuální pozici smart serva
 
 ### 📝 Jak to funguje?
 
@@ -362,6 +372,9 @@ Dostupné příkazy:
 
 ---
 **Díky této knihovně můžeš jednoduše testovat a ovládat robota bez nutnosti měnit kód – stačí zadávat příkazy přes Serial monitor!**
+
+
+## Práce s WIFI
 
 - **Autor:** (NZ)
 
