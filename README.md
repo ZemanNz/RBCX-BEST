@@ -148,9 +148,13 @@ rkLedBlue(false);  // Vypnutí modré LED
 - **Serva:**
   - 4 konektory pro připojení serv.
 
+# Tabulka pinů - pinout
+
 !["Tabulka pinů - pinout"](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/Tabulka_s_piny.png)
 
 - podle tabulky si muzete zjistit, jake piny muzete vyuzit, jaké mají číslo a jak se jmenují na desce.
+
+# Ukázka DPS v kicadu
 
 !["Ukázka DPS v kicadu"](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/Sn%C3%ADmek%20obrazovky%20z%202025-10-24%2021-50-48.png)
 
@@ -167,7 +171,7 @@ rkLedBlue(false);  // Vypnutí modré LED
   - GPIO14: Pin blíže ke středu desky. Viz obrázky.
   - GPIO25: Viz obrázky.
   - GPIO26: Viz obrázky.
-  
+
 !["GPIO piny - GPIO27, GPIO14"](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/SENZORY-15-edit.jpg)
 !["IN1 a IN2"](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/SENZORY-25-edit.jpg)
 
