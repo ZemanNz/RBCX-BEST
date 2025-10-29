@@ -148,18 +148,20 @@ rkLedBlue(false);  // Vypnutí modré LED
 - **Serva:**
   - 4 konektory pro připojení serv.
 
-# Tabulka pinů - pinout
+### Tabulka pinů - pinout
 
 !["Tabulka pinů - pinout"](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/Tabulka_s_piny.png)
 
 - podle tabulky si muzete zjistit, jake piny muzete vyuzit, jaké mají číslo a jak se jmenují na desce.
+- tabulku si muzete sthnout : https://github.com/RoboticsBrno/RB3204-RBCX/blob/master/hw/pinout.xlsx
 
-# Ukázka DPS v kicadu
+### Ukázka DPS v kicadu
 
 !["Ukázka DPS v kicadu"](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/Sn%C3%ADmek%20obrazovky%20z%202025-10-24%2021-50-48.png)
 
 - pokud by vám nestacila tabulka můžete si stáhnout návrh DPS a tam zjistit vse co potrebujete.
 - zde je znázorněna část, která ukazuje GPIO piny a UART -- pozor na deskách jsoou španné popisky --- TX a RX jsou správně tady v ukázce.
+- pokud mate kicad. tak s muzete projekt stahnout zde : https://github.com/RoboticsBrno/RB3204-RBCX/blob/master/hw/RBCX.brd a https://github.com/RoboticsBrno/RB3204-RBCX/blob/master/hw/RBCX.sch ------ nasledne tyto dva soubory musite dat do slosky ktera se vam vygeneruje ---> /Stažené/RBCX
 
 - **Tlačítka:**
  - Tlačítka lze připojit na IN1 a IN2 (analogové hodnoty, ale mohou se použít i jako digitální) 
@@ -179,6 +181,7 @@ rkLedBlue(false);  // Vypnutí modré LED
   - Při připojování periférií dbejte na správné napájecí napětí (3.3V nebo 5V podle specifikace).
   - Pro další piny a podrobnosti konzultujte dokumentaci desky.
 
+
 ## 🔌 Zapojení a konfigurace pinů
 
 ### Zapojení I2C:
@@ -189,14 +192,13 @@ Sběrnice I2C umožňuje připojení více zařízení na stejné vodiče. V tom
 
 Ujistěte se, že připojená I2C zařízení mají správnou adresu a odpovídající napájecí napětí (3.3V nebo 5V podle specifikace).
 
-### Zapojení digitálních pinů:
-Deska poskytuje několik digitálních pinů, které lze využít pro různá zařízení (tlačítka, senzory atd.). Klíčové digitální piny:
+!["I2C-1 piny"](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/popsane%20I2C%20piny.png)
+- na obrazku jsou uvedene kde zapojit I2C-1.
+- v codu sda = 21 a scl = 22.
 
-- **GPIO14** → Lze použít pro tlačítka nebo jiná digitální zařízení.
-- **GPIO27** → Další možnost pro připojení digitálních zařízení.
-
-Dbejte na to, aby na každý pin nebyl připojen nepřiměřený počet zařízení a bylo dodrženo napájecí napětí.
-
+!["I2C-2 piny"](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/I2C-2-.png)
+- na obrazku jsou uvedene kde zapojit I2C-2.
+- v codu sda = 14 a scl = 26.
 
 ## Práce s I2C
 
@@ -218,11 +220,19 @@ Dbejte na to, aby na každý pin nebyl připojen nepřiměřený počet zaříze
 
 UART (Universal Asynchronous Receiver/Transmitter) je jednoduché rozhraní pro sériovou komunikaci mezi deskou a dalšími zařízeními (například jiným mikrokontrolérem, PC, nebo periferiemi). Na desce RBCX je UART2 vyveden na pinech GPIO16 (RX) a GPIO17 (TX).
 
-### 📸 Zapojení UART na desce RBCX
+### 📸 Zapojení UART na desce RBCX -- Popisky na desce jsou špatně!!!!
 
-![](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/UART_RBCX.jpg)
+!["UART2_kicad"](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/UART2_kicad.png)
+- GND vedle je RX a vedle TX
 
-*(Na obrázku je vidět připojení vodičů k RBCX desce na UART2(na desve ESP UART2, RX a TX piny vedle IO5)(v codu: rx:16, tx:17).)*
+![UART2 v realite](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/zapojen%C3%AD_UART_rbcx_esp32.jpg)
+- zapojení v realitě --> k druhému zařízení se vzdy pripojuje RX - rbcx na TX - druheho zarizeni a RX - druheho zarizeni na TX - rbcx
+- Na obrázku je vidět připojení vodičů k RBCX desce na UART2(na desve ESP UART2, RX a TX piny vedle IO5)(v codu: rx:16, tx:17.
+
+![TX na RX a na opak](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/Sn%C3%ADmek%20obrazovky%20z%202025-10-24%2021-55-12.png)
+-zapojeno uart mezi 2 esp32 --->vzdy rx na tx a naopak + spolecny GND!!!
+
+
 
 ### 📚 Knihovna pro příjem struktury přes UART
 
