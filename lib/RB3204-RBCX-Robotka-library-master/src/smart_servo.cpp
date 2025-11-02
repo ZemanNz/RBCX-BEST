@@ -8,7 +8,7 @@ namespace rk {
         bus = &rkSmartServoBus(cfg.pocet_chytrych_serv);
     }
     
-    void smart_servo::rkSmartServoInit(int id, int low, int high) {
+    void smart_servo::rkSmartServoInit(int id, int low, int high, int16_t max_diff_centideg, uint8_t  max_diff_readings) {
         if (bus == nullptr) {
             printf("Chyba: Smart servo bus není inicializován! Voláte smart_servo::init()?\n");
             return;
@@ -17,8 +17,8 @@ namespace rk {
         bus->limit(id, lx16a::Angle::deg(low), lx16a::Angle::deg(high));
         bus->setAutoStopParams(
             lx16a::SmartServoBus::AutoStopParams{
-                .max_diff_centideg = 400,
-                .max_diff_readings = 2,
+                .max_diff_centideg = max_diff_centideg,
+                .max_diff_readings = max_diff_readings,
             });
         printf("Smart Servo %d inicializováno (limity: %d°-%d°)\n", id, low, high);
     }

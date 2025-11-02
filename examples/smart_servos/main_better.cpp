@@ -10,7 +10,7 @@ void setup() {
     rkLedBlue(true); // Turn on blue LED
 
 
-    rkSmartServoInit(0, 0, 240);
+    rkSmartServoInit(0, 0, 240, 500, 3);
     rkSmartServoInit(1, 0, 100);
     
     if (rkButtonIsPressed(BTN_UP)) {

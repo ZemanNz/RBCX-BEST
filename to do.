@@ -46,3 +46,4 @@ udelat funkce pro ovladani na dalku (s,w,a,d), (<>)
 * potom tu presnost dale neresit.....  mozna to nechat na vyslednyho robota...
 * zdokumentovat ten uart zkrz novy fotky v osekana robotka
 * udelat dokumentaci knihiovny....  -----> readme   --- ano udelat 
+* citlivost chytrych serv mozne nastavit v init

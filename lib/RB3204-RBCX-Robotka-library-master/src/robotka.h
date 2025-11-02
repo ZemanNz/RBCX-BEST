@@ -1100,12 +1100,13 @@ lx16a::SmartServoBus& rkSmartServoBus(uint8_t servo_count);
 /**
  * \brief Inicializace smart serva
  * 
- * @param bus Reference na SmartServoBus
  * @param id ID serva (0–253)
  * @param low Dolní limit úhlu v ° (výchozí 0)
  * @param high Horní limit úhlu v ° (výchozí 240)
+ * @param max_diff_centideg Maximum difference between expected and actual servo angle before the AutoStop Triggers ---- for soft_move
+ * @param max_diff_readings How many times must the difference between expected and actual servo angle ---- for soft_move
  */
-void rkSmartServoInit(int id, int low = 0, int high = 240);
+void rkSmartServoInit(int id, int low = 0, int high = 240, int16_t max_diff_centideg = 400, uint8_t  max_diff_readings = 3);
 
 /**
  * \brief Rychlý pohyb serva bez regulace
