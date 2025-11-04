@@ -337,6 +337,60 @@ void loop() {
 
 ---
 
+## Práce s chytrými servy
+
+//obr.bur.konektor//
+- pokud je vystupek nahoře, tak serial pin je v pravo smerem do serva
+- stejně je to i u serv s jinym typem konektorů
+
+//obr.zapojenich.serv na desce --- vyfotit//
+- tyto konektory pripajene na desce jsou pod napetim primo z baterie --> servo to zvládne
+//obr.pullup rezistor na iservo//
+- pullup rezistor je nutne napajet mezi 3.3V a iservo protože
+
+* za sebe lze zapojit libovolny pocet ch. serv, ale musí mít spravne nastavený ID --> deska pripojena na servo id ==0 , na to napojeny servo id ==1 .......
+- !!! Je notne v robotka.h nastavit spravne pocet chytrych serv---> pocet_chytrych_serv(2) ---> mam 2 chytry serva
+- priklad na pouziti ch. serv je v examples
+
+#### Nastavení ID ch. serv
+//obr zapojeni GPIO14 pro nastaveni id//
+- na obrázku vidíte správné zapojení pro nastavení ID serva
+- napajeni serva je vzdy z 5V - treba z pinu pro normalni servo
+- iservo pin pripojte na GPIO14 ---- to je GPIO -6 ---> pouziva se tez na I2C2
+* pro nastaveni chytrych serv pouzijte tento kod: 
+```cpp
+#include <Arduino.h>
+#include "SmartServoBus.hpp"
+
+using namespace lx16a;
+
+static int n = 0;
+static SmartServoBus servoBus;
+
+void setup() {
+    // Servos on the bus must have sequential IDs, starting from 0 (not 1)!
+    servoBus.begin(1, UART_NUM_2, GPIO_NUM_14);
+
+    // Set servo Id (must be only one servo connected to the bus)
+    servoBus.setId(0); //nastavení serva na ID = 0
+    while (true) {
+        printf("GetId: %d\n", servoBus.getId()); // servo bude vypisovat jaky je id
+        delay(1000);
+    }
+    
+}
+void loop() { // pro zkouzku pohybu....
+
+    servoBus.set(0, Angle::deg(0));
+
+    delay(5000);
+
+    servoBus.set(0,Angle::deg(240));
+    delay(5000);
+}
+
+```
+
 ## 🟦 Práce se Serial monitorem
 
 Tato knihovna umožňuje ovládat serva a motory přímo přes Serial monitor. Můžeš zadávat příkazy ve formě textových řetězců, které se následně zpracují a provedou odpovídající akce na robotu.
