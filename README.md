@@ -347,7 +347,7 @@ void loop() {
 - tyto konektory pripajene na desce jsou pod napetim primo z baterie --> servo to zvládne
 
 !["obr.pullup rezistor na iservo"](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/pullup.jpg)
-- pullup rezistor je nutne napajet mezi 3.3V a iservo protože (nejspise kdyz se zrovna se servem nekomunikuje tak zadne napeti na iservu muze delat problemy)
+- pullup rezistor (10 KΩ, po namereni napajeneho to bude 4,4....KΩ ---> nejspise nejake paralerni zapojeni)je nutne napajet mezi 3.3V a iservo protože (nejspise kdyz se zrovna se servem nekomunikuje tak zadne napeti na iservu muze delat problemy)
 
 * za sebe lze zapojit libovolny pocet ch. serv, ale musí mít spravne nastavený ID --> deska pripojena na servo id ==0 , na to napojeny servo id ==1 .......
 - !!! Je notne v robotka.h nastavit spravne pocet chytrych serv---> pocet_chytrych_serv(2) ---> mam 2 chytry serva!!!
