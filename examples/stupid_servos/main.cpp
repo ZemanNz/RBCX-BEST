@@ -7,15 +7,24 @@ void setup() {
 
     // Nastavení serva
     rkServosSetPosition(1, 90); // Servo 1 nastaví na 90°
-    delay(1000);
+    delay(3000);
 
     rkServosSetPosition(1, 0); // Servo 1 nastaví na 0°
-    delay(1000);
+    delay(3000);
 
-    rkServosSetPosition(1, 180); // Servo 1 nastaví na 180°
-    delay(1000);
+    rkServosSetPosition(1, -90); // Servo 1 nastaví na 180°
+    delay(3000);
 }
 
 void loop() {
-    // Serva zůstávají na poslední pozici
+
+    if (rkButtonIsPressed(BTN_UP)) {
+        rkServosSetPosition(1, 0); // Servo 1 nastaví na 90°
+    }
+    if (rkButtonIsPressed(BTN_DOWN)) {
+        rkServosSetPosition(1, 90); // Servo 1 nastaví na 180°
+    }
+    if (rkButtonIsPressed(BTN_LEFT)) {
+        rkServosSetPosition(1, -90); // Servo 1 nastaví na 180°
+    }
 }

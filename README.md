@@ -339,13 +339,14 @@ void loop() {
 
 ## Práce s chytrými servy
 
-//obr.bur.konektor//
+!["obr.bur.konektor"](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/konektor_ch.serv.jpg)
 - pokud je vystupek nahoře, tak serial pin je v pravo smerem do serva
 - stejně je to i u serv s jinym typem konektorů
 
-//obr.zapojenich.serv na desce --- vyfotit//
+!["obr.zapojenich.serv na desce"](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/zapojeni_na_desce_ch_serv.jpg)
 - tyto konektory pripajene na desce jsou pod napetim primo z baterie --> servo to zvládne
-//obr.pullup rezistor na iservo//
+
+!["obr.pullup rezistor na iservo"](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/pullup.jpg)
 - pullup rezistor je nutne napajet mezi 3.3V a iservo protože
 
 * za sebe lze zapojit libovolny pocet ch. serv, ale musí mít spravne nastavený ID --> deska pripojena na servo id ==0 , na to napojeny servo id ==1 .......
@@ -353,7 +354,7 @@ void loop() {
 - priklad na pouziti ch. serv je v examples
 
 #### Nastavení ID ch. serv
-//obr zapojeni GPIO14 pro nastaveni id//
+!["obr zapojeni GPIO14 pro nastaveni id"](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/zapojeni_chy._serv.jpg)
 - na obrázku vidíte správné zapojení pro nastavení ID serva
 - napajeni serva je vzdy z 5V - treba z pinu pro normalni servo
 - iservo pin pripojte na GPIO14 ---- to je GPIO -6 ---> pouziva se tez na I2C2

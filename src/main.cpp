@@ -1,29 +1,30 @@
-#include <Arduino.h>
-#include "SmartServoBus.hpp"
-
-using namespace lx16a;
-
-static int n = 0;
-static SmartServoBus servoBus;
+#include "robotka.h"
 
 void setup() {
-    // Servos on the bus must have sequential IDs, starting from 0 (not 1)!
-    servoBus.begin(1, UART_NUM_2, GPIO_NUM_14);
+    Serial.begin(115200);
+    rkConfig cfg;
+    rkSetup(cfg);
 
-    // Set servo Id (must be only one servo connected to the bus)
-    servoBus.setId(0); //nastavení serva na ID = 0
-    while (true) {
-        printf("GetId: %d\n", servoBus.getId()); // servo bude vypisovat jaky je id
-        delay(1000);
-    }
-    
+    // Nastavení serva
+    rkServosSetPosition(1, 90); // Servo 1 nastaví na 90°
+    delay(3000);
+
+    rkServosSetPosition(1, 0); // Servo 1 nastaví na 0°
+    delay(3000);
+
+    rkServosSetPosition(1, -90); // Servo 1 nastaví na 180°
+    delay(3000);
 }
-void loop() { // pro zkouzku pohybu....
 
-    servoBus.set(0, Angle::deg(0));
+void loop() {
 
-    delay(5000);
-
-    servoBus.set(0,Angle::deg(240));
-    delay(5000);
+    if (rkButtonIsPressed(BTN_UP)) {
+        rkServosSetPosition(1, 0); // Servo 1 nastaví na 90°
+    }
+    if (rkButtonIsPressed(BTN_DOWN)) {
+        rkServosSetPosition(1, 90); // Servo 1 nastaví na 180°
+    }
+    if (rkButtonIsPressed(BTN_LEFT)) {
+        rkServosSetPosition(1, -90); // Servo 1 nastaví na 180°
+    }
 }
