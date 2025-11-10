@@ -1,30 +1,24 @@
+#include <Arduino.h>
 #include "robotka.h"
 
 void setup() {
-    Serial.begin(115200);
     rkConfig cfg;
     rkSetup(cfg);
+    printf("Robotka started!\n");
+    
+    rkLedRed(true); // Turn on red LED
+    rkLedBlue(true); // Turn on blue LED
 
-    // Nastavení serva
-    rkServosSetPosition(1, 90); // Servo 1 nastaví na 90°
-    delay(3000);
 
-    rkServosSetPosition(1, 0); // Servo 1 nastaví na 0°
-    delay(3000);
-
-    rkServosSetPosition(1, -90); // Servo 1 nastaví na 180°
-    delay(3000);
+    rkSmartServoInit(0, 80, 240, 500, 3);
+    
+    
 }
-
 void loop() {
-
     if (rkButtonIsPressed(BTN_UP)) {
-        rkServosSetPosition(1, 0); // Servo 1 nastaví na 90°
+        rkSmartServoMove(0,0,100);
     }
     if (rkButtonIsPressed(BTN_DOWN)) {
-        rkServosSetPosition(1, 90); // Servo 1 nastaví na 180°
-    }
-    if (rkButtonIsPressed(BTN_LEFT)) {
-        rkServosSetPosition(1, -90); // Servo 1 nastaví na 180°
-    }
+        rkSmartServoMove(0,240, 100);
+    } 
 }

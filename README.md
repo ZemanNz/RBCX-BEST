@@ -4,7 +4,7 @@
 
 Cílem projektu **RBCX-BEST** je vylepšit funkčnost knihovny Robotka. Projekt přináší nové funkce a optimalizace, které zlepšují použitelnost a efektivitu knihovny. Všechny funkce jsou popsány v lib/RB3204-RBCX-Robotka-library-master/src/robotka.h !!!  ----> https://github.com/ZemanNz/RBCX-BEST/blob/main/lib/RB3204-RBCX-Robotka-library-master/src/robotka.h
 
-![RBCX Front View](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/rbcx-front.png)
+![RBCX Front View](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/Rbcx-front.png)
 
 ### Klíčové vlastnosti:
 
