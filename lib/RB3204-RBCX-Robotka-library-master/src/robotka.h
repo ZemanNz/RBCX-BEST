@@ -60,12 +60,12 @@ struct rkConfig {
         , left_wheel_diameter(68) // v mm
         , right_wheel_diameter(68.3) // v mm
         , roztec_kol(255.0) // v mm
-        , konstanta_radius_vnejsi_kolo(1.0f) // Korekční faktor pro vnější kolo při zatáčení
+        , konstanta_radius_vnejsi_kolo(1.01f) // Korekční faktor pro vnější kolo při zatáčení
         , konstanta_radius_vnitrni_kolo(1.0f) // Korekční faktor pro vnitřní kolo při zatáčení
-        , korekce_nedotacivosti_left(1.0f)// Korekce nedotáčivosti při otaceni na miste do leva
-        , korekce_nedotacivosti_right(1.02f)// Korekce nedotáčivosti při otaceni na miste do prava
-        , Button1(NULL)
-        , Button2(NULL)
+        , korekce_nedotacivosti_left(1.014f)// Korekce nedotáčivosti při otaceni na miste do leva
+        , korekce_nedotacivosti_right(1.12f)// Korekce nedotáčivosti při otaceni na miste do prava
+        , Button1(34)
+        , Button2(35)
         , motor_id_left(2)
         , motor_id_right(1)
         , motor_max_power_pct(100)
@@ -637,7 +637,7 @@ void wall_following(float distance_to_drive, float speed, float distance_of_wall
  * Funkce first_sensor a second_sensor vrací hodnoty v mm ze senzorů vzdálenosti --- ultrazvuky nebo laserový s.
  */
 void orient_to_wall(bool button_or_right, std::function<uint32_t()> first_sensor, 
-                   std::function<uint32_t()> second_sensor, float speed = 10);
+                   std::function<uint32_t()> second_sensor, int o_kolik_je_dal_zadni = 0, float speed = 10);
 
 /**
  * \brief Srovnání robota podle nejbližší zdi pomocí dvou senzorů vzdálenosti
@@ -658,7 +658,7 @@ void orient_to_wall(bool button_or_right, std::function<uint32_t()> first_sensor
  */
 
 void orient_to_wall_any_price(bool button_or_right, std::function<uint32_t()> first_sensor, 
-                   std::function<uint32_t()> second_sensor, float speed = 20);
+                   std::function<uint32_t()> second_sensor, int o_kolik_je_dal_zadni = 0, float speed = 20);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**@}*/

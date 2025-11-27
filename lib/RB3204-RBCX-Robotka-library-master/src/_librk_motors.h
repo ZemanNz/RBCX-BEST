@@ -54,10 +54,10 @@ public:
                    std::function<int()> second_sensor);
 
     void orient_to_wall(bool buttom_or_right, std::function<int()> first_sensor, 
-                   std::function<int()> second_sensor, float speed);
+                   std::function<int()> second_sensor, int o_kolik_je_dal_zadni, float speed);
 
     void orient_to_wall_any_price(bool button_or_right, std::function<uint32_t()> first_sensor, 
-                   std::function<uint32_t()> second_sensor, float speed);
+                   std::function<uint32_t()> second_sensor, int o_kolik_je_dal_zadni, float speed);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     void initWifi(const char* ssid, const char* password);
@@ -68,14 +68,16 @@ public:
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     rb::MotorId idLeft() const { return m_id_left; }
     rb::MotorId idRight() const { return m_id_right; }
+    
+    int16_t pctToSpeed(float pct);
+    int32_t mmToTicks(float mm) const;
 
 private:
     Motors(const Motors&) = delete;
 
     static int32_t scale(int32_t val);
     static int16_t pctToPower(int8_t pct);
-    int16_t pctToSpeed(float pct);
-    int32_t mmToTicks(float mm) const;
+
     int32_t mmToTicks_left(float mm) const;
     int32_t mmToTicks_right(float mm) const;
     float ticksToMm(int32_t ticks) const;
