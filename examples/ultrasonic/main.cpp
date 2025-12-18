@@ -10,6 +10,6 @@ void setup() {
 void loop() {
     // Čtení vzdálenosti z ultrazvukového senzoru
     int distance = rkUltraMeasure(0);
-    Serial.printf("Ultrasonic distance: %d cm\n", distance);
+    Serial.printf("Ultrasonic distance: %d mm\n", distance); // vzdalenost je v mm !!!!!
     delay(500);
 }

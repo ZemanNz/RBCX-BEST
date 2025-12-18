@@ -911,7 +911,7 @@ uint16_t rkIrRight();
 /**
  * \defgroup ultrasound Ultrazvuky
  *
- * Funkce pro meření vzálenosti pomocí ultrazvuků.
+ * Funkce pro meření vzálenosti pomocí ultrazvuků. V mm !!!
  * @{
  */
 

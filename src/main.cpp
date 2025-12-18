@@ -5,21 +5,12 @@ void setup() {
     rkConfig cfg;
     rkSetup(cfg);
 
-    // Nastavení serva
-    rkServosSetPosition(1, 85); //85 stupnu je zavrene zasobniky
-    rkServosSetPosition(2, 85);
-    rkServosSetPosition(3, 85);
+    rkLedAll(true);
+    delay(5000);
+    rkLedAll(false);
 }
 
 void loop() {
 
-    if (rkButtonIsPressed(BTN_UP)) {
-        rkServosSetPosition(1, -70); //-70 stupnu je otevrene zasobniky
-    }
-    if (rkButtonIsPressed(BTN_RIGHT)) {
-        rkServosSetPosition(2, -70);
-    }
-    if (rkButtonIsPressed(BTN_LEFT)) {
-        rkServosSetPosition(3, -70);
-    }
+
 }
