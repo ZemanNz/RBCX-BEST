@@ -248,10 +248,10 @@ void backward_acc(float mm, float speed){
 void back_buttons(float speed){
     gCtx.motors().back_buttons(speed);
 }
-void wall_following(float distance_to_drive,float speed, float distance_of_wall, bool is_wall_on_right,
+void wall_following(float distance_to_drive,float speed, bool automatic_distance_of_wall ,float distance_of_wall, bool is_wall_on_right,
                    std::function<uint32_t()> first_sensor, 
-                   std::function<uint32_t()> second_sensor){
-    gCtx.motors().wall_following(distance_to_drive, speed, distance_of_wall, is_wall_on_right, first_sensor, second_sensor);
+                   std::function<uint32_t()> second_sensor, int o_kolik_je_zadni_dal){
+    gCtx.motors().wall_following(distance_to_drive, speed, automatic_distance_of_wall ,distance_of_wall, is_wall_on_right, first_sensor, second_sensor, o_kolik_je_zadni_dal);
 }
 void orient_to_wall(bool buttom_or_right, std::function<uint32_t()> first_sensor, 
                    std::function<uint32_t()> second_sensor, int o_kolik_je_dal_zadni, float speed){

@@ -1667,15 +1667,15 @@ void Motors::back_buttons(float speed) {
     man.motor(m_id_right).power(0);
 }
 
-void Motors::wall_following(float distance_to_drive, float speed, float distance_of_wall, bool is_wall_on_right,
+void Motors::wall_following(float distance_to_drive, float speed, bool automatic_distance_of_wall, float distance_of_wall, bool is_wall_on_right,
                    std::function<int()> first_sensor, 
-                   std::function<int()> second_sensor) {
+                   std::function<int()> second_sensor, int o_kolik_je_zadni_dal) {
 
     auto& man = rb::Manager::get();
     
-    float m_kp = 0.28f; // Proporcionální konstanta
+    float m_kp = 0.06f; // Proporcionální konstanta
     float m_min_speed = 20.0f; // Minimální rychlost motorů
-    float m_max_correction = 6.0f; // Maximální korekce rychlosti
+    float m_max_correction = 1.2f; // Maximální korekce rychlosti
     
     // Reset pozic
     man.motor(m_id_left).setCurrentPosition(0);
@@ -1695,6 +1695,11 @@ void Motors::wall_following(float distance_to_drive, float speed, float distance
     int target_ticks = mmToTicks(distance_to_drive);
     float celkovy_error = 0;
 
+    if(automatic_distance_of_wall){
+        distance_of_wall = first_sensor();
+    }
+
+
     while((abs(target_ticks) > abs(left_pos) || abs(target_ticks) > abs(right_pos)) && 
           (millis() - start_time < timeoutMs)) {
         
@@ -1708,7 +1713,8 @@ void Motors::wall_following(float distance_to_drive, float speed, float distance
         delay(50);
 
         int front_distance_senzor = first_sensor();
-        int back_distance_senzor = second_sensor();
+        
+        int back_distance_senzor = second_sensor() + o_kolik_je_zadni_dal;
 
         if(front_distance_senzor <= 0 || front_distance_senzor > 300 || back_distance_senzor <= 0 || back_distance_senzor > 300){
             // std::cout << "Chyba senzoru vzdálenosti!" << std::endl;

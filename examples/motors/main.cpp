@@ -122,9 +122,9 @@ void loop() {
                              []() -> uint32_t { return rkUltraMeasure(1); });
                              
         delay(1000);
-        wall_following(1300 ,30.0f, 100.0f, true,
+        wall_following(1300 ,30.0f, true,  100.0f, true,
                    []() -> uint32_t { return rkUltraMeasure(2); },
-                   []() -> uint32_t { return rkUltraMeasure(1); }); 
+                   []() -> uint32_t { return rkUltraMeasure(1); }, -23); 
         
         Serial.println("Sequence 5 completed!");
     }

@@ -49,9 +49,9 @@ public:
     void forward_acc(float mm, float speed);
     void backward_acc(float mm, float speed);
     void back_buttons(float speed);
-    void wall_following(float distance_to_drive, float speed, float distance_of_wall, bool is_wall_on_right,
+    void wall_following(float distance_to_drive, float speed, bool automatic_distance_of_wall, float distance_of_wall, bool is_wall_on_right,
                    std::function<int()> first_sensor, 
-                   std::function<int()> second_sensor);
+                   std::function<int()> second_sensor, int o_kolik_je_zadni_dal);
 
     void orient_to_wall(bool buttom_or_right, std::function<int()> first_sensor, 
                    std::function<int()> second_sensor, int o_kolik_je_dal_zadni, float speed);
