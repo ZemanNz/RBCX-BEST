@@ -42,6 +42,9 @@ void setup() {
   pinMode(XSHUT1, OUTPUT);
   pinMode(XSHUT2, OUTPUT);
 
+  pinMode(21, PULLUP);
+  pinMode(22, PULLUP);
+
   // 2. Vypnutí obou senzorů (Reset)
   digitalWrite(XSHUT1, LOW);
   digitalWrite(XSHUT2, LOW);
@@ -69,6 +72,7 @@ void setup() {
     Serial.println(F("CHYBA: Senzor 1 se nepodařilo nastartovat!"));
     while (1);
   }
+  yield();
   Serial.println("Senzor 1 nastaven na 0x30.");
   
   // Teď by měl být vidět na 0x30
@@ -88,6 +92,7 @@ void setup() {
     Serial.println(F("CHYBA: Senzor 2 se nepodařilo nastartovat!"));
     while (1);
   }
+  yield();
   Serial.println("Senzor 2 nastaven na 0x31.");
 
   // --- Finální kontrola ---
