@@ -59,6 +59,23 @@ void setup() {
   Serial.println("Krok 1: Všechny VL53L0X vypnuty.");
   scan_i2c();
 
+  // --- Zapnutí a nastavení Senzoru 2 ---
+  Serial.println("Krok 3: Zapínám Senzor 2...");
+  digitalWrite(XSHUT2, HIGH);
+  delay(10);
+
+  // Teď by měl být vidět senzor 1 (0x30) a senzor 2 (0x29)
+  scan_i2c();
+
+  Serial.println("ahoj");
+
+  // Inicializace + změna adresy na 0x31
+  if (!lox2.begin(LOX2_ADDRESS)) {
+    Serial.println(F("CHYBA: Senzor 2 se nepodařilo nastartovat!"));
+    while (1);
+  }
+  Serial.println("Senzor 2 nastaven na 0x31.");
+
   // --- Zapnutí a nastavení Senzoru 1 ---
   Serial.println("Krok 2: Zapínám Senzor 1...");
   digitalWrite(XSHUT1, HIGH);
@@ -68,32 +85,16 @@ void setup() {
   scan_i2c(); 
 
   // Inicializace + změna adresy na 0x30
-  if (!lox1.begin(LOX1_ADDRESS)) {
-    Serial.println(F("CHYBA: Senzor 1 se nepodařilo nastartovat!"));
-    while (1);
-  }
-  yield();
+  lox1.begin(LOX1_ADDRESS , true, &Wire);
+
   Serial.println("Senzor 1 nastaven na 0x30.");
   
   // Teď by měl být vidět na 0x30
   scan_i2c();
+  // Důležité: Po inicializaci a změně adresy senzorů VL53L0X se pin XSHUT udržuje HIGH,
+  // aby senzor zůstal aktivní na nové adrese. Kdyby se XSHUT stáhl LOW,
+  // senzor by se resetoval a vrátil na výchozí adresu (0x29).
 
-
-  // --- Zapnutí a nastavení Senzoru 2 ---
-  Serial.println("Krok 3: Zapínám Senzor 2...");
-  digitalWrite(XSHUT2, HIGH);
-  delay(10);
-
-  // Teď by měl být vidět senzor 1 (0x30) a senzor 2 (0x29)
-  scan_i2c();
-
-  // Inicializace + změna adresy na 0x31
-  if (!lox2.begin(LOX2_ADDRESS)) {
-    Serial.println(F("CHYBA: Senzor 2 se nepodařilo nastartovat!"));
-    while (1);
-  }
-  yield();
-  Serial.println("Senzor 2 nastaven na 0x31.");
 
   // --- Finální kontrola ---
   Serial.println("Krok 4: HOTOVO. Finální stav sběrnice:");
@@ -128,4 +129,3 @@ void loop() {
   Serial.println();
   delay(200);
 }
-
