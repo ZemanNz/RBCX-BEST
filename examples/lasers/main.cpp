@@ -12,16 +12,21 @@ void setup() {
   delay(50);
   pinMode(21, PULLUP);
   pinMode(22, PULLUP);
-  pinMode(14, PULLUP);
-  pinMode(26, PULLUP);
   // 1) Spust obě I2C sběrnice
-  Wire.begin(14, 26, 400000);
-  Wire.setTimeOut(1);
+
   Wire1.begin(21, 22, 400000);
   Wire1.setTimeOut(1);
+
+  // 1) Reset senzoru
+  pinMode(27, OUTPUT);
+  digitalWrite(27, LOW);
+  pinMode(14, OUTPUT);
+  digitalWrite(14, LOW);
+  delay(200);
+
   // 2) Inicializuj senzory:
   rk_laser_init("front",  Wire1, loxFront,  27, 0x30);
-  rk_laser_init("bottom", Wire,  loxBottom, 33, 0x31);
+  rk_laser_init("bottom", Wire1,  loxBottom, 14, 0x31);
   Serial.println("Scanning I2C WIRE1...");
     for (byte addr = 1; addr < 127; addr++) {
       Wire1.beginTransmission(addr);
@@ -31,15 +36,6 @@ void setup() {
       }
     }
     Serial.println("Scan complete.\n");
-
-    Serial.println("Scanning I2C WIRE...");
-    for (byte addr = 1; addr < 127; addr++) {
-      Wire.beginTransmission(addr);
-      if (Wire.endTransmission() == 0) {
-        Serial.print("  Found: 0x");
-        Serial.println(addr, HEX);
-      }
-    }
 }
 
 void loop() {

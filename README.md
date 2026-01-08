@@ -225,6 +225,7 @@ Ujistěte se, že připojená I2C zařízení mají správnou adresu a odpovída
 
 !["I2C-1 piny"](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/popsane%20I2C%20piny.png)
 - na obrazku jsou uvedene kde zapojit I2C-1.
+- pro sda a scl jsou 2 dvojice pinů vzdalenějších od středu desky. další 2 dvojice jsou na +;
 - v codu sda = 21 a scl = 22.
 
 !["I2C-2 piny"](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/I2C-2-.png)

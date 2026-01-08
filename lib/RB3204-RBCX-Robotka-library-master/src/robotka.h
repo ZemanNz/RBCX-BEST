@@ -1016,6 +1016,11 @@ bool rkColorSensorGetRGB(const char* name, float* r, float* g, float* b);
  *   - Jinak provede boot na výchozí adrese 0x29, zapíše do registru 0x8A new_address
  *     a provede druhý boot na new_address.
  *
+ * Defaultne je maximalni pocet senzoru 6
+ * Před inicializovanim senzoru nastavit xshut pin na low --- jak je v examplu
+ * Senzor defaultně měří do 1,2 m
+ * 
+ * 
  * @param name        Textový identifikátor senzoru pro ladicí výpisy.
  * @param bus         Referenční I2C sběrnice (Wire nebo Wire1) pro komunikaci.
  * @param lox         Reference na instanci Adafruit_VL53L0X pro daný senzor.
