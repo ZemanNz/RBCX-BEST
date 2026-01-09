@@ -1,50 +1,106 @@
+#include <Arduino.h>
 #include <Wire.h>
 #include <Adafruit_VL53L0X.h>
 #include "robotka.h"
 
-// deklarace instanci senzoru
-Adafruit_VL53L0X loxFront = Adafruit_VL53L0X();
-Adafruit_VL53L0X loxBottom = Adafruit_VL53L0X();
+// Definice pinů XSHUT (upravte si podle reality, pokud je máte jinak)
+#define PIN_XSHUT_1 27  // Přední
+#define PIN_XSHUT_2 14  // Spodní
+#define PIN_XSHUT_3 26  // Senzor 3
+
+// Adresy
+#define ADRESA_1 0x30
+#define ADRESA_2 0x31
+#define ADRESA_3 0x32
+
+// Objekty senzorů
+Adafruit_VL53L0X sensor1 = Adafruit_VL53L0X();
+Adafruit_VL53L0X sensor2 = Adafruit_VL53L0X();
+Adafruit_VL53L0X sensor3 = Adafruit_VL53L0X();
+
+// Funkce pro nastavení jednoho senzoru
+bool nastavitSenzor(Adafruit_VL53L0X &sensor, int pin, uint8_t novaAdresa) {
+  Serial.printf("--> Startuji senzor na pinu %d... ", pin);
+  
+  // 1. Zapnout senzor
+  digitalWrite(pin, HIGH);
+  delay(50); // Počkáme, až se probere
+
+  // 2. Inicializace (vždy na defaultní adrese 0x29)
+  if (!sensor.begin(0x29, false, &Wire)) {
+    Serial.println("CHYBA: Senzor neodpověděl na 0x29!");
+    return false;
+  }
+
+  // 3. Změna adresy na finální
+  if (!sensor.setAddress(novaAdresa)) {
+    Serial.println("CHYBA: Nepodařilo se změnit adresu!");
+    return false;
+  }
+
+  Serial.printf("OK. Přesunuto na 0x%X\n", novaAdresa);
+  return true;
+}
 
 void setup() {
   Serial.begin(115200);
-  rkConfig cfg; rkSetup(cfg);
-  delay(50);
-  pinMode(21, PULLUP);
-  pinMode(22, PULLUP);
-  // 1) Spust obě I2C sběrnice
+  while (!Serial) delay(1);
 
-  Wire1.begin(21, 22, 400000);
-  Wire1.setTimeOut(1);
+  Serial.println("\n=== START DIAGNOSTIKY VL53L0X ===");
 
-  // 1) Reset senzoru
-  pinMode(27, OUTPUT);
-  digitalWrite(27, LOW);
-  pinMode(14, OUTPUT);
-  digitalWrite(14, LOW);
-  delay(200);
+  // 1. HARD RESET VŠECH SENZORŮ
+  // Všechny vypneme, aby nerušily I2C sběrnici
+  pinMode(PIN_XSHUT_1, OUTPUT); digitalWrite(PIN_XSHUT_1, LOW);
+  pinMode(PIN_XSHUT_2, OUTPUT); digitalWrite(PIN_XSHUT_2, LOW);
+  pinMode(PIN_XSHUT_3, OUTPUT); digitalWrite(PIN_XSHUT_3, LOW);
+  
+  Serial.println("Všechny senzory vypnuty (XSHUT = LOW). Čekám...");
+  delay(100);
 
-  // 2) Inicializuj senzory:
-  rk_laser_init("front",  Wire1, loxFront,  27, 0x30);
-  rk_laser_init("bottom", Wire1,  loxBottom, 14, 0x31);
-  Serial.println("Scanning I2C WIRE1...");
-    for (byte addr = 1; addr < 127; addr++) {
-      Wire1.beginTransmission(addr);
-      if (Wire1.endTransmission() == 0) {
-        Serial.print("  Found: 0x");
-        Serial.println(addr, HEX);
-      }
-    }
-    Serial.println("Scan complete.\n");
+  // 2. Inicializace Robotky a I2C
+  rkConfig cfg;
+  rkSetup(cfg);
+  
+  // I2C na 100kHz pro jistotu (stabilita > rychlost)
+  Wire.begin(21, 22, 10000);
+
+  // 3. Postupné zapínání
+  // SENZOR 1
+  if (!nastavitSenzor(sensor1, PIN_XSHUT_1, ADRESA_1)) {
+    Serial.println("!!! Konec testu - chyba senzoru 1 !!!");
+    while(1);
+  }
+
+  // SENZOR 2
+  if (!nastavitSenzor(sensor2, PIN_XSHUT_2, ADRESA_2)) {
+    Serial.println("!!! Konec testu - chyba senzoru 2 !!!");
+    while(1);
+  }
+
+  // SENZOR 3
+  if (!nastavitSenzor(sensor3, PIN_XSHUT_3, ADRESA_3)) {
+    Serial.println("!!! Konec testu - chyba senzoru 3 !!!");
+    while(1);
+  }
+
+  Serial.println("=== HOTOVO: Všechny 3 senzory běží ===");
 }
 
 void loop() {
-  int d1 = rk_laser_measure("front");
-  int d2 = rk_laser_measure("bottom");
+  VL53L0X_RangingMeasurementData_t measure;
   
-    Serial.println("Scan complete.\n");
-  Serial.print("Front:  "); Serial.print(d1>=0?String(d1):"Err"); Serial.print(" mm, ");
-  Serial.print("Bottom: "); Serial.print(d2>=0?String(d2):"Err"); Serial.println(" mm");
+  // Měření 1
+  sensor1.rangingTest(&measure, false);
+  int d1 = (measure.RangeStatus != 4) ? measure.RangeMilliMeter : -1;
 
-  delay(100);
+  // Měření 2
+  sensor2.rangingTest(&measure, false);
+  int d2 = (measure.RangeStatus != 4) ? measure.RangeMilliMeter : -1;
+
+  // Měření 3
+  sensor3.rangingTest(&measure, false);
+  int d3 = (measure.RangeStatus != 4) ? measure.RangeMilliMeter : -1;
+
+  Serial.printf("S1: %4d mm | S2: %4d mm | S3: %4d mm\n", d1, d2, d3);
+  delay(200);
 }
