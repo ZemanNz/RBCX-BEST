@@ -37,45 +37,6 @@ Cílem projektu **RBCX-BEST** je vylepšit funkčnost knihovny Robotka. Projekt 
 
 ---
 
-## 🚀 Instalace a použití
-
-1️⃣ **Nainstalujte VS Code a PlatformIO**  
-   - Stáhněte a nainstalujte [VS Code](https://code.visualstudio.com/).  
-   - Přidejte rozšíření [PlatformIO IDE](https://platformio.org/install) a potřebné balíčky pro C++.  
-
-2️⃣ **Stáhněte projekt**  
-   - Navštivte [GitHub repozitář](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT.git) a klikněte na "Code" → "Download ZIP".  
-   - Rozbalte ZIP soubor a otevřete jej ve VS Code (PlatformIO → Open Folder).  
-   - Alternativně můžete projekt klonovat přímo přes terminál:  
-     ```bash
-     git clone https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT.git
-     cd RBCX-OSEKANY_ROBOT
-     ```
-
-3️⃣ **Sestavení a nahrání**  
-   - Otevřete terminál pomocí "Ctrl + Shift + P" a spusťte příkazy PlatformIO. Ujistěte se, že máte správně vybraný COM port (např. COM4).  
-   - Alternativně použijte následující příkazy:  
-
-   ```bash
-   pio run                 # Kompilace
-   pio run --target upload # Nahrání na desku (vypněte Serial Monitor před nahráním !!!)
-   pio run --target clean  # Vyčištění sestavení
-   ```
-![" "](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/SharedScreenshot.jpg)
----
-
-## ⚙️ Příkazy pro GitHub
-
-Zde je několik užitečných příkazů pro správu repozitáře GitHub:
-
-```bash
-git init                 # Inicializace nového git repozitáře
-git clone <url>          # Klonování existujícího repozitáře
-git add .                # Přidání změn ke commitnutí
-git commit -m "zpráva"  # Commit změn
-git push                 # Odeslání na vzdálený repozitář
-git pull                 # Stažení posledních změn z repozitáře
-```
 ## ⚙️ Konfigurace (`rkConfig()`)
 
 `rkConfig()` je součást knihovny Robotka a najdeš ji v souboru `robotka.h`. Umožňuje nakonfigurovat různé parametry hardware, například nastavení pinů pro motory, polaritu motorů, zrychlení motorů, maximální rychlost motorů a podobně.
@@ -534,6 +495,108 @@ void loop() {
 Chcete-li přidat vlastní funkce pro tlačítka L, K, J, H, G, M, N, B, upravte v souboru `wifi_control.cpp`:
 
 Díky WiFi funkcím můžeš ovládat robota na dálku, sledovat jeho logy a testovat chování bez nutnosti fyzického připojení kabelem!
+
+# Startovací projekt pro robota (RBCX-BEST)
+
+Tento repozitář slouží jako startovací bod pro tvého robota. Abys mohl psát svůj vlastní kód a zároveň dostávat naše aktualizace jádra knihovny, postupuj podle těchto kroků:
+
+## 🚀 Instalace a použití
+
+1️⃣ **Nainstalujte VS Code a PlatformIO**  
+   - Stáhněte a nainstalujte [VS Code](https://code.visualstudio.com/).  
+   - Přidejte rozšíření [PlatformIO IDE](https://platformio.org/install) a potřebné balíčky pro C++.  
+
+
+
+## 1. Založení tvého robota (První spuštění)
+
+1. Klikni na tlačítko **Fork** vpravo nahoře na této stránce. Tím se ti vytvoří tvá vlastní kopie repozitáře na tvém GitHub účtu. 
+2. Otevři si VS Code (nebo svůj terminál), přejdi do složky, kam chceš projekt uložit, a stáhni si **svůj** forknutý repozitář do počítače:
+
+```bash
+git clone [https://github.com/TVOJE_JMENO/RBCX-BEST.git](https://github.com/TVOJE_JMENO/RBCX-BEST.git)
+```
+*(Poznámka: Po stažení už je projekt plně propojený s Gitem, nemusíš nic inicializovat ani nastavovat.)*
+
+3. Otevři si staženou složku ve VS Code / PlatformIO.
+
+## 2. Jak programovat a ukládat postup
+
+Své vlastní funkce a logiku robota piš **výhradně do souboru `src/main.cpp`** (případně si tvoř vlastní soubory ve složce `src`). 
+
+Když chceš svou práci uložit a poslat k sobě na GitHub, použij klasický postup v terminálu:
+
+```bash
+# 1. Přidání všech změn ke zpracování
+git add .
+
+# 2. Vytvoření balíčku s popiskem toho, co jsi udělal
+git commit -m "Popis toho, co jsem zrovna naprogramoval"
+
+# 3. Odeslání na tvůj GitHub
+git push
+```
+
+## 3. Jak stáhnout naše nejnovější aktualizace
+
+Když vydáme vylepšení naší knihovny nebo opravíme chyby, můžeš si je bezpečně stáhnout do svého projektu. 
+
+⚠️ **DŮLEŽITÉ:** Než to uděláš, ujisti se, že máš všechny své aktuální změny uložené u sebe na GitHubu (pomocí příkazů `git add`, `commit` a `push` viz výše).
+
+1. Jdi na stránku **svého** forknutého repozitáře na GitHubu.
+2. Těsně pod zeleným tlačítkem *Code* uvidíš nápis *This branch is X commits behind ZemanNz:main*.
+3. Klikni na tlačítko **Sync fork** a dej **Update branch**. (Tím se tvůj GitHub repozitář na internetu spojí s našimi novinkami).
+4. Otevři svůj projekt ve VS Code a v terminálu si stáhni tyto spojené novinky z internetu k sobě do počítače:
+
+```bash
+git pull
+```
+
+Hotovo! Naše knihovny v projektu se zaktualizovaly a tvůj kód v `main.cpp` zůstal nedotčený.
+
+## 4. Co se stane, když si svůj repozitář přejmenuji?
+
+Pokud si forknutý repozitář přejmenuješ (např. z původního `RBCX-BEST` na název svého robota, např. `Muj-Rychly-Robot`), nemusíš se bát, že bys ztratil přístup k našim aktualizacím. Systém forkování bude fungovat dál.
+
+### Na GitHubu (Tlačítko Sync Fork)
+Když projekt přejmenuješ v nastavení (*Settings -> Repository name*), GitHub si spojení s naším originálním repozitářem pamatuje. Tlačítko **Sync fork** tam stále bude a bude normálně stahovat naše nejnovější funkce.
+
+### U tebe v počítači (Nastavení lokálního Gitu)
+Pokud už máš projekt stažený v počítači (přes `git clone`) a **až poté** si ho na GitHubu přejmenuješ, je potřeba svému Gitu v počítači říct, že se adresa na internetu změnila:
+
+1. Otevři terminál ve složce se svým robotem.
+2. Změň adresu na svůj nový název pomocí tohoto příkazu (nezapomeň doplnit své jméno a nový název):
+
+```bash
+git remote set-url origin [https://github.com/TVOJE_JMENO/NOVY_NAZEV_ROBOTA.git](https://github.com/TVOJE_JMENO/NOVY_NAZEV_ROBOTA.git)
+```
+
+Odteď budou tvé příkazy pro ukládání (`git push`) a stahování (`git pull`) bezpečně fungovat pod novým názvem.
+
+3️⃣ **Sestavení a nahrání**  
+   - Otevřete terminál pomocí "Ctrl + Shift + P" a spusťte příkazy PlatformIO. Ujistěte se, že máte správně vybraný COM port (např. COM4).  
+   - Alternativně použijte následující příkazy:  
+
+   ```bash
+   pio run                 # Kompilace
+   pio run --target upload # Nahrání na desku (vypněte Serial Monitor před nahráním !!!)
+   pio run --target clean  # Vyčištění sestavení
+   ```
+![" "](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/SharedScreenshot.jpg)
+---
+
+## ⚙️ Příkazy pro GitHub
+
+Zde je několik užitečných příkazů pro správu repozitáře GitHub:
+
+```bash
+git init                 # Inicializace nového git repozitáře
+git clone <url>          # Klonování existujícího repozitáře
+git add .                # Přidání změn ke commitnutí
+git commit -m "zpráva"  # Commit změn
+git push                 # Odeslání na vzdálený repozitář
+git pull                 # Stažení posledních změn z repozitáře
+```
 
 
 ## Autor: (NZ)

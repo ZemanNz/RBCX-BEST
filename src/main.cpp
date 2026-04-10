@@ -1,14 +1,77 @@
 #include <Arduino.h>
 #include "robotka.h"
 
-// Struktura pro přijímání dat o senzorech
-// Musí být stejná jako na odesílajícím ESP32
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+// Nesmím předělávat --- já NZ
+
+
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 typedef struct __attribute__((packed)) {
     uint8_t sensor_id;
     uint16_t distance; // mm
 } SensorData;
 
 SensorData received_data;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void setup() {
     rkConfig cfg;
