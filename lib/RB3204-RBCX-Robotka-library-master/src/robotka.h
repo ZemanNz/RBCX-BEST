@@ -57,22 +57,22 @@ struct rkPinsConfig {
 struct rkConfig {
     rkConfig()
         : prevod_motoru(1983.3f) // pro 12v ==  41.62486f * 48.f, pro 6v == 1981.3f
-        , left_wheel_diameter(62) // v mm
-        , right_wheel_diameter(61.5) // v mm
-        , roztec_kol(190.0) // v mm
-        , konstanta_radius_vnejsi_kolo(1.0f) // Korekční faktor pro vnější kolo při zatáčení
-        , konstanta_radius_vnitrni_kolo(1.0f) // Korekční faktor pro vnitřní kolo při zatáčení
-        , korekce_nedotacivosti_left(0.98f)// Korekce nedotáčivosti při otaceni na miste do leva
-        , korekce_nedotacivosti_right(0.99f)// Korekce nedotáčivosti při otaceni na miste do prava
-        , Button1(34)
-        , Button2(35)
+        , left_wheel_diameter(61.0) // v mm
+        , right_wheel_diameter(61.0) // v mm
+        , roztec_kol(270.0) // v mm
+        , konstanta_radius_vnejsi_kolo(0.96f) // Korekční faktor pro vnější kolo při zatáčení
+        , konstanta_radius_vnitrni_kolo(0.96f) // Korekční faktor pro vnitřní kolo při zatáčení
+        , korekce_nedotacivosti_left(0.97f)// Korekce nedotáčivosti při otaceni na miste do leva
+        , korekce_nedotacivosti_right(0.97f)// Korekce nedotáčivosti při otaceni na miste do prava
+        , Button1(NULL)
+        , Button2(NULL)
         , motor_id_left(4)
         , motor_id_right(1)
         , motor_max_power_pct(100)
         , motor_polarity_switch_left(false)
         , motor_polarity_switch_right(true)
         , motor_enable_failsafe(false)
-        , motor_wheel_diameter(63)
+        , motor_wheel_diameter(61.0)
         , motor_max_ticks_per_second(5200) // vyzkousite tak ze spustite funkci max_rychlost() a podle toho nastavite
         , motor_max_acceleration(50000)
         , stupid_servo_min(-1.65f)
@@ -591,15 +591,38 @@ void forward_acc(float mm, float speed);
 void backward_acc(float mm, float speed);
 
 /**
- * \brief Pohyb robota vzad, dokud nenarazí oběma tlačítky na zeď
- * 
- * Timeout je 10 000 ms == 10 sekund, pokud chcete zmenit tak v _librk_motors.cpp v teto funkci zmente int timeoutMs = 10000;
- * 
- * Pokud bylo stisknuto jedno tlacitko na druhe se bude cekat jen 3 sekundy.
- * 
- * Při couváni jede robut s P - regulátorem.
+ * \brief Zjistí, zda je stisknuto vlastní fyzické tlačítko 1 (napojeno na pin z rkConfig.Button1)
+ * \param waitForRelease Přejete-li si po vyhodnocení stisku počkat na puštění tlačítka (výchozí: nepauznout - false)
+ * \return Vrátí `true` pokud je tlačítko stisknuto na hodnotě LOW.
  */
-void back_buttons(float speed);
+bool rkButton1(bool waitForRelease = false);
+
+/**
+ * \brief Zjistí, zda je stisknuto vlastní fyzické tlačítko 2 (napojeno na pin z rkConfig.Button2)
+ * \param waitForRelease Přejete-li si po vyhodnocení stisku počkat na puštění tlačítka (výchozí: nepauznout - false)
+ * \return Vrátí `true` pokud je tlačítko stisknuto na hodnotě LOW.
+ */
+bool rkButton2(bool waitForRelease = false);
+
+/**
+ * \brief Pohyb robota vzad, dokud obě zadané podmínky nevrátí true.
+ * Timeout je 10 sekund. Po stisku prvního se na druhé čeká 3 vteřiny.
+ * Udržuje rovný směr pomocí P-regulátoru a enkodérů.
+ * \param speed Rychlost (0-100), se kterou se bude couvat.
+ * \param first_button Funkce vyhodnocující první stranu (výchozí je konfigurace tlačítek 1)
+ * \param second_button Funkce vyhodnocující druhou stranu (výchozí je konfigurace tlačítek 2)
+ */
+void back_buttons(float speed, std::function<bool()> first_button = []{ return rkButton1(); }, std::function<bool()> second_button = []{ return rkButton2(); });
+
+/**
+ * \brief Pohyb robota vpřed, dokud obě zadané podmínky nevrátí true.
+ * Timeout je 10 sekund. Po stisku prvního se na druhé čeká 3 vteřiny.
+ * Udržuje rovný směr pomocí P-regulátoru a enkodérů.
+ * \param speed Rychlost (0-100) vpřed.
+ * \param first_button Funkce vyhodnocující první stranu (výchozí je konfigurace tlačítek 1)
+ * \param second_button Funkce vyhodnocující druhou stranu (výchozí je konfigurace tlačítek 2)
+ */
+void front_buttons(float speed, std::function<bool()> first_button = []{ return rkButton1(); }, std::function<bool()> second_button = []{ return rkButton2(); });
 
 /**
  * \brief Pohyb robota vpřed, a jede podél zdi pomocí dvou senzorů vzdálenosti

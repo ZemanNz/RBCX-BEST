@@ -48,7 +48,8 @@ public:
     void radius_left(float radius, float angle, float speed);
     void forward_acc(float mm, float speed);
     void backward_acc(float mm, float speed);
-    void back_buttons(float speed);
+    void back_buttons(float speed, std::function<bool()> first_button, std::function<bool()> second_button);
+    void front_buttons(float speed, std::function<bool()> first_button, std::function<bool()> second_button);
     void wall_following(float distance_to_drive, float speed, bool automatic_distance_of_wall, float distance_of_wall, bool is_wall_on_right,
                    std::function<int()> first_sensor, 
                    std::function<int()> second_sensor, int o_kolik_je_zadni_dal);
@@ -68,6 +69,9 @@ public:
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     rb::MotorId idLeft() const { return m_id_left; }
     rb::MotorId idRight() const { return m_id_right; }
+
+    bool rkButton2(bool waitForRelease);
+    bool rkButton1(bool waitForRelease);
     
     int16_t pctToSpeed(float pct);
     int32_t mmToTicks(float mm) const;
@@ -116,6 +120,10 @@ private:
     int32_t m_max_speed;
     bool m_polarity_switch_left;
     bool m_polarity_switch_right;
+public:
+    byte getButton1Pin() const { return Button1; }
+    byte getButton2Pin() const { return Button2; }
+private:
     byte Button1;
     byte Button2;
 
