@@ -332,6 +332,12 @@ Pro snadnou práci s gyroskopem jsou v knihovně Robotka připraveny následují
 !["obr.zapojenich.serv na desce"](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/zapojeni_na_desce_ch_serv.jpg)
 - tyto konektory pripajene na desce jsou pod napetim primo z baterie --> servo to zvládne
 
+
+!["Popis smart serva"](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/ss_popis.jpg)
+
+!["Zapojení smart serva"](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/zap_ss.jpg)
+
+
 !["obr.pullup rezistor na iservo"](https://github.com/ZemanNz/OSEKANA_ROBOTKA_PROJEKT/blob/main/obrazky/pullup.jpg)
 - pullup rezistor (10 KΩ, po namereni napajeneho to bude 4,4....KΩ ---> nejspise nejake paralerni zapojeni)je nutne napajet mezi 3.3V a iservo protože (nejspise kdyz se zrovna se servem nekomunikuje tak zadne napeti na iservu muze delat problemy)
 

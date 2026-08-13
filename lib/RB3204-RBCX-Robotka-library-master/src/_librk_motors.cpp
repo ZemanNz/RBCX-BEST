@@ -1199,7 +1199,7 @@ void Motors::radius_left(float radius, float angle, float speed) {
 void Motors::forward_acc(float mm, float speed) {
     auto& man = rb::Manager::get();
     
-    float m_kp = 0.23f; // Proporcionální konstanta
+    float m_kp = 0.138f; // Proporcionální konstanta
     float m_min_speed = 10.0f; // Minimální rychlost motorů (změněno z 18.0f na 10.0f)
     float m_max_correction = 5.5f;
 
